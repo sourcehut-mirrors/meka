@@ -1,0 +1,34 @@
+[package]
+name = "mlua-module-manifest"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/mlua-module-manifest"
+readme = "README.md"
+description = "Organize Lua and compile-to-Lua language modules into a manifest"
+
+[features]
+default = []
+mlua-lua54 = ["mlua/lua54", "mlua-searcher/mlua-lua54", "mlua-utils/mlua-lua54"]
+mlua-lua53 = ["mlua/lua53", "mlua-searcher/mlua-lua53", "mlua-utils/mlua-lua53"]
+mlua-lua52 = ["mlua/lua52", "mlua-searcher/mlua-lua52", "mlua-utils/mlua-lua52"]
+mlua-lua51 = ["mlua/lua51", "mlua-searcher/mlua-lua51", "mlua-utils/mlua-lua51"]
+mlua-luajit = ["mlua/luajit", "mlua-searcher/mlua-luajit", "mlua-utils/mlua-luajit"]
+mlua-luajit52 = ["mlua/luajit52", "mlua-searcher/mlua-luajit52", "mlua-utils/mlua-luajit52"]
+mlua-luau = ["mlua/luau", "mlua-searcher/mlua-luau", "mlua-utils/mlua-luau"]
+mlua-luau-jit = ["mlua/luau-jit", "mlua-searcher/mlua-luau-jit", "mlua-utils/mlua-luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4", "mlua-searcher/mlua-luau-vector4", "mlua-utils/mlua-luau-vector4"]
+mlua-vendored = ["mlua/vendored", "mlua-searcher/mlua-vendored", "mlua-utils/mlua-vendored"]
+
+[dependencies]
+derive_builder = { workspace = true }
+ignore = { workspace = true }
+io-cat = { workspace = true }
+mlua = { workspace = true }
+mlua-searcher = { path = "../mlua-searcher", default-features = false }
+mlua-utils = { path = "../mlua-utils", default-features = false }
+once_cell = { workspace = true }
+optional-collections = { workspace = true }
+
+[dev-dependencies]
+mlua-module-manifest = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
+mlua-searcher = { path = "../mlua-searcher", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

@@ -1,0 +1,26 @@
+[package]
+name = "mlua-utils"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/mlua-utils"
+readme = "README.md"
+description = "Utility functions for mlua"
+
+[features]
+default = []
+mlua-lua54 = ["mlua/lua54"]
+mlua-lua53 = ["mlua/lua53"]
+mlua-lua52 = ["mlua/lua52"]
+mlua-lua51 = ["mlua/lua51"]
+mlua-luajit = ["mlua/luajit"]
+mlua-luajit52 = ["mlua/luajit52"]
+mlua-luau = ["mlua/luau"]
+mlua-luau-jit = ["mlua/luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4"]
+mlua-vendored = ["mlua/vendored"]
+
+[dependencies]
+mlua = { workspace = true }
+
+[dev-dependencies]
+mlua-utils = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

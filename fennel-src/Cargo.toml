@@ -1,0 +1,40 @@
+[package]
+name = "fennel-src"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/fennel-src"
+readme = "README.md"
+description = "Vendored version of Fennel"
+
+[features]
+default = ["fennel153"]
+fennel100 = []
+fennel153 = []
+mlua-lua54 = ["mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-utils/mlua-lua54"]
+mlua-lua53 = ["mlua/lua53", "mlua-module-manifest/mlua-lua53", "mlua-utils/mlua-lua53"]
+mlua-lua52 = ["mlua/lua52", "mlua-module-manifest/mlua-lua52", "mlua-utils/mlua-lua52"]
+mlua-lua51 = ["mlua/lua51", "mlua-module-manifest/mlua-lua51", "mlua-utils/mlua-lua51"]
+mlua-luajit = ["mlua/luajit", "mlua-module-manifest/mlua-luajit", "mlua-utils/mlua-luajit"]
+mlua-luajit52 = ["mlua/luajit52", "mlua-module-manifest/mlua-luajit52", "mlua-utils/mlua-luajit52"]
+mlua-luau = ["mlua/luau", "mlua-module-manifest/mlua-luau", "mlua-utils/mlua-luau"]
+mlua-luau-jit = ["mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit", "mlua-utils/mlua-luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4", "mlua-utils/mlua-luau-vector4"]
+mlua-vendored = ["mlua/vendored", "mlua-module-manifest/mlua-vendored", "mlua-utils/mlua-vendored"]
+
+[dependencies]
+mlua = { workspace = true }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
+mlua-utils = { path = "../mlua-utils", default-features = false }
+paste = { workspace = true }
+
+[build-dependencies]
+gpgrv = { workspace = true }
+semver = { workspace = true }
+
+[dev-dependencies]
+fennel-src = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+gpgrv = { workspace = true }
+mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
+mlua-searcher = { path = "../mlua-searcher", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
+semver = { workspace = true }

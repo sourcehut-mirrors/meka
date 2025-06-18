@@ -1,0 +1,33 @@
+[package]
+name = "fennel-mount"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/fennel-mount"
+readme = "README.md"
+description = "Make Fennel available in mlua::Lua instance"
+
+[features]
+default = ["fennel153"]
+fennel100 = ["fennel-src/fennel100"]
+fennel153 = ["fennel-src/fennel153"]
+mlua-lua54 = ["fennel-src/mlua-lua54", "mlua/lua54", "mlua-searcher/mlua-lua54"]
+mlua-lua53 = ["fennel-src/mlua-lua53", "mlua/lua53", "mlua-searcher/mlua-lua53"]
+mlua-lua52 = ["fennel-src/mlua-lua52", "mlua/lua52", "mlua-searcher/mlua-lua52"]
+mlua-lua51 = ["fennel-src/mlua-lua51", "mlua/lua51", "mlua-searcher/mlua-lua51"]
+mlua-luajit = ["fennel-src/mlua-luajit", "mlua/luajit", "mlua-searcher/mlua-luajit"]
+mlua-luajit52 = ["fennel-src/mlua-luajit52", "mlua/luajit52", "mlua-searcher/mlua-luajit52"]
+mlua-luau = ["fennel-src/mlua-luau", "mlua/luau", "mlua-searcher/mlua-luau"]
+mlua-luau-jit = ["fennel-src/mlua-luau-jit", "mlua/luau-jit", "mlua-searcher/mlua-luau-jit"]
+mlua-luau-vector4 = ["fennel-src/mlua-luau-vector4", "mlua/luau-vector4", "mlua-searcher/mlua-luau-vector4"]
+mlua-vendored = ["fennel-src/mlua-vendored", "mlua/vendored", "mlua-searcher/mlua-vendored"]
+
+[dependencies]
+fennel-src = { path = "../fennel-src", default-features = false }
+mlua = { workspace = true }
+mlua-searcher = { path = "../mlua-searcher", default-features = false }
+
+[dev-dependencies]
+fennel-mount = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
+mlua-searcher = { path = "../mlua-searcher", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

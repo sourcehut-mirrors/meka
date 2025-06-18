@@ -1,0 +1,17 @@
+[package]
+name = "meka-module-manifest-tests"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[features]
+default = ["fennel153-lua54-vendored"]
+fennel153-lua54-vendored = ["meka-module-manifest/fennel153",
+                            "meka-module-manifest/mlua-lua54",
+                            "meka-module-manifest/mlua-vendored",
+                            "mlua-module-manifest/mlua-lua54",
+                            "mlua-module-manifest/mlua-vendored"]
+
+[dev-dependencies]
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
