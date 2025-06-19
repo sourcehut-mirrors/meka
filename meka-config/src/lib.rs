@@ -1,4 +1,4 @@
-use mlua::{Function, Lua, Table};
+use mlua::{Function, Lua, LuaOptions, StdLib, Table};
 use mlua_module_manifest::{Manifest, Module};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -58,10 +58,36 @@ pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
 
 pub struct Config(HashMap<String, Manifest>);
 
+/// Modify `package.path` and `package.cpath` to prevent loading Lua and C modules from system
+/// paths.
+fn config_new_modify_paths(lua: &Lua) -> ConfigInitResult<()> {
+    let globals: Table = lua.globals();
+    let package: Table = globals.get("package").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "meka-config new function couldn't get Lua package table".to_string(),
+        )
+    })?;
+    let (package_path, package_cpath) = mlua_utils::extract_non_system_lua_paths(&lua)?;
+    package.set("path", package_path).map_err(|_| {
+        mlua::Error::RuntimeError(
+            "meka-config new function couldn't set Lua package.path".to_string(),
+        )
+    })?;
+    package.set("cpath", package_cpath).map_err(|_| {
+        mlua::Error::RuntimeError(
+            "meka-config new function couldn't set Lua package.cpath".to_string(),
+        )
+    })?;
+    Ok(())
+}
+
 impl Config {
     pub fn new(module: Module, env: Option<Env>) -> ConfigInitResult<Self> {
+        let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+
         // Set up Lua environment: modify `package.path` and `package.cpath` to prevent loading
         // Lua and C modules from system paths.
+        config_new_modify_paths(&lua)?;
 
         // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
         // local Fennel modules.
