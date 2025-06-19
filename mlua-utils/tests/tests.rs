@@ -25,6 +25,12 @@ fn package_config_works() {
 }
 
 #[test]
+fn package_path_works() {
+    let lua = Lua::new();
+    assert!(mlua_utils::package_path(&lua).is_ok());
+}
+
+#[test]
 fn typename_works() {
     let lua = Lua::new();
 

@@ -103,6 +103,39 @@ pub fn package_config(lua: &Lua) -> mlua::Result<(String, String, String, String
     }
 }
 
+/// Return Lua's `package.path` as `String`.
+pub fn package_path(lua: &Lua) -> mlua::Result<String> {
+    let globals: Table = lua.globals();
+    let package: Table = globals.get("package").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_path function couldn't get Lua package table".to_string(),
+        )
+    })?;
+    let package_path: Value = package.get("path").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_path function couldn't get Lua package.path value".to_string(),
+        )
+    })?;
+    let package_path: String = match package_path {
+        Value::String(package_path) => package_path
+            .to_str()
+            .map_err(|_| {
+                mlua::Error::RuntimeError(
+                    "mlua-utils package_path function couldn't convert mlua::String to Rust string"
+                        .to_string(),
+                )
+            })?
+            .to_owned(),
+        val => {
+            return Err(mlua::Error::RuntimeError(format!(
+                "mlua-utils package_path function expected string value for Lua's package.path, but got {}",
+                typename(&val)
+            )));
+        }
+    };
+    Ok(package_path)
+}
+
 /// Convert an `mlua::Value` into type `String`.
 pub fn typename(val: &Value) -> &'static str {
     match val {
