@@ -12,6 +12,12 @@ fn try_into_string_works() {
 }
 
 #[test]
+fn extract_non_system_lua_paths_works() {
+    let lua = Lua::new();
+    assert!(mlua_utils::extract_non_system_lua_paths(&lua).is_ok());
+}
+
+#[test]
 fn package_config_works() {
     let lua = Lua::new();
     assert!(mlua_utils::package_config(&lua).is_ok());
@@ -22,6 +28,12 @@ fn package_config_works() {
     assert_eq!(path_mark, "?");
     assert_eq!(exedir_mark, "!");
     assert_eq!(ignore_mark, "-");
+}
+
+#[test]
+fn package_cpath_works() {
+    let lua = Lua::new();
+    assert!(mlua_utils::package_cpath(&lua).is_ok());
 }
 
 #[test]
