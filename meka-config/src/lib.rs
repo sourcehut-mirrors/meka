@@ -20,7 +20,6 @@ const TABLE_GET_EXPECT: &str = "Unexpectedly couldn't get key from pre-checked t
 #[derive(Debug)]
 pub enum ConfigInitError {
     FennelCompileError(fennel_compile::Error),
-    FennelMountError(fennel_mount::Error),
     FennelSearcherError(fennel_searcher::Error),
     Lua(mlua::Error),
     LuaSearcherError(mlua_searcher::Error),
@@ -30,7 +29,6 @@ impl fmt::Display for ConfigInitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             ConfigInitError::FennelCompileError(error) => format!("{}", error),
-            ConfigInitError::FennelMountError(error) => format!("{}", error),
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
             ConfigInitError::LuaSearcher(error) => format!("{}", error),
@@ -42,12 +40,6 @@ impl fmt::Display for ConfigInitError {
 impl From<fennel_compile::Error> for ConfigInitError {
     fn from(error: fennel_compile::Error) -> Self {
         ConfigInitError::FennelCompileError(error)
-    }
-}
-
-impl From<fennel_mount::Error> for ConfigInitError {
-    fn from(error: fennel_mount::Error) -> Self {
-        ConfigInitError::FennelMountError(error)
     }
 }
 
