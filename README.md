@@ -63,16 +63,23 @@ Or, equivalently:
 ```fennel
 (local fennel-src (require :fennel-src))
 
-(defmanifest kiwi {:name :kiwi.cite            :path :kiwi/cite.fnl}
-                  {:name :kiwi.date            :path :kiwi/date.fnl}
-                  {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
-                  {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
-                  {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
-                  {:name :kiwi.food            :path :kiwi/food/init.fnl}
-                  {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
-                  {:name :kiwi.time            :path :kiwi/time.fnl}
-                  {:name :kiwi.utils           :path :kiwi/utils.fnl}
-                  (fennel-src))
+;; Meka automatically imports the manifest macro. The following is short for:
+;;
+;;     (local kiwi ((. (require :meka) :manifest :new) {...}))
+;;
+(local kiwi (manifest {:name :kiwi.cite            :path :kiwi/cite.fnl}
+                      {:name :kiwi.date            :path :kiwi/date.fnl}
+                      {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
+                      {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
+                      {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
+                      {:name :kiwi.food            :path :kiwi/food/init.fnl}
+                      {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
+                      {:name :kiwi.time            :path :kiwi/time.fnl}
+                      {:name :kiwi.utils           :path :kiwi/utils.fnl}
+                      ;; Embed Fennel via `fennel-src` crate. Enables `(require :fennel)`.
+                      (fennel-src)))
+
+{: kiwi}
 ```
 
 Or, simply:
