@@ -2,7 +2,9 @@
 fn it_works() {
     use meka_config::{Config, Env};
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
+    use std::borrow::Cow;
     use std::collections::HashMap;
+    use std::convert::From;
 
     let module = r#"(local fennel-src (require :fennel-src))
 (local meka (require :meka))
@@ -36,7 +38,7 @@ fn it_works() {
 
     // Passing equivalent `fennel-src` mapping should make no difference.
     let mut env = Env::new();
-    env.insert("fennel-src", fennel_src::loader);
+    env.insert(Cow::from("fennel-src"), fennel_src::loader);
     assert!(Config::new(module, Some(env)).is_ok());
 
     let module = r#"local fennel_src = require("fennel-src")
@@ -87,7 +89,7 @@ fn defmanifest_fennel_macro_works() {
     assert!(Config::new(module, env).is_ok());
 
     let mut env = Env::new();
-    env.insert("fennel-src", fennel_src::loader);
+    env.insert(Cow::from("fennel-src"), fennel_src::loader);
     assert!(Config::new(module, Some(env)).is_ok());
 }
 
@@ -118,6 +120,6 @@ fn manifest_fennel_macro_works() {
     assert!(Config::new(module, env).is_ok());
 
     let mut env = Env::new();
-    env.insert("fennel-src", fennel_src::loader);
+    env.insert(Cow::from("fennel-src"), fennel_src::loader);
     assert!(Config::new(arg, Some(env)).is_ok());
 }

@@ -87,7 +87,9 @@ impl Config {
         setup_standard_library(&lua)?;
 
         // If `env` exists, enable importing libraries therein.
-        setup_env_library(&lua)?;
+        if let Some(env) = env {
+            setup_env_library(&lua, env)?;
+        }
 
         // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
         // local Fennel modules.
@@ -188,8 +190,12 @@ impl Config {
             .into_function()?)
     }
 
-    fn setup_env_library(lua: &Lua) -> ConfigInitResult<()> {
-        todo!()
+    fn setup_env_library(lua: &Lua, env: Env) -> ConfigInitResult<()> {
+        if env.len() == 0 {
+            return Ok(());
+        }
+        lua.add_function_searcher(env)?;
+        Ok(())
     }
 
     /// Insert Fennel's searcher function in `package.searchers` (or `package.loaders`).
@@ -255,4 +261,4 @@ impl Config {
 /// an `mlua_module_manifest::Manifest`. The idea is to enable Rust crates to export complete
 /// Lua modules. We map those exported Lua modules to names which can be `require`d within a
 /// Meka config.
-pub type Env = HashMap<&'static str, fn(&Lua, Table, &str) -> mlua::Result<Function>>;
+pub type Env = HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>;
