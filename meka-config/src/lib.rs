@@ -3,7 +3,7 @@ use fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
 use fennel_src::FENNEL153;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table};
-use mlua_module_manifest::{Manifest, Module};
+use mlua_module_manifest::{Manifest, Module, ModuleFileType};
 use mlua_searcher::AddSearcher;
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -19,6 +19,8 @@ const TABLE_GET_EXPECT: &str = "Unexpectedly couldn't get key from pre-checked t
 
 #[derive(Debug)]
 pub enum ConfigInitError {
+    InvalidModuleFileType,
+
     FennelCompileError(fennel_compile::Error),
     FennelSearcherError(fennel_searcher::Error),
     Lua(mlua::Error),
@@ -28,6 +30,8 @@ pub enum ConfigInitError {
 impl fmt::Display for ConfigInitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
+            ConfigInitError::InvalidModuleFileType => "Expected Fennel or Lua config file type, but got FennelMacros".to_string(),
+
             ConfigInitError::FennelCompileError(error) => format!("{}", error),
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
@@ -88,10 +92,23 @@ impl Config {
         insert_fennel_searcher(&lua)?;
 
         // Determine whether the config module is written in Fennel or Lua.
+        let file_type = match module {
+            Module::File(module_file) => module_file.file_type,
+            Module::NamedFile(module_named_file) => module_named_file.file_type,
+            Module::NamedText(module_named_text) => module_named_text.file_type,
+        };
 
-        // Fennel requires 1) adding macro searcher to `mlua::Lua` to enable using our Fennel
-        // macros, and 2) prepending an `import-macros` line to the config module so that end
-        // users don't have to.
+        match file_type {
+            // Fennel requires 1) adding macro searcher to `mlua::Lua` to enable using our
+            // Fennel macros, and 2) prepending an `import-macros` line to the config module
+            // so that end users don't have to.
+            ModuleFileType::Fennel => {
+            }
+            ModuleFileType::FennelMacros => {
+                return Err(ConfigInitError::InvalidModuleFileType);
+            }
+            ModuleFileType::Lua => {}
+        }
 
         // Evaluate the config module and check the return value. It should be a `Manifest`
         // `mlua::Userdata` or an `mlua::Table` containing `Manifest` `mlua::Userdata`s indexed
