@@ -150,7 +150,10 @@ impl Config {
 
         lua.add_searcher(searcher)?;
 
-        let mut searcher: HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>> = HashMap::with_capacity(1);
+        let mut searcher: HashMap<
+            Cow<'static, str>,
+            fn(&Lua, Table, &str) -> mlua::Result<Function>,
+        > = HashMap::with_capacity(1);
 
         // Enabling importing `fennel_src::loader` at "fennel-src".
         searcher.insert(Cow::from("fennel-src"), fennel_src::loader);
@@ -170,10 +173,15 @@ impl Config {
         })?;
 
         let manifest: Function = Manifest::loader(lua, env, "manifest").map_err(|_| {
-            mlua::Error::RuntimeError("meka_loader function called Manifest::loader and got error".to_string())
+            mlua::Error::RuntimeError(
+                "meka_loader function called Manifest::loader and got error".to_string(),
+            )
         })?;
         let manifest: Table = manifest.call().map_err(|_| {
-            mlua::Error::RuntimeError("meka_loader function called Manifest::loader in Lua context and got error".to_string())
+            mlua::Error::RuntimeError(
+                "meka_loader function called Manifest::loader in Lua context and got error"
+                    .to_string(),
+            )
         })?;
         tbl.set("manifest", manifest).map_err(|_| {
             mlua::Error::RuntimeError("meka_loader function failed to set Lua table".to_string())
