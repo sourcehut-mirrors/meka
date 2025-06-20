@@ -1,5 +1,10 @@
+#[cfg(feature = "fennel100")]
+use fennel_src::FENNEL100;
+#[cfg(feature = "fennel153")]
+use fennel_src::FENNEL153;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table};
 use mlua_module_manifest::{Manifest, Module};
+use mlua_searcher::AddSearcher;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::From;
@@ -18,6 +23,7 @@ pub enum ConfigInitError {
     FennelMountError(fennel_mount::Error),
     FennelSearcherError(fennel_searcher::Error),
     Lua(mlua::Error),
+    LuaSearcherError(mlua_searcher::Error),
 }
 
 impl fmt::Display for ConfigInitError {
@@ -27,6 +33,7 @@ impl fmt::Display for ConfigInitError {
             ConfigInitError::FennelMountError(error) => format!("{}", error),
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
+            ConfigInitError::LuaSearcher(error) => format!("{}", error),
         };
         write!(f, "{}", res)
     }
@@ -56,6 +63,12 @@ impl From<mlua::Error> for ConfigInitError {
     }
 }
 
+impl From<mlua_searcher::Error> for ConfigInitError {
+    fn from(error: mlua_searcher::Error) -> Self {
+        ConfigInitError::LuaSearcher(error)
+    }
+}
+
 impl error::Error for ConfigInitError {}
 
 pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
@@ -70,7 +83,7 @@ impl Config {
         // Lua and C modules from system paths.
         modify_paths(&lua)?;
 
-        // Set up "standard library": enable importing Fennel, `fennel_src::loader` and `meka`.
+        // Set up "standard library": enable importing fennel, fennel-src and meka.
         setup_standard_library(&lua)?;
 
         // If `env` exists, enable importing libraries therein.
@@ -125,7 +138,54 @@ impl Config {
     }
 
     fn setup_standard_library(lua: &Lua) -> ConfigInitResult<()> {
-        todo!()
+        let mut searcher = HashMap::with_capacity(1);
+
+        // Enable importing Fennel at "fennel".
+        #[cfg(feature = "fennel100")]
+        searcher.insert(Cow::from("fennel"), Cow::from(FENNEL100));
+        #[cfg(feature = "fennel153")]
+        searcher.insert(Cow::from("fennel"), Cow::from(FENNEL153));
+
+        lua.add_searcher(searcher)?;
+
+        let mut searcher: HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>> = HashMap::with_capacity(1);
+
+        // Enabling importing `fennel_src::loader` at "fennel-src".
+        searcher.insert(Cow::from("fennel-src"), fennel_src::loader);
+        // Enabling importing `meka_loader` at "meka".
+        searcher.insert(Cow::from("meka"), meka_loader);
+
+        lua.add_function_searcher(searcher)?;
+
+        Ok(())
+    }
+
+    fn meka_loader(lua: &Lua, env: Table, name: &str) -> mlua::Result<Function> {
+        let globals = lua.globals();
+
+        let tbl = lua.create_table().map_err(|_| {
+            mlua::Error::RuntimeError("meka_loader function failed to create Lua table".to_string())
+        })?;
+
+        let manifest: Function = Manifest::loader(lua, env, "manifest").map_err(|_| {
+            mlua::Error::RuntimeError("meka_loader function called Manifest::loader and got error".to_string())
+        })?;
+        let manifest: Table = manifest.call().map_err(|_| {
+            mlua::Error::RuntimeError("meka_loader function called Manifest::loader in Lua context and got error".to_string())
+        })?;
+        tbl.set("manifest", manifest).map_err(|_| {
+            mlua::Error::RuntimeError("meka_loader function failed to set Lua table".to_string())
+        })?;
+
+        globals.set("meka", tbl).map_err(|_| {
+            mlua::Error::RuntimeError("meka_loader function failed to set Lua table".to_string())
+        })?;
+
+        Ok(lua
+            .load("return meka")
+            .set_name(name)
+            .set_environment(env)
+            .into_function()?)
     }
 
     fn setup_env_library(lua: &Lua) -> ConfigInitResult<()> {

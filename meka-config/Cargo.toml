@@ -8,25 +8,27 @@ description = "Read Lua module manifests from config file or string"
 
 [features]
 default = ["fennel153"]
-fennel100 = ["fennel-mount/fennel100", "fennel-searcher/fennel100"]
-fennel153 = ["fennel-mount/fennel153", "fennel-searcher/fennel153"]
-mlua-lua54 = ["fennel-compile/mlua-lua54", "fennel-mount/mlua-lua54", "fennel-searcher/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
-mlua-lua53 = ["fennel-compile/mlua-lua53", "fennel-mount/mlua-lua53", "fennel-searcher/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]
-mlua-lua52 = ["fennel-compile/mlua-lua52", "fennel-mount/mlua-lua52", "fennel-searcher/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52"]
-mlua-lua51 = ["fennel-compile/mlua-lua51", "fennel-mount/mlua-lua51", "fennel-searcher/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51"]
-mlua-luajit = ["fennel-compile/mlua-luajit", "fennel-mount/mlua-luajit", "fennel-searcher/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit"]
-mlua-luajit52 = ["fennel-compile/mlua-luajit52", "fennel-mount/mlua-luajit52", "fennel-searcher/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52"]
-mlua-luau = ["fennel-compile/mlua-luau", "fennel-mount/mlua-luau", "fennel-searcher/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
-mlua-luau-jit = ["fennel-compile/mlua-luau-jit", "fennel-mount/mlua-luau-jit", "fennel-searcher/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
-mlua-luau-vector4 = ["fennel-compile/mlua-luau-vector4", "fennel-mount/mlua-luau-vector4", "fennel-searcher/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
-mlua-vendored = ["fennel-compile/mlua-vendored", "fennel-mount/mlua-vendored", "fennel-searcher/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
+fennel100 = ["fennel-mount/fennel100", "fennel-searcher/fennel100", "fennel-src/fennel100"]
+fennel153 = ["fennel-mount/fennel153", "fennel-searcher/fennel153", "fennel-src/fennel153"]
+mlua-lua54 = ["fennel-compile/mlua-lua54", "fennel-mount/mlua-lua54", "fennel-searcher/mlua-lua54", "fennel-src/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-searcher/mlua-lua54"]
+mlua-lua53 = ["fennel-compile/mlua-lua53", "fennel-mount/mlua-lua53", "fennel-searcher/mlua-lua53", "fennel-src/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53", "mlua-searcher/mlua-lua53"]
+mlua-lua52 = ["fennel-compile/mlua-lua52", "fennel-mount/mlua-lua52", "fennel-searcher/mlua-lua52", "fennel-src/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52", "mlua-searcher/mlua-lua52"]
+mlua-lua51 = ["fennel-compile/mlua-lua51", "fennel-mount/mlua-lua51", "fennel-searcher/mlua-lua51", "fennel-src/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51", "mlua-searcher/mlua-lua51"]
+mlua-luajit = ["fennel-compile/mlua-luajit", "fennel-mount/mlua-luajit", "fennel-searcher/mlua-luajit", "fennel-src/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit", "mlua-searcher/mlua-luajit"]
+mlua-luajit52 = ["fennel-compile/mlua-luajit52", "fennel-mount/mlua-luajit52", "fennel-searcher/mlua-luajit52", "fennel-src/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52", "mlua-searcher/mlua-luajit52"]
+mlua-luau = ["fennel-compile/mlua-luau", "fennel-mount/mlua-luau", "fennel-searcher/mlua-luau", "fennel-src/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau", "mlua-searcher/mlua-luau"]
+mlua-luau-jit = ["fennel-compile/mlua-luau-jit", "fennel-mount/mlua-luau-jit", "fennel-searcher/mlua-luau-jit", "fennel-src/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit", "mlua-searcher/mlua-luau-jit"]
+mlua-luau-vector4 = ["fennel-compile/mlua-luau-vector4", "fennel-mount/mlua-luau-vector4", "fennel-searcher/mlua-luau-vector4", "fennel-src/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4", "mlua-searcher/mlua-luau-vector4"]
+mlua-vendored = ["fennel-compile/mlua-vendored", "fennel-mount/mlua-vendored", "fennel-searcher/mlua-vendored", "fennel-src/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored", "mlua-searcher/mlua-vendored"]
 
 [dependencies]
 fennel-compile = { path = "../fennel-compile", default-features = false }
 fennel-mount = { path = "../fennel-mount", default-features = false }
 fennel-searcher = { path = "../fennel-searcher", default-features = false }
+fennel-src = { path = "../fennel-src", default-features = false }
 mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
+mlua-searcher = { path = "../mlua-searcher", default-features = false }
 
 [dev-dependencies]
 fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
