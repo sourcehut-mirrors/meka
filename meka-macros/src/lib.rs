@@ -17,7 +17,7 @@ pub fn meka_include(input: TokenStream) -> TokenStream {
 }
 
 struct MekaInclude {
-    pub name: Option<LitStr>,
+    pub key: Option<LitStr>,
     pub map: Option<Vec<(LitStr, Expr)>>,
 }
 
@@ -26,7 +26,7 @@ impl Parse for MekaInclude {
         // Handle empty input: meka_include!()
         if input.is_empty() {
             return Ok(MekaInclude {
-                name: None,
+                key: None,
                 map: None,
             });
         }
@@ -36,12 +36,12 @@ impl Parse for MekaInclude {
 
         if lookahead.peek(LitStr) {
             // First argument is a string literal.
-            let name = input.parse::<LitStr>()?;
+            let key = input.parse::<LitStr>()?;
 
             if input.is_empty() {
                 // Case: meka_include!("some-string")
                 Ok(MekaInclude {
-                    name: Some(name),
+                    key: Some(key),
                     map: None,
                 })
             } else {
@@ -49,7 +49,7 @@ impl Parse for MekaInclude {
                 input.parse::<Token![,]>()?;
                 let map = parse_function_map(input)?;
                 Ok(MekaInclude {
-                    name: Some(name),
+                    key: Some(key),
                     map: Some(map),
                 })
             }
@@ -57,7 +57,7 @@ impl Parse for MekaInclude {
             // Case: meka_include!({key => value, ...})
             let map = parse_function_map(input)?;
             Ok(MekaInclude {
-                name: None,
+                key: None,
                 map: Some(map),
             })
         } else {
@@ -97,9 +97,9 @@ fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Expr)>> {
 impl MekaInclude {
     /// Returns `proc_macro2::TokenStream` for testability.
     fn expand(self) -> syn::Result<proc_macro2::TokenStream> {
-        let tokens = match (self.name, self.map) {
-            (Some(name), Some(map)) => {
-                // Both name and map present
+        let tokens = match (self.key, self.map) {
+            (Some(key), Some(map)) => {
+                // Both key and map present
                 // Generate a HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>
                 let map_entries = map.iter().map(|(key, value)| {
                     let key_str = &key.value();
@@ -111,25 +111,25 @@ impl MekaInclude {
 
                 quote! {
                     {
-                        let name = #name;
+                        let key = #key;
                         let mut map: std::collections::HashMap<std::borrow::Cow<'static, std::primitive::str>, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
                         #(#map_entries)*
 
                         // TODO: Replace with your actual logic
-                        println!("Name: {}, Map has {} entries", name, map.len());
+                        println!("Key: {}, Map has {} entries", key, map.len());
                         for (k, _) in &map {
                             println!("  Key: {}", k);
                         }
                     }
                 }
             }
-            (Some(name), None) => {
-                // Only name present
+            (Some(key), None) => {
+                // Only key present
                 quote! {
                     {
-                        let name = #name;
+                        let key = #key;
                         // TODO: Replace with your actual logic
-                        println!("Name only: {}", name);
+                        println!("Key only: {}", key);
                     }
                 }
             }
@@ -181,7 +181,7 @@ mod inline_tests {
     fn empty_parse_works() {
         let input = quote! {};
         let parsed: MekaInclude = parse2(input).unwrap();
-        assert!(parsed.name.is_none());
+        assert!(parsed.key.is_none());
         assert!(parsed.map.is_none());
     }
 
@@ -189,8 +189,8 @@ mod inline_tests {
     fn string_only_works() {
         let input = quote! { "test" };
         let parsed: MekaInclude = parse2(input).unwrap();
-        assert!(parsed.name.is_some());
-        assert_eq!(parsed.name.unwrap().value(), "test");
+        assert!(parsed.key.is_some());
+        assert_eq!(parsed.key.unwrap().value(), "test");
         assert!(parsed.map.is_none());
     }
 
@@ -198,7 +198,7 @@ mod inline_tests {
     fn map_only_works() {
         let input = quote! { {"key1" => func1, "key2" => func2} };
         let parsed: MekaInclude = parse2(input).unwrap();
-        assert!(parsed.name.is_none());
+        assert!(parsed.key.is_none());
         assert!(parsed.map.is_some());
         assert_eq!(parsed.map.unwrap().len(), 2);
     }
@@ -207,8 +207,8 @@ mod inline_tests {
     fn string_and_map_works() {
         let input = quote! { "test", {"key1" => func1, "key2" => func2} };
         let parsed: MekaInclude = parse2(input).unwrap();
-        assert!(parsed.name.is_some());
-        assert_eq!(parsed.name.unwrap().value(), "test");
+        assert!(parsed.key.is_some());
+        assert_eq!(parsed.key.unwrap().value(), "test");
         assert!(parsed.map.is_some());
         assert_eq!(parsed.map.unwrap().len(), 2);
     }
