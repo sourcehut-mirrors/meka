@@ -2,16 +2,49 @@
 use fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
 use fennel_src::FENNEL153;
-use mlua::{Function, Lua, LuaOptions, StdLib, Table};
+use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFileType};
 use mlua_searcher::AddSearcher;
+use mlua_utils::{IntoCharArray, IsList};
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::convert::From;
+use std::convert::{From, TryFrom};
 use std::error;
 use std::fmt;
+use std::fs::File;
+use std::io;
+use std::io::Read;
 use std::path::Path;
 use std::result::Result;
+use std::vec::Vec;
+
+#[cfg(target_family = "windows")]
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
+
+#[cfg(not(target_family = "windows"))]
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
+
+/// Fennel macros to aid in writing `manifest.fnl` files.
+const MEKA_MACROS: &str = include_str!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    path_separator!(),
+    "meka",
+    path_separator!(),
+    "macros.fnl"
+));
+
+/// Error message for `Iterator::Item.expect()` in `mlua::TablePairs`es - which `mlua`
+/// wraps in `Result` to facilitate lazily converting Lua types to Rust. Presumably this
+/// can only fail if the user requests a Rust type which doesn't implement `FromLua`.
+const PAIRS_EXPECT: &str = "`mlua::TablePairs::pairs()` unexpectedly failed";
 
 /// Error message designed for running `table.get(key)` on `mlua::Table` `table` verified to
 /// contain key `key`.
@@ -19,10 +52,17 @@ const TABLE_GET_EXPECT: &str = "Unexpectedly couldn't get key from pre-checked t
 
 #[derive(Debug)]
 pub enum ConfigInitError {
-    InvalidModuleFileType,
+    InvalidConfigModuleFileType,
+    InvalidConfigModuleResult { got: &'static str },
+    InvalidConfigModuleResultTableKey { got: &'static str },
+    MalformedConfigModuleResultTableKeyString { content: Vec<u8> },
+    InvalidConfigModuleResultTableValue { got: &'static str },
+    InvalidConfigModuleResultTableValueUserData,
+    InvalidConfigModuleResultUserData,
 
     FennelCompileError(fennel_compile::Error),
     FennelSearcherError(fennel_searcher::Error),
+    Io(io::Error),
     Lua(mlua::Error),
     LuaSearcherError(mlua_searcher::Error),
 }
@@ -30,10 +70,17 @@ pub enum ConfigInitError {
 impl fmt::Display for ConfigInitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
-            ConfigInitError::InvalidModuleFileType => "Expected Fennel or Lua config file type, but got FennelMacros".to_string(),
+            ConfigInitError::InvalidConfigModuleFileType => "Expected Fennel or Lua config module file type, but got FennelMacros".to_string(),
+            ConfigInitError::InvalidConfigModuleResult { got } => format!("Expected config module to return table or userdata, but got {}", got),
+            ConfigInitError::InvalidConfigModuleResultTableKey { got } => format!("Expected config module to return table of userdata indexed by string, but found key of type {}", got),
+            ConfigInitError::MalformedConfigModuleResultTableKeyString { content } => format!("Couldn't convert string key in table returned by config module from Lua to Rust: {:?}", content),
+            ConfigInitError::InvalidConfigModuleResultTableValue { got } => format!("Expected config module to return table of userdata indexed by string, but found value of type {}", got),
+            ConfigInitError::InvalidConfigModuleResultTableValueUserData => "Expected config module to return table of Manifest userdata indexed by string, but found unsupported userdata type".to_string(),
+            ConfigInitError::InvalidConfigModuleResultUserData => "Expected config module to return Manifest userdata, but found unsupported userdata type".to_string(),
 
             ConfigInitError::FennelCompileError(error) => format!("{}", error),
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
+            ConfigInitError::Io(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
             ConfigInitError::LuaSearcher(error) => format!("{}", error),
         };
@@ -50,6 +97,12 @@ impl From<fennel_compile::Error> for ConfigInitError {
 impl From<fennel_searcher::Error> for ConfigInitError {
     fn from(error: fennel_searcher::Error) -> Self {
         ConfigInitError::FennelSearcherError(error)
+    }
+}
+
+impl From<io::Error> for ConfigInitError {
+    fn from(error: io::Error) -> Self {
+        ConfigInitError::Io(error)
     }
 }
 
@@ -91,6 +144,9 @@ impl Config {
         // local Fennel modules.
         insert_fennel_searcher(&lua)?;
 
+        // Read config module to string.
+        let config_str = read_config_module(module.clone())?;
+
         // Determine whether the config module is written in Fennel or Lua.
         let file_type = match module {
             Module::File(module_file) => module_file.file_type,
@@ -98,26 +154,93 @@ impl Config {
             Module::NamedText(module_named_text) => module_named_text.file_type,
         };
 
-        match file_type {
-            // Fennel requires 1) adding macro searcher to `mlua::Lua` to enable using our
-            // Fennel macros, and 2) prepending an `import-macros` line to the config module
-            // so that end users don't have to.
+        let config_str = match file_type {
             ModuleFileType::Fennel => {
+                // Add macro searcher to `mlua::Lua` to enable using our Fennel macros.
+                let mut searcher_fnl_macros = HashMap::with_capacity(1);
+                searcher_fnl_macros.insert(Cow::from("meka.macros"), Cow::from(MEKA_MACROS));
+                lua.add_searcher_fnl_macros(searcher_fnl_macros)?;
+
+                // Prepend `import-macros` to config module so that end users don't have to.
+                let config_str = format!(
+                    "(import-macros {: manifest} :meka.macros)\n\n{}",
+                    config_str
+                );
+
+                // Compile Fennel to Lua.
+                lua.compile_fennel_string(&config_str)?
             }
             ModuleFileType::FennelMacros => {
-                return Err(ConfigInitError::InvalidModuleFileType);
+                return Err(ConfigInitError::InvalidConfigModuleFileType);
             }
-            ModuleFileType::Lua => {}
-        }
+            ModuleFileType::Lua => config_str,
+        };
 
-        // Evaluate the config module and check the return value. It should be a `Manifest`
-        // `mlua::Userdata` or an `mlua::Table` containing `Manifest` `mlua::Userdata`s indexed
-        // by string keys.
-
-        // Collect the `Manifest`(s) into a `HashMap`.
+        // For collecting `Manifest`(s).
         let mut map: HashMap<String, Manifest> = HashMap::new();
 
-        todo!()
+        // Evaluate config module and check return value. It should be `Manifest` `mlua::Userdata`
+        // or an `mlua::Table` containing `Manifest` `mlua::Userdata`s indexed by string keys.
+        let value: Value = lua.load(&config_str).eval().map_err(|e| {
+            mlua::Error::RuntimeError(format!(
+                "meka-config new function got error evaluating config module: {}",
+                e
+            ))
+        })?;
+
+        match value {
+            Value::Table(table) => {
+                if table.is_list() {
+                    let got = "list";
+                    return Err(ConfigInitError::InvalidConfigModuleResult { got });
+                }
+                for pairs in table.pairs::<Value, Value>() {
+                    match pairs.expect(PAIRS_EXPECT) {
+                        // Found `mlua::String` key.
+                        (Value::String(key), value) => {
+                            match key.to_str() {
+                                Ok(key) => {
+                                    match value {
+                                        Value::UserData(ud) => {
+                                            let manifest = Manifest::try_from(ud).map_err(|_| {
+                                                ConfigInitError::InvalidConfigModuleResultTableValueUserData
+                                            })?;
+                                            map.insert(key.to_string(), manifest);
+                                        }
+                                        value => {
+                                            let got = mlua_utils::typename(&value);
+                                            return Err(ConfigInitError::InvalidConfigModuleResultTableValue { got });
+                                        }
+                                    }
+                                }
+                                Err(_) => {
+                                    let content = key.into_char_array();
+                                    return Err(ConfigInitError::MalformedConfigModuleResultTableKeyString { content });
+                                }
+                            }
+                        }
+
+                        // Found unsupported key.
+                        (key, _) => {
+                            let got = mlua_utils::typename(&key);
+                            return Err(ConfigInitError::InvalidConfigModuleResultTableKey { got });
+                        }
+                    }
+                }
+            }
+            Value::UserData(ud) => {
+                let manifest = Manifest::try_from(ud)
+                    .map_err(|_| ConfigInitError::InvalidConfigModuleResultUserData)?;
+                // Empty string represents case where config module returns `Manifest` userdata.
+                map.insert("".to_string(), manifest);
+            }
+            value => {
+                let got = mlua_utils::typename(&value);
+                return Err(ConfigInitError::InvalidConfigModuleResult { got });
+            }
+        }
+
+        Ok(Self(map))
     }
 
     /// Modify `package.path` and `package.cpath` to prevent loading Lua and C modules from
@@ -268,6 +391,24 @@ impl Config {
             })?;
 
         Ok(())
+    }
+
+    fn read_config_module(module: Module) -> ConfigInitResult<String> {
+        let text: String = match module {
+            Module::File(module_file) => read_config_module_from_path(module_file.path)?,
+            Module::NamedFile(module_named_file) => {
+                read_config_module_from_path(module_named_file.path)?
+            }
+            Module::NamedText(module_named_text) => module_named_text.text.into_owned(),
+        };
+        Ok(text)
+    }
+
+    fn read_config_module_from_path(path: Path) -> ConfigInitResult<String> {
+        let mut config_str = String::new();
+        let mut file = File::open(path)?;
+        file.read_to_string(&mut config_str)?;
+        Ok(config_str)
     }
 }
 

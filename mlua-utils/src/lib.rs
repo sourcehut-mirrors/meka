@@ -7,6 +7,9 @@ use std::vec::Vec;
 /// at least n+1 chars.
 const PATH_CHARS_NTH_EXPECT: &str = "Unexpectedly couldn't get nth char from pre-checked path";
 
+/// Error message for `mlua::Table::contains_key(1).expect()` - which should always succeed.
+const TABLE_CONTAINS_KEY_1_EXPECT: &str = "`mlua::Table::contains_key(1)` unexpectedly failed";
+
 // Error extracting `String` from an `mlua::String` or `mlua::Value`.
 #[derive(Debug)]
 pub enum InputStringError {
@@ -68,6 +71,19 @@ impl TryIntoString for mlua::String {
                 content: self.into_char_array(),
             }),
         }
+    }
+}
+
+pub trait IsList {
+    /// Ascertain whether the given `mlua::Table` is a list.
+    fn is_list(&self) -> bool;
+}
+
+impl IsList for Table {
+    fn is_list(&self) -> bool {
+        // Presume `mlua::Table` contains exclusively numeric keys if the value of key 1
+        // is non-nil.
+        self.contains_key(1).expect(TABLE_CONTAINS_KEY_1_EXPECT)
     }
 }
 
