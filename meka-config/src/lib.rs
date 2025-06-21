@@ -144,37 +144,9 @@ impl Config {
         // local Fennel modules.
         insert_fennel_searcher(&lua)?;
 
-        // Read config module to string.
-        let config_str = read_config_module(module.clone())?;
-
-        // Determine whether the config module is written in Fennel or Lua.
-        let file_type = match module {
-            Module::File(module_file) => module_file.file_type,
-            Module::NamedFile(module_named_file) => module_named_file.file_type,
-            Module::NamedText(module_named_text) => module_named_text.file_type,
-        };
-
-        let config_str = match file_type {
-            ModuleFileType::Fennel => {
-                // Add macro searcher to `mlua::Lua` to enable using our Fennel macros.
-                let mut searcher_fnl_macros = HashMap::with_capacity(1);
-                searcher_fnl_macros.insert(Cow::from("meka.macros"), Cow::from(MEKA_MACROS));
-                lua.add_searcher_fnl_macros(searcher_fnl_macros)?;
-
-                // Prepend `import-macros` to config module so that end users don't have to.
-                let config_str = format!(
-                    "(import-macros {: manifest} :meka.macros)\n\n{}",
-                    config_str
-                );
-
-                // Compile Fennel to Lua.
-                lua.compile_fennel_string(&config_str)?
-            }
-            ModuleFileType::FennelMacros => {
-                return Err(ConfigInitError::InvalidConfigModuleFileType);
-            }
-            ModuleFileType::Lua => config_str,
-        };
+        // Get config module as Lua string, converting compile-to-Lua language config module
+        // to Lua as needed.
+        let config_str = get_config_module_as_lua_string(&lua, module)?;
 
         // For collecting `Manifest`(s).
         let mut map: HashMap<String, Manifest> = HashMap::new();
@@ -391,6 +363,42 @@ impl Config {
             })?;
 
         Ok(())
+    }
+
+    fn get_config_module_as_lua_string(lua: &Lua, module: Module) -> ConfigInitResult<String> {
+        // Read config module to string.
+        let config_str = read_config_module(module.clone())?;
+
+        // Determine whether the config module is written in Fennel or Lua.
+        let file_type = match module {
+            Module::File(module_file) => module_file.file_type,
+            Module::NamedFile(module_named_file) => module_named_file.file_type,
+            Module::NamedText(module_named_text) => module_named_text.file_type,
+        };
+
+        let config_str = match file_type {
+            ModuleFileType::Fennel => {
+                // Add macro searcher to `mlua::Lua` to enable using our Fennel macros.
+                let mut searcher_fnl_macros = HashMap::with_capacity(1);
+                searcher_fnl_macros.insert(Cow::from("meka.macros"), Cow::from(MEKA_MACROS));
+                lua.add_searcher_fnl_macros(searcher_fnl_macros)?;
+
+                // Prepend `import-macros` to config module so that end users don't have to.
+                let config_str = format!(
+                    "(import-macros {: manifest} :meka.macros)\n\n{}",
+                    config_str
+                );
+
+                // Compile Fennel to Lua.
+                lua.compile_fennel_string(&config_str)?
+            }
+            ModuleFileType::FennelMacros => {
+                return Err(ConfigInitError::InvalidConfigModuleFileType);
+            }
+            ModuleFileType::Lua => config_str,
+        };
+
+        Ok(config_str)
     }
 
     fn read_config_module(module: Module) -> ConfigInitResult<String> {
