@@ -61,12 +61,9 @@ Create `manifest.fnl` alongside `Cargo.toml` in `$CARGO_MANIFEST_DIR`:
 Or, equivalently:
 
 ```fennel
+(import-macros {: manifest} :meka.macros)
 (local fennel-src (require :fennel-src))
 
-;; Meka automatically imports the manifest macro. The following is short for:
-;;
-;;     (local kiwi ((. (require :meka) :manifest :new) {...}))
-;;
 (local kiwi (manifest {:name :kiwi.cite            :path :kiwi/cite.fnl}
                       {:name :kiwi.date            :path :kiwi/date.fnl}
                       {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
@@ -85,6 +82,7 @@ Or, equivalently:
 Or, simply:
 
 ```fennel
+(import-macros {: manifest} :meka.macros)
 (local fennel-src (require :fennel-src))
 
 ;; Refer to this manifest in `meka_include!` or `meka_load!` by omitting a string argument.

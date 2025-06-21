@@ -69,7 +69,8 @@ fn manifest_fennel_macro_works() {
     use std::borrow::Cow;
     use std::convert::From;
 
-    let module: &str = r#"(local fennel-src (require :fennel-src))
+    let module: &str = r#"(import-macros {: manifest} :meka.macros)
+    (local fennel-src (require :fennel-src))
 
 ;; Meka automatically imports the manifest macro. The following is short for:
 ;;
@@ -107,7 +108,8 @@ fn standalone_manifest_fennel_macro_works() {
     use std::borrow::Cow;
     use std::convert::From;
 
-    let module: &str = r#"(local fennel-src (require :fennel-src))
+    let module: &str = r#"(import-macros {: manifest} :meka.macros)
+    (local fennel-src (require :fennel-src))
 
 ;; Refer to this manifest in `meka_include!` or `meka_load!` by omitting a string argument.
 (manifest {:name :kiwi.cite            :path :kiwi/cite.fnl

@@ -395,12 +395,6 @@ impl Config {
                 searcher_fnl_macros.insert(Cow::from("meka.macros"), Cow::from(MEKA_MACROS));
                 lua.add_searcher_fnl_macros(searcher_fnl_macros)?;
 
-                // Prepend `import-macros` to config module so that end users don't have to.
-                let config_str = format!(
-                    "(import-macros {{: manifest}} :meka.macros)\n\n{}",
-                    config_str
-                );
-
                 // Compile Fennel to Lua.
                 lua.compile_fennel_string(&config_str)?
             }
