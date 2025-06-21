@@ -1,3 +1,5 @@
+use fennel_compile::Compile;
+use fennel_searcher::AddSearcher as AddFennelSearcher;
 #[cfg(feature = "fennel100")]
 use fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
@@ -82,7 +84,7 @@ impl fmt::Display for ConfigInitError {
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
             ConfigInitError::Io(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
-            ConfigInitError::LuaSearcher(error) => format!("{}", error),
+            ConfigInitError::LuaSearcherError(error) => format!("{}", error),
         };
         write!(f, "{}", res)
     }
@@ -114,7 +116,7 @@ impl From<mlua::Error> for ConfigInitError {
 
 impl From<mlua_searcher::Error> for ConfigInitError {
     fn from(error: mlua_searcher::Error) -> Self {
-        ConfigInitError::LuaSearcher(error)
+        ConfigInitError::LuaSearcherError(error)
     }
 }
 
@@ -122,7 +124,7 @@ impl error::Error for ConfigInitError {}
 
 pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
 
-pub struct Config(HashMap<String, Manifest>);
+pub struct Config(pub HashMap<String, Manifest>);
 
 impl Config {
     pub fn new(module: Module, env: Option<Env>) -> ConfigInitResult<Self> {
@@ -130,23 +132,23 @@ impl Config {
 
         // Set up Lua environment: modify `package.path` and `package.cpath` to prevent loading
         // Lua and C modules from system paths.
-        modify_paths(&lua)?;
+        Self::modify_paths(&lua)?;
 
         // Set up "standard library": enable importing fennel, fennel-src and meka.
-        setup_standard_library(&lua)?;
+        Self::setup_standard_library(&lua)?;
 
         // If `env` exists, enable importing libraries therein.
         if let Some(env) = env {
-            setup_env_library(&lua, env)?;
+            Self::setup_env_library(&lua, env)?;
         }
 
         // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
         // local Fennel modules.
-        insert_fennel_searcher(&lua)?;
+        Self::insert_fennel_searcher(&lua)?;
 
         // Get config module as Lua string, converting compile-to-Lua language config module
         // to Lua as needed.
-        let config_str = get_config_module_as_lua_string(&lua, module)?;
+        let config_str = Self::get_config_module_as_lua_string(&lua, module)?;
 
         // For collecting `Manifest`(s).
         let mut map: HashMap<String, Manifest> = HashMap::new();
@@ -262,7 +264,7 @@ impl Config {
         // Enabling importing `fennel_src::loader` at "fennel-src".
         searcher.insert(Cow::from("fennel-src"), fennel_src::loader);
         // Enabling importing `meka_loader` at "meka".
-        searcher.insert(Cow::from("meka"), meka_loader);
+        searcher.insert(Cow::from("meka"), Self::meka_loader);
 
         lua.add_function_searcher(searcher)?;
 
@@ -276,12 +278,12 @@ impl Config {
             mlua::Error::RuntimeError("meka_loader function failed to create Lua table".to_string())
         })?;
 
-        let manifest: Function = Manifest::loader(lua, env, "manifest").map_err(|_| {
+        let manifest: Function = Manifest::loader(lua, env.clone(), "manifest").map_err(|_| {
             mlua::Error::RuntimeError(
                 "meka_loader function called Manifest::loader and got error".to_string(),
             )
         })?;
-        let manifest: Table = manifest.call().map_err(|_| {
+        let manifest: Table = manifest.call(()).map_err(|_| {
             mlua::Error::RuntimeError(
                 "meka_loader function called Manifest::loader in Lua context and got error"
                     .to_string(),
@@ -332,7 +334,7 @@ impl Config {
             )
         })?;
 
-        let fennel_searcher: Function = fennel_make_searcher.call().map_err(|_| {
+        let fennel_searcher: Function = fennel_make_searcher.call(()).map_err(|_| {
             mlua::Error::RuntimeError(
                 "meka-config new function called fennel.make-searcher and got error".to_string(),
             )
@@ -344,12 +346,22 @@ impl Config {
             )
         })?;
 
-        let package_loaders: Table = if package.contains_key("loaders") {
+        let package_loaders: Table = if package.contains_key("loaders").map_err(|_| {
+            mlua::Error::RuntimeError(
+                "meka-config new function couldn't check if package table contains loaders key"
+                    .to_string(),
+            )
+        })? {
             package.get("loaders").expect(TABLE_GET_EXPECT)
-        } else if package.contains_key("searchers") {
+        } else if package.contains_key("searchers").map_err(|_| {
+            mlua::Error::RuntimeError(
+                "meka-config new function couldn't check if package table contains searchers key"
+                    .to_string(),
+            )
+        })? {
             package.get("searchers").expect(TABLE_GET_EXPECT)
         } else {
-            return Err(mlua::Error::RuntimeError("meka-config new function couldn't find either Lua package.loaders or package.searchers table".to_string())?);
+            return Err(ConfigInitError::from(mlua::Error::RuntimeError("meka-config new function couldn't find either Lua package.loaders or package.searchers table".to_string())));
         };
 
         let package_loaders_len = package_loaders.len().map_err(|_| {
@@ -367,7 +379,7 @@ impl Config {
 
     fn get_config_module_as_lua_string(lua: &Lua, module: Module) -> ConfigInitResult<String> {
         // Read config module to string.
-        let config_str = read_config_module(module.clone())?;
+        let config_str = Self::read_config_module(module.clone())?;
 
         // Determine whether the config module is written in Fennel or Lua.
         let file_type = match module {
@@ -385,7 +397,7 @@ impl Config {
 
                 // Prepend `import-macros` to config module so that end users don't have to.
                 let config_str = format!(
-                    "(import-macros {: manifest} :meka.macros)\n\n{}",
+                    "(import-macros {{: manifest}} :meka.macros)\n\n{}",
                     config_str
                 );
 
@@ -403,16 +415,16 @@ impl Config {
 
     fn read_config_module(module: Module) -> ConfigInitResult<String> {
         let text: String = match module {
-            Module::File(module_file) => read_config_module_from_path(module_file.path)?,
+            Module::File(module_file) => Self::read_config_module_from_path(&module_file.path)?,
             Module::NamedFile(module_named_file) => {
-                read_config_module_from_path(module_named_file.path)?
+                Self::read_config_module_from_path(&module_named_file.path)?
             }
             Module::NamedText(module_named_text) => module_named_text.text.into_owned(),
         };
         Ok(text)
     }
 
-    fn read_config_module_from_path(path: Path) -> ConfigInitResult<String> {
+    fn read_config_module_from_path(path: &Path) -> ConfigInitResult<String> {
         let mut config_str = String::new();
         let mut file = File::open(path)?;
         file.read_to_string(&mut config_str)?;
