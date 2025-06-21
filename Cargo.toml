@@ -5,6 +5,7 @@ members = [
   "fennel-searcher",
   "fennel-src",
   "meka-config",
+  "meka-macros",
   "meka-module-manifest",
   "meka-module-manifest-tests",
   "mlua-module-manifest",
@@ -29,5 +30,8 @@ mlua = { version = "0.10", default-features = false }
 once_cell = { version = "1" }
 optional-collections = { git = "https://git.sr.ht/~ioiojo/optional-collections", rev = "d9a0720d39b975bd0c117e42e12aba2c1d908a6d" }
 paste = { version = "1" }
+proc-macro2 = { version = "1" }
+quote = { version = "1" }
 semver = { version = "1" }
 serial_test = { version = "3" }
+syn = { version = "2", features = ["full"] }

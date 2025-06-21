@@ -25,6 +25,10 @@ check-fennel-src:
 check-meka-config:
   cargo check --package meka-config --features mlua-lua54,mlua-vendored
 
+# Run cargo check on meka-macros
+check-meka-macros:
+  cargo check --package meka-macros --features mlua-lua54,mlua-vendored
+
 # Run cargo check on meka-module-manifest
 check-meka-module-manifest:
   cargo check --package meka-module-manifest --features mlua-lua54,mlua-vendored
@@ -68,6 +72,10 @@ test-fennel-src:
 # Run cargo test on meka-config
 test-meka-config:
   cargo test --package meka-config --features mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-macros
+test-meka-macros:
+  cargo test --package meka-macros --features mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-module-manifest
 test-meka-module-manifest:

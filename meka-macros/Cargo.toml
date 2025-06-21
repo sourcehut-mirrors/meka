@@ -1,0 +1,36 @@
+[package]
+name = "meka-macros"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-macros"
+readme = "README.md"
+description = "Proc macros for Meka"
+
+[lib]
+proc-macro = true
+
+[features]
+default = ["fennel153"]
+fennel100 = ["meka-config/fennel100"]
+fennel153 = ["meka-config/fennel153"]
+mlua-lua54 = ["meka-config/mlua-lua54"]
+mlua-lua53 = ["meka-config/mlua-lua53"]
+mlua-lua52 = ["meka-config/mlua-lua52"]
+mlua-lua51 = ["meka-config/mlua-lua51"]
+mlua-luajit = ["meka-config/mlua-luajit"]
+mlua-luajit52 = ["meka-config/mlua-luajit52"]
+mlua-luau = ["meka-config/mlua-luau"]
+mlua-luau-jit = ["meka-config/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-config/mlua-luau-vector4"]
+mlua-vendored = ["meka-config/mlua-vendored"]
+
+[dependencies]
+meka-config = { path = "../meka-config", default-features = false }
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }
+
+[dev-dependencies]
+fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+meka-macros = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
