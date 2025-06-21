@@ -83,5 +83,3 @@ impl fmt::Display for ModuleFileType {
         write!(f, "{}", res)
     }
 }
-
-pub(crate) type ProcessModuleArgs = (Cow<'static, str>, CatBox, ModuleFileType);

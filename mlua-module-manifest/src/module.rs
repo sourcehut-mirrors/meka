@@ -15,7 +15,7 @@ use crate::module_error::{
     ModuleFileInitError, ModuleInitError, ModuleNamedFileInitError, ModuleNamedTextInitError,
 };
 use crate::module_traits::Name;
-use crate::module_types::{ModuleFileType, ModuleInitResult, ProcessModuleArgs};
+use crate::module_types::{ModuleFileType, ModuleInitResult};
 
 /// Error message designed for running `env::var_os("CARGO_MANIFEST_DIR")`.
 const ENV_VAR_OS_CARGO_MANIFEST_DIR_EXPECT: &str =
@@ -51,14 +51,6 @@ impl ModuleFile {
             path: path.to_owned().into(),
             file_type,
         })
-    }
-}
-
-impl From<ModuleFile> for ProcessModuleArgs {
-    fn from(module_file: ModuleFile) -> Self {
-        let name = module_file.name();
-        let ModuleFile { path, file_type } = module_file;
-        (name, Box::new(path), file_type)
     }
 }
 
@@ -160,18 +152,6 @@ impl From<ModuleNamedFile> for ModuleFile {
     }
 }
 
-impl From<ModuleNamedFile> for ProcessModuleArgs {
-    fn from(
-        ModuleNamedFile {
-            name,
-            path,
-            file_type,
-        }: ModuleNamedFile,
-    ) -> Self {
-        (name, Box::new(path), file_type)
-    }
-}
-
 impl Name for ModuleNamedFile {
     fn name(&self) -> Cow<'static, str> {
         self.name.clone()
@@ -268,18 +248,6 @@ impl From<&ModuleNamedText> for (Cow<'static, str>, Cow<'static, str>) {
             name.clone().into_owned().into(),
             text.clone().into_owned().into(),
         )
-    }
-}
-
-impl From<ModuleNamedText> for ProcessModuleArgs {
-    fn from(
-        ModuleNamedText {
-            name,
-            text,
-            file_type,
-        }: ModuleNamedText,
-    ) -> Self {
-        (name, Box::new(text), file_type)
     }
 }
 
