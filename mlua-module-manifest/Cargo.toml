@@ -22,7 +22,6 @@ mlua-vendored = ["mlua/vendored", "mlua-searcher/mlua-vendored", "mlua-utils/mlu
 [dependencies]
 derive_builder = { workspace = true }
 ignore = { workspace = true }
-io-cat = { workspace = true }
 mlua = { workspace = true }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }
 mlua-utils = { path = "../mlua-utils", default-features = false }

@@ -2,18 +2,23 @@ use std::convert::From;
 use std::error;
 use std::fmt;
 use std::fmt::Debug;
+use std::path::PathBuf;
 
 use crate::module_error::{ModuleInitError, ModuleNamedTextInitError};
 
 #[derive(Debug)]
 pub enum ManifestInitError {
     ModuleInitError(ModuleInitError),
+    WalkNonDirectory { path: PathBuf },
 }
 
 impl fmt::Display for ManifestInitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             ManifestInitError::ModuleInitError(error) => format!("{}", error),
+            ManifestInitError::WalkNonDirectory { path } => {
+                format!("Couldn't find directory at path {:?}", path)
+            }
         };
         write!(f, "{}", res)
     }

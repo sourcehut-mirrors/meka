@@ -152,7 +152,7 @@ fn walkman() -> Result<Manifest, ManifestInitError> {
     let Manifest {
         docstring: _,
         modules,
-    } = Manifest::try_from_dir("walkman")?;
+    } = Manifest::from_dir("tests/fixtures/walkman")?;
     Ok(Manifest::new(
         Some(Cow::from("Directory walking example")),
         modules,
@@ -160,7 +160,7 @@ fn walkman() -> Result<Manifest, ManifestInitError> {
 }
 
 const WALKMAN_LUA: &str = r#"local manifest = require("manifest")
-return manifest.new("Directory walking example", manifest.walk("walkman"))"#;
+return manifest.new("Directory walking example", manifest.walk("tests/fixtures/walkman"))"#;
 
 fn walkman_lua() -> mlua::Result<Manifest> {
     let lua = Lua::new();

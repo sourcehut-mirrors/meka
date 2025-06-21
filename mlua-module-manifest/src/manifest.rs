@@ -8,6 +8,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::iter::Extend;
 use std::ops::Index;
+use std::path::Path;
 use std::string::String;
 use std::vec::Vec;
 
@@ -43,11 +44,18 @@ impl Manifest {
         Self { docstring, modules }
     }
 
-    pub fn try_from_dir<S>(path: S) -> Result<Manifest, ManifestInitError>
+    pub fn from_dir<P>(path: P) -> Result<Manifest, ManifestInitError>
     where
-        S: AsRef<str>,
+        P: AsRef<Path>,
     {
-        let modules = Walk::new(path.as_ref())
+        let path: &Path = path.as_ref();
+
+        if !path.is_dir() {
+            let path = path.to_owned();
+            return Err(ManifestInitError::WalkNonDirectory { path });
+        }
+
+        let modules = Walk::new(path)
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| {
@@ -97,7 +105,7 @@ impl Manifest {
         let walk = lua.create_function(|_, value: Value| {
             if let Value::String(path) = value {
                 let path = &*path.to_str()?;
-                Ok(Manifest::try_from_dir(path)?)
+                Ok(Manifest::from_dir(path)?)
             } else {
                 let got = mlua_utils::typename(&value);
                 Err(mlua::Error::RuntimeError(format!(
@@ -628,11 +636,11 @@ impl NamedTextManifest {
         Self { docstring, modules }
     }
 
-    pub fn try_from_dir<S>(path: S) -> Result<NamedTextManifest, NamedTextManifestInitError>
+    pub fn from_dir<P>(path: P) -> Result<NamedTextManifest, NamedTextManifestInitError>
     where
-        S: AsRef<str>,
+        P: AsRef<Path>,
     {
-        NamedTextManifest::try_from(Manifest::try_from_dir(path)?)
+        NamedTextManifest::try_from(Manifest::from_dir(path)?)
     }
 
     pub fn add(&mut self, elem: ModuleNamedText) {

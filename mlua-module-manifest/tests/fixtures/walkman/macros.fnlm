@@ -1,0 +1,16 @@
+(local M {})
+
+(local module-sym (gensym))
+
+(fn init-module [name]
+  `(local ,(sym (tostring name))))
+
+(fn M.playlist [name]
+  (init-module name))
+
+(fn M.add-song [...]
+  `(let [val# ((. (require :walkman/song) :new) ,...)]
+     (table.insert ,module-sym val#)
+     val#))
+
+M

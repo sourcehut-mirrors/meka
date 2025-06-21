@@ -1,5 +1,3 @@
-use io_cat::CatBox;
-use std::borrow::Cow;
 use std::clone::Clone;
 use std::fmt;
 use std::fmt::Debug;
