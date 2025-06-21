@@ -11,7 +11,9 @@ pub fn meka_include(input: TokenStream) -> TokenStream {
     let parsed = parse_macro_input!(input as MekaInclude);
     parsed
         .expand()
-        .unwrap_or_else(|err| err.to_compile_error().into())
+        .unwrap_or_else(|err| err.to_compile_error())
+        // Convert `proc_macro2::TokenStream` to `proc_macro::TokenStream`.
+        .into()
 }
 
 struct MekaInclude {
@@ -93,23 +95,24 @@ fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Expr)>> {
 }
 
 impl MekaInclude {
-    fn expand(self) -> syn::Result<TokenStream> {
+    /// Returns `proc_macro2::TokenStream` for testability.
+    fn expand(self) -> syn::Result<proc_macro2::TokenStream> {
         let tokens = match (self.name, self.map) {
             (Some(name), Some(map)) => {
                 // Both name and map present
-                // Generate a HashMap<&'static str, fn()>
+                // Generate a HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>
                 let map_entries = map.iter().map(|(key, value)| {
                     let key_str = &key.value();
                     quote! {
                         let _: fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function> = #value;
-                        map.insert(#key_str, #value);
+                        map.insert(std::borrow::Cow::from(#key_str), #value);
                     }
                 });
 
                 quote! {
                     {
                         let name = #name;
-                        let mut map: std::collections::HashMap<&'static std::primitive::str, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
+                        let mut map: std::collections::HashMap<std::borrow::Cow<'static, std::primitive::str>, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
                         #(#map_entries)*
 
                         // TODO: Replace with your actual logic
@@ -136,13 +139,13 @@ impl MekaInclude {
                     let key_str = &key.value();
                     quote! {
                         let _: fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function> = #value;
-                        map.insert(#key_str, #value);
+                        map.insert(std::borrow::Cow::from(#key_str), #value);
                     }
                 });
 
                 quote! {
                     {
-                        let mut map: std::collections::HashMap<&'static std::primitive::str, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
+                        let mut map: std::collections::HashMap<std::borrow::Cow<'static, std::primitive::str>, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
                         #(#map_entries)*
 
                         // TODO: Replace with your actual logic
@@ -215,8 +218,10 @@ mod inline_tests {
         let input = quote! {};
         let parsed: MekaInclude = parse2(input).unwrap();
         let expanded = parsed.expand().unwrap();
-        // You can test that it doesn't panic and produces some output
-        assert!(!expanded.to_string().is_empty());
+        // Works because we're using `proc_macro2::TokenStream`.
+        let expanded_string = expanded.to_string();
+        assert!(!expanded_string.is_empty());
+        assert!(expanded_string.contains("Empty meka_include call"));
     }
 
     #[test]
