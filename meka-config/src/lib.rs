@@ -66,6 +66,8 @@ pub enum ConfigInitError {
     FennelSearcherError(fennel_searcher::Error),
     Io(io::Error),
     Lua(mlua::Error),
+    LuaModuleManifestModuleFileInitError(mlua_module_manifest::ModuleFileInitError),
+    LuaModuleManifestModuleNamedTextInitError(mlua_module_manifest::ModuleNamedTextInitError),
     LuaSearcherError(mlua_searcher::Error),
 }
 
@@ -84,6 +86,8 @@ impl fmt::Display for ConfigInitError {
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
             ConfigInitError::Io(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
+            ConfigInitError::LuaModuleManifestModuleFileInitError(error) => format!("{}", error),
+            ConfigInitError::LuaModuleManifestModuleNamedTextInitError(error) => format!("{}", error),
             ConfigInitError::LuaSearcherError(error) => format!("{}", error),
         };
         write!(f, "{}", res)
@@ -114,6 +118,18 @@ impl From<mlua::Error> for ConfigInitError {
     }
 }
 
+impl From<mlua_module_manifest::ModuleFileInitError> for ConfigInitError {
+    fn from(error: mlua_module_manifest::ModuleFileInitError) -> Self {
+        ConfigInitError::LuaModuleManifestModuleFileInitError(error)
+    }
+}
+
+impl From<mlua_module_manifest::ModuleNamedTextInitError> for ConfigInitError {
+    fn from(error: mlua_module_manifest::ModuleNamedTextInitError) -> Self {
+        ConfigInitError::LuaModuleManifestModuleNamedTextInitError(error)
+    }
+}
+
 impl From<mlua_searcher::Error> for ConfigInitError {
     fn from(error: mlua_searcher::Error) -> Self {
         ConfigInitError::LuaSearcherError(error)
@@ -127,6 +143,25 @@ pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
 pub struct Config(pub HashMap<String, Manifest>);
 
 impl Config {
+    pub fn from_path<P>(path: P, env: Option<Env>) -> ConfigInitResult<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let path: Path = path.as_ref();
+        let module = ModuleFile::new(path, None)?;
+        let module = Module::File(module);
+        Config::new(module, env)
+    }
+
+    pub fn from_str(s: S, file_type: ModuleFileType, env: Option<Env>) -> ConfigInitResult<Self>
+    where
+        S: AsRef<str>,
+    {
+        let module = ModuleNamedText::new("manifest", s.as_ref(), file_type)?;
+        let module = Module::NamedText(module);
+        Config::new(module, env)
+    }
+
     pub fn new(module: Module, env: Option<Env>) -> ConfigInitResult<Self> {
         let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 
