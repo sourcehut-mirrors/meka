@@ -5,7 +5,7 @@ use fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
 use fennel_src::FENNEL153;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
-use mlua_module_manifest::{Manifest, Module, ModuleFileType};
+use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
 use mlua_searcher::AddSearcher;
 use mlua_utils::{IntoCharArray, IsList};
 use std::borrow::Cow;
@@ -147,13 +147,13 @@ impl Config {
     where
         P: AsRef<Path>,
     {
-        let path: Path = path.as_ref();
+        let path: &Path = path.as_ref();
         let module = ModuleFile::new(path, None)?;
         let module = Module::File(module);
         Config::new(module, env)
     }
 
-    pub fn from_str(s: S, file_type: ModuleFileType, env: Option<Env>) -> ConfigInitResult<Self>
+    pub fn from_str<S>(s: S, file_type: ModuleFileType, env: Option<Env>) -> ConfigInitResult<Self>
     where
         S: AsRef<str>,
     {
