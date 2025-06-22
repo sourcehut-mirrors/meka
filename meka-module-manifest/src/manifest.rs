@@ -16,8 +16,8 @@ use crate::error::CompiledNamedTextManifestInitError;
 
 #[derive(Clone, Debug)]
 pub struct CompiledNamedTextManifest {
-    docstring: Option<Cow<'static, str>>,
-    modules: Vec<ModuleNamedText>,
+    pub docstring: Option<Cow<'static, str>>,
+    pub modules: Vec<ModuleNamedText>,
 }
 
 impl CompiledNamedTextManifest {
