@@ -1,5 +1,16 @@
+use meka_config::{Config, Env};
+use meka_module_manifest::CompiledNamedTextManifest;
+use meka_types::CatMap;
+use mlua::{Function, Lua, Table};
+use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, NamedTextManifest};
+use optional_collections::InsertOrInit;
 use proc_macro::TokenStream;
 use quote::quote;
+use std::borrow::Cow;
+use std::boxed::Box;
+use std::collections::HashMap;
+use std::convert::{From, TryFrom};
+use std::vec::Vec;
 use syn::{
     Expr, LitStr, Token, braced,
     parse::{Parse, ParseStream},
@@ -100,14 +111,69 @@ impl MekaInclude {
         let tokens = match (self.key, self.map) {
             (Some(key), Some(map)) => {
                 // Both key and map present
-                // Generate a HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>
+                let mut env: Env = HashMap::with_capacity(map.len());
                 let map_entries = map.iter().map(|(key, value)| {
                     let key_str = &key.value();
-                    quote! {
-                        let _: fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function> = #value;
-                        map.insert(std::borrow::Cow::from(#key_str), #value);
-                    }
+                    let fn_ptr: fn(&Lua, Table, &str) -> mlua::Result<Function> = value.value();
+                    env.insert(Cow::from(key_str), fn_ptr);
                 });
+
+                let runtime_root =
+                    meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
+
+                let path_fnl = runtime_root.join("manifest.fnl");
+                let path_init_fnl = runtime_root.join("manifest").join("init.fnl");
+                let path_lua = runtime_root.join("manifest.lua");
+                let path_init_lua = runtime_root.join("manifest").join("init.lua");
+
+                let module = if path_fnl.is_file() {
+                    Module::File(
+                        ModuleFile::new(path_fnl, Some(ModuleFileType::Fennel)).expect(&format!(
+                            "Sorry, couldn't instantiate Module from path {:?}",
+                            path_fnl
+                        )),
+                    )
+                } else if path_init_fnl.is_file() {
+                    Module::File(
+                        ModuleFile::new(path_init_fnl, Some(ModuleFileType::Fennel)).expect(
+                            &format!(
+                                "Sorry, couldn't instantiate Module from path {:?}",
+                                path_init_fnl
+                            ),
+                        ),
+                    )
+                } else if path_lua.is_file() {
+                    Module::File(ModuleFile::new(path_lua, Some(ModuleFileType::Lua)).expect(
+                        &format!(
+                            "Sorry, couldn't instantiate Module from path {:?}",
+                            path_lua
+                        ),
+                    ))
+                } else if path_init_lua.is_file() {
+                    Module::File(
+                        ModuleFile::new(path_init_lua, Some(ModuleFileType::Lua)).expect(&format!(
+                            "Sorry, couldn't instantiate Module from path {:?}",
+                            path_init_lua
+                        )),
+                    )
+                } else {
+                    panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
+                };
+
+                let config: HashMap<String, Manifest> = Config::new(module, Some(env))
+                    .expect("Sorry, couldn't instantiate Config")
+                    .0;
+
+                let key = key.value();
+
+                let manifest = if let Some(manifest) = config.get(&key) {
+                    CompiledNamedTextManifest::try_from(*manifest)
+                        .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                } else {
+                    panic!("Sorry, couldn't find key {} in Meka manifest", key);
+                };
+
+                let include = Include::from(manifest);
 
                 quote! {
                     {
@@ -168,6 +234,70 @@ impl MekaInclude {
         };
 
         Ok(tokens.into())
+    }
+}
+
+struct Include {
+    /// For use with `mlua::Lua.add_searcher_fnl_macros()`.
+    pub fnl_macros: Option<HashMap<Cow<'static, str>, Cow<'static, str>>>,
+
+    /// For use with `mlua::Lua.add_searcher()`.
+    pub lua: Option<HashMap<Cow<'static, str>, Cow<'static, str>>>,
+}
+
+impl From<CompiledNamedTextManifest> for Include {
+    fn from(manifest: CompiledNamedTextManifest) -> Self {
+        let mut fnl_macros: Option<HashMap<Cow<'static, str>, Cow<'static, str>>> = None;
+        let mut lua: Option<HashMap<Cow<'static, str>, Cow<'static, str>>> = None;
+        for module in manifest.modules.into_iter() {
+            match module.file_type {
+                // Fennel has already been AOT-compiled to Lua.
+                ModuleFileType::Fennel | ModuleFileType::Lua => {
+                    lua.insert_or_init(module.name, module.text);
+                }
+                ModuleFileType::FennelMacros => {
+                    fnl_macros.insert_or_init(module.name, module.text);
+                }
+            }
+        }
+        Self { fnl_macros, lua }
+    }
+}
+
+struct Load {
+    /// For use with `mlua::Lua.add_cat_searcher_fnl()`.
+    pub fnl: Option<CatMap>,
+
+    /// For use with `mlua::Lua.add_cat_searcher_fnl_macros()`.
+    pub fnl_macros: Option<CatMap>,
+
+    /// For use with `mlua::Lua.add_cat_searcher()`.
+    pub lua: Option<CatMap>,
+}
+
+impl From<NamedTextManifest> for Load {
+    fn from(manifest: NamedTextManifest) -> Self {
+        let mut fnl: Option<CatMap> = None;
+        let mut fnl_macros: Option<CatMap> = None;
+        let mut lua: Option<CatMap> = None;
+        for module in manifest.modules.into_iter() {
+            match module.file_type {
+                ModuleFileType::Fennel => {
+                    fnl.insert_or_init(module.name, Box::new(module.text));
+                }
+                ModuleFileType::FennelMacros => {
+                    fnl_macros.insert_or_init(module.name, Box::new(module.text));
+                }
+                ModuleFileType::Lua => {
+                    lua.insert_or_init(module.name, Box::new(module.text));
+                }
+            }
+        }
+        Self {
+            fnl,
+            fnl_macros,
+            lua,
+        }
     }
 }
 

@@ -11,21 +11,27 @@ proc-macro = true
 
 [features]
 default = ["fennel153"]
-fennel100 = ["meka-config/fennel100"]
-fennel153 = ["meka-config/fennel153"]
-mlua-lua54 = ["meka-config/mlua-lua54"]
-mlua-lua53 = ["meka-config/mlua-lua53"]
-mlua-lua52 = ["meka-config/mlua-lua52"]
-mlua-lua51 = ["meka-config/mlua-lua51"]
-mlua-luajit = ["meka-config/mlua-luajit"]
-mlua-luajit52 = ["meka-config/mlua-luajit52"]
-mlua-luau = ["meka-config/mlua-luau"]
-mlua-luau-jit = ["meka-config/mlua-luau-jit"]
-mlua-luau-vector4 = ["meka-config/mlua-luau-vector4"]
-mlua-vendored = ["meka-config/mlua-vendored"]
+fennel100 = ["meka-config/fennel100", "meka-module-manifest/fennel100"]
+fennel153 = ["meka-config/fennel153", "meka-module-manifest/fennel153"]
+mlua-lua54 = ["meka-config/mlua-lua54", "meka-module-manifest/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["meka-config/mlua-lua53", "meka-module-manifest/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["meka-config/mlua-lua52", "meka-module-manifest/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["meka-config/mlua-lua51", "meka-module-manifest/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["meka-config/mlua-luajit", "meka-module-manifest/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["meka-config/mlua-luajit52", "meka-module-manifest/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["meka-config/mlua-luau", "meka-module-manifest/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["meka-config/mlua-luau-jit", "meka-module-manifest/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-vendored = ["meka-config/mlua-vendored", "meka-module-manifest/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]
 meka-config = { path = "../meka-config", default-features = false }
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+meka-types = { path = "../meka-types" }
+meka-utils = { path = "../meka-utils" }
+mlua = { workspace = true, default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
+optional-collections = { workspace = true }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
 syn = { workspace = true }
@@ -33,4 +39,6 @@ syn = { workspace = true }
 [dev-dependencies]
 fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 meka-macros = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
