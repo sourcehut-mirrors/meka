@@ -1,5 +1,6 @@
 use fennel_compile::Compile;
 use fennel_mount::Mount;
+use meka_types::CatMap;
 use mlua::{Function, Lua, MetaMethod, RegistryKey, Table, UserData, UserDataMethods, Value};
 use mlua_searcher::AddSearcher as _;
 use std::borrow::Cow;
@@ -8,7 +9,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use crate::types::{CatMap, Result};
+use crate::types::Result;
 
 /// Stores Fennel macro modules indexed by module name, and provides an `mlua::MetaMethod`
 /// to enable importing the stored macros by name in an `mlua::Lua`.

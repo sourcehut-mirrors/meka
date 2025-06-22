@@ -1,0 +1,10 @@
+[package]
+name = "meka-types"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-types"
+readme = "README.md"
+description = "Types for Meka"
+
+[dependencies]
+io-cat = { workspace = true }

@@ -1,3 +1,4 @@
+use meka_types::CatMap;
 use mlua::{Function, Lua, MetaMethod, RegistryKey, Table, UserData, UserDataMethods, Value};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -5,7 +6,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
-use crate::types::{CatMap, Result};
+use crate::types::Result;
 
 /// Stores Lua modules indexed by module name, and provides an `mlua::MetaMethod` to
 /// enable `require`ing the stored modules by name in an `mlua::Lua`.

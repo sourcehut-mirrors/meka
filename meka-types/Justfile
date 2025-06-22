@@ -1,0 +1,9 @@
+default: check
+
+# Run cargo check
+check:
+  cargo check
+
+# Run cargo test
+test:
+  cargo test

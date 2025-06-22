@@ -37,6 +37,10 @@ check-meka-module-manifest:
 check-meka-module-manifest-tests:
   cargo check --package meka-module-manifest-tests
 
+# Run cargo check on meka-types
+check-meka-types:
+  cargo check --package meka-types
+
 # Run cargo check on meka-utils
 check-meka-utils:
   cargo check --package meka-utils
@@ -88,6 +92,10 @@ test-meka-module-manifest:
 # Run cargo test on meka-module-manifest-tests
 test-meka-module-manifest-tests:
   cargo test --package meka-module-manifest-tests
+
+# Run cargo test on meka-types
+test-meka-types:
+  cargo test --package meka-types
 
 # Run cargo test on meka-utils
 test-meka-utils:

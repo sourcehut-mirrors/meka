@@ -3,6 +3,7 @@ mod tests {
     use fennel_compile::Compile;
     use fennel_mount::Mount;
     use fennel_searcher::AddSearcher;
+    use meka_types::CatMap;
     use mlua::{Lua, LuaOptions, StdLib, Table, Value};
     use serial_test::serial;
     use std::borrow::Cow;
@@ -11,8 +12,6 @@ mod tests {
     use std::fs::File;
     use std::io::{Read, Write};
     use std::path::PathBuf;
-
-    type CatMap = io_cat::CatMap<Cow<'static, str>>;
 
     const ENV_VAR_OS_CARGO_MANIFEST_DIR_EXPECT: &str =
         "Unexpectedly couldn't access $CARGO_MANIFEST_DIR environment variable";

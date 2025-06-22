@@ -8,6 +8,7 @@ members = [
   "meka-macros",
   "meka-module-manifest",
   "meka-module-manifest-tests",
+  "meka-types",
   "meka-utils",
   "mlua-module-manifest",
   "mlua-searcher",
