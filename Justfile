@@ -37,6 +37,10 @@ check-meka-module-manifest:
 check-meka-module-manifest-tests:
   cargo check --package meka-module-manifest-tests
 
+# Run cargo check on meka-utils
+check-meka-utils:
+  cargo check --package meka-utils
+
 # Run cargo check on mlua-module-manifest
 check-mlua-module-manifest:
   cargo check --package mlua-module-manifest --features mlua-lua54,mlua-vendored
@@ -84,6 +88,10 @@ test-meka-module-manifest:
 # Run cargo test on meka-module-manifest-tests
 test-meka-module-manifest-tests:
   cargo test --package meka-module-manifest-tests
+
+# Run cargo test on meka-utils
+test-meka-utils:
+  cargo test --package meka-utils
 
 # Run cargo test on mlua-module-manifest
 test-mlua-module-manifest:
