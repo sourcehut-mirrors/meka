@@ -2,8 +2,8 @@ default: check
 
 # Run cargo check passing mlua features lua54 vendored
 check:
-  cargo check --features fennel153,mlua-lua54,mlua-vendored
+  cargo check --features mlua-lua54,mlua-vendored
 
 # Run cargo test passing mlua features lua54 vendored
 test:
-  cargo test --features fennel153,mlua-lua54,mlua-vendored
+  cargo test --features mlua-lua54,mlua-vendored

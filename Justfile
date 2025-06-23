@@ -25,6 +25,38 @@ check-fennel-src:
 check-meka-config:
   cargo check --package meka-config --features mlua-lua54,mlua-vendored
 
+# Run cargo check on meka-config-macros
+check-meka-config-macros:
+  cargo check --package meka-config-macros --features mlua-lua54,mlua-vendored
+
+# Run cargo check on meka-config-macros-test-empty-metadata
+check-meka-config-macros-test-empty-metadata:
+  cargo check --package meka-config-macros-test-empty-metadata
+
+# Run cargo check on meka-config-macros-test-empty-metadata-section
+check-meka-config-macros-test-empty-metadata-section:
+  cargo check --package meka-config-macros-test-empty-metadata-section
+
+# Run cargo check on meka-config-macros-test-graceful-degradation
+check-meka-config-macros-test-graceful-degradation:
+  cargo check --package meka-config-macros-test-graceful-degradation
+
+# Run cargo check on meka-config-macros-test-invalid-loader-path
+check-meka-config-macros-test-invalid-loader-path:
+  cargo check --package meka-config-macros-test-invalid-loader-path
+
+# Run cargo check on meka-config-macros-test-multiple-loaders
+check-meka-config-macros-test-multiple-loaders:
+  cargo check --package meka-config-macros-test-multiple-loaders
+
+# Run cargo check on meka-config-macros-test-single-loader
+check-meka-config-macros-test-single-loader:
+  cargo check --package meka-config-macros-test-single-loader
+
+# Run cargo check on meka-config-tests
+check-meka-config-tests:
+  cargo check --package meka-config-tests
+
 # Run cargo check on meka-macros
 check-meka-macros:
   cargo check --package meka-macros --features mlua-lua54,mlua-vendored
@@ -80,6 +112,38 @@ test-fennel-src:
 # Run cargo test on meka-config
 test-meka-config:
   cargo test --package meka-config --features mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-config-macros
+test-meka-config-macros:
+  cargo test --package meka-config-macros --features mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-config-macros-test-empty-metadata
+test-meka-config-macros-test-empty-metadata:
+  cargo test --package meka-config-macros-test-empty-metadata
+
+# Run cargo test on meka-config-macros-test-empty-metadata-section
+test-meka-config-macros-test-empty-metadata-section:
+  cargo test --package meka-config-macros-test-empty-metadata-section
+
+# Run cargo test on meka-config-macros-test-graceful-degradation
+test-meka-config-macros-test-graceful-degradation:
+  cargo test --package meka-config-macros-test-graceful-degradation
+
+# Run cargo test on meka-config-macros-test-invalid-loader-path
+test-meka-config-macros-test-invalid-loader-path:
+  cargo test --package meka-config-macros-test-invalid-loader-path
+
+# Run cargo test on meka-config-macros-test-multiple-loaders
+test-meka-config-macros-test-multiple-loaders:
+  cargo test --package meka-config-macros-test-multiple-loaders
+
+# Run cargo test on meka-config-macros-test-single-loader
+test-meka-config-macros-test-single-loader:
+  cargo test --package meka-config-macros-test-single-loader
+
+# Run cargo test on meka-config-tests
+test-meka-config-tests:
+  cargo test --package meka-config-tests
 
 # Run cargo test on meka-macros
 test-meka-macros:

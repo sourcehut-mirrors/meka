@@ -1,0 +1,19 @@
+[package]
+name = "meka-config-macros-test-empty-metadata-section"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[package.metadata.meka]
+# Empty section
+
+[features]
+default = ["lua54-vendored"]
+lua54-vendored = ["meka-config-macros/mlua-lua54",
+                  "meka-config-macros/mlua-vendored",
+                  "mlua/lua54",
+                  "mlua/vendored"]
+
+[dependencies]
+meka-config-macros = { path = "../meka-config-macros", default-features = false }
+mlua = { workspace = true, default-features = false }

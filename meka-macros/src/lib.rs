@@ -1,4 +1,4 @@
-use meka_config::{Config, Env};
+use meka_config::{Config, LoaderRegistry};
 use meka_module_manifest::CompiledNamedTextManifest;
 use meka_types::CatCowMap;
 use mlua::{Function, Lua, Table};
@@ -111,12 +111,14 @@ impl MekaInclude {
         let tokens = match (self.key, self.map) {
             (Some(key), Some(map)) => {
                 // Both key and map present
-                let mut env: Env = HashMap::with_capacity(map.len());
                 let map_entries = map.iter().map(|(key, value)| {
                     let key_str = &key.value();
-                    let fn_ptr: fn(&Lua, Table, &str) -> mlua::Result<Function> = value.value();
-                    env.insert(Cow::from(key_str), fn_ptr);
+                    quote! {
+                        let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
+                        env.insert(::std::borrow::Cow::from(#key_str), #value);
+                    }
                 });
+                let map_entries_len = map_entries.len();
 
                 let runtime_root =
                     meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
@@ -160,26 +162,24 @@ impl MekaInclude {
                     panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
                 };
 
-                let config: HashMap<String, Manifest> = Config::new(module, Some(env))
-                    .expect("Sorry, couldn't instantiate Config")
-                    .0;
-
-                let key = key.value();
-
-                let manifest = if let Some(manifest) = config.get(&key) {
-                    CompiledNamedTextManifest::try_from(*manifest)
-                        .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
-                } else {
-                    panic!("Sorry, couldn't find key {} in Meka manifest", key);
-                };
-
-                let include = Include::from(manifest);
-
                 quote! {
                     {
                         let key = #key;
-                        let mut map: std::collections::HashMap<std::borrow::Cow<'static, std::primitive::str>, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
+                        let mut env: ::std::collections::HashMap<::std::borrow::Cow<'static, ::std::primitive::str>, fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function>> = ::std::collections::HashMap::with_capacity(#map_entries_len);
                         #(#map_entries)*
+
+                        let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(module, Some(env))
+                            .expect("Sorry, couldn't instantiate Config")
+                            .0;
+
+                        let manifest = if let Some(manifest) = config.get(&key) {
+                            ::meka_module_manifest::CompiledNamedTextManifest::try_from(*manifest)
+                                .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                        } else {
+                            panic!("Sorry, couldn't find key {} in Meka manifest", key);
+                        };
+
+                        let include = Include::from(manifest);
 
                         // TODO: Replace with your actual logic
                         println!("Key: {}, Map has {} entries", key, map.len());

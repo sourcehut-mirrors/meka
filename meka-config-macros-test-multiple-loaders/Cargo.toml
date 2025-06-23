@@ -1,0 +1,35 @@
+[package]
+name = "meka-config-macros-test-multiple-loaders"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[[package.metadata.meka.loader]]
+name = "fennel-src"
+loader = "fennel_src::loader"
+
+[[package.metadata.meka.loader]]
+name = "lua-src"
+loader = "test_loaders::lua_loader"
+
+[[package.metadata.meka.loader]]
+name = "n64"
+loader = "test_loaders::cartridge_loader"
+
+[features]
+default = ["fennel153-lua54-vendored"]
+fennel153-lua54-vendored = ["fennel-src/fennel153",
+                            "fennel-src/mlua-lua54",
+                            "fennel-src/mlua-vendored",
+                            "meka-config-macros/mlua-lua54",
+                            "meka-config-macros/mlua-vendored",
+                            "mlua/lua54",
+                            "mlua/vendored",
+                            "mlua-module-manifest/mlua-lua54",
+                            "mlua-module-manifest/mlua-vendored"]
+
+[dependencies]
+fennel-src = { path = "../fennel-src", default-features = false }
+meka-config-macros = { path = "../meka-config-macros", default-features = false }
+mlua = { workspace = true, default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }

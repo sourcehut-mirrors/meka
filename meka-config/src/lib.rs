@@ -4,6 +4,7 @@ use fennel_searcher::AddSearcher as AddFennelSearcher;
 use fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
 use fennel_src::FENNEL153;
+use meka_config_macros::loader_registry_from_cargo_manifest;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
 use mlua_searcher::AddSearcher;
@@ -143,39 +144,42 @@ pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
 pub struct Config(pub HashMap<String, Manifest>);
 
 impl Config {
-    pub fn from_path<P>(path: P, env: Option<Env>) -> ConfigInitResult<Self>
+    pub fn from_path<P>(path: P, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self>
     where
         P: AsRef<Path>,
     {
         let path: &Path = path.as_ref();
         let module = ModuleFile::new(path, None)?;
         let module = Module::File(module);
-        Config::new(module, env)
+        Config::new(module, lreg)
     }
 
-    pub fn from_str<S>(s: S, file_type: ModuleFileType, env: Option<Env>) -> ConfigInitResult<Self>
+    pub fn from_str<S>(
+        s: S,
+        file_type: ModuleFileType,
+        lreg: Option<LoaderRegistry>,
+    ) -> ConfigInitResult<Self>
     where
         S: AsRef<str>,
     {
         let module = ModuleNamedText::new("manifest", s.as_ref(), file_type)?;
         let module = Module::NamedText(module);
-        Config::new(module, env)
+        Config::new(module, lreg)
     }
 
-    pub fn new(module: Module, env: Option<Env>) -> ConfigInitResult<Self> {
+    pub fn new(module: Module, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self> {
         let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 
         // Set up Lua environment: modify `package.path` and `package.cpath` to prevent loading
         // Lua and C modules from system paths.
         Self::modify_paths(&lua)?;
 
+        // Set up "user library": enable importing user-defined libraries. Done before standard
+        // library to enable overrides.
+        Self::setup_user_library(&lua, lreg)?;
+
         // Set up "standard library": enable importing fennel, fennel-src and meka.
         Self::setup_standard_library(&lua)?;
-
-        // If `env` exists, enable importing libraries therein.
-        if let Some(env) = env {
-            Self::setup_env_library(&lua, env)?;
-        }
 
         // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
         // local Fennel modules.
@@ -339,11 +343,13 @@ impl Config {
             .into_function()?)
     }
 
-    fn setup_env_library(lua: &Lua, env: Env) -> ConfigInitResult<()> {
-        if env.len() == 0 {
-            return Ok(());
+    fn setup_user_library(lua: &Lua, lreg: Option<LoaderRegistry>) -> ConfigInitResult<()> {
+        let mut loader_registry: LoaderRegistry = loader_registry_from_cargo_manifest!();
+        match lreg {
+            Some(lreg) if !lreg.is_empty() => loader_registry.extend(lreg),
+            _ => {}
         }
-        lua.add_function_searcher(env)?;
+        lua.add_function_searcher(loader_registry)?;
         Ok(())
     }
 
@@ -461,11 +467,12 @@ impl Config {
     }
 }
 
-/// `Env` is a `HashMap` of Lua loader functions indexed by name.
+/// `LoaderRegistry` is a `HashMap` of Lua loader functions indexed by name.
 ///
 /// Each Lua loader function must return an `mlua::Function` which, when called, returns an
 /// `mlua::Table` with a `__call` metamethod defined. Calling said `mlua::Table` must return
 /// an `mlua_module_manifest::Manifest`. The idea is to enable Rust crates to export complete
 /// Lua modules. We map those exported Lua modules to names which can be `require`d within a
 /// Meka config.
-pub type Env = HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>;
+pub type LoaderRegistry =
+    HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>;

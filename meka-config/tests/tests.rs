@@ -1,6 +1,6 @@
 #[test]
 fn it_works() {
-    use meka_config::{Config, Env};
+    use meka_config::{Config, LoaderRegistry};
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
     use std::borrow::Cow;
     use std::convert::From;
@@ -31,14 +31,14 @@ fn it_works() {
     let module = Module::NamedText(
         ModuleNamedText::new("manifest", module, ModuleFileType::Fennel).unwrap(),
     );
-    let env: Option<Env> = None;
+    let loader_registry: Option<LoaderRegistry> = None;
     // `fennel-src` should be available by default to `mlua::Lua`.
-    assert!(Config::new(module.clone(), env).is_ok());
+    assert!(Config::new(module.clone(), loader_registry).is_ok());
 
     // Passing equivalent `fennel-src` mapping should make no difference.
-    let mut env = Env::new();
-    env.insert(Cow::from("fennel-src"), fennel_src::loader);
-    assert!(Config::new(module, Some(env.clone())).is_ok());
+    let mut loader_registry = LoaderRegistry::new();
+    loader_registry.insert(Cow::from("fennel-src"), fennel_src::loader);
+    assert!(Config::new(module, Some(loader_registry.clone())).is_ok());
 
     let module: &str = r#"local fennel_src = require("fennel-src")
 local meka = require("meka")
@@ -59,12 +59,12 @@ return {kiwi = kiwi}"#;
 
     // Passing equivalent Lua config should make no difference.
     assert!(Config::new(module.clone(), None).is_ok());
-    assert!(Config::new(module, Some(env)).is_ok());
+    assert!(Config::new(module, Some(loader_registry)).is_ok());
 }
 
 #[test]
 fn manifest_fennel_macro_works() {
-    use meka_config::{Config, Env};
+    use meka_config::{Config, LoaderRegistry};
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
     use std::borrow::Cow;
     use std::convert::From;
@@ -93,17 +93,17 @@ fn manifest_fennel_macro_works() {
     let module = Module::NamedText(
         ModuleNamedText::new("manifest", module, ModuleFileType::Fennel).unwrap(),
     );
-    let env: Option<Env> = None;
-    assert!(Config::new(module.clone(), env).is_ok());
+    let loader_registry: Option<LoaderRegistry> = None;
+    assert!(Config::new(module.clone(), loader_registry).is_ok());
 
-    let mut env = Env::new();
-    env.insert(Cow::from("fennel-src"), fennel_src::loader);
-    assert!(Config::new(module, Some(env)).is_ok());
+    let mut loader_registry = LoaderRegistry::new();
+    loader_registry.insert(Cow::from("fennel-src"), fennel_src::loader);
+    assert!(Config::new(module, Some(loader_registry)).is_ok());
 }
 
 #[test]
 fn standalone_manifest_fennel_macro_works() {
-    use meka_config::{Config, Env};
+    use meka_config::{Config, LoaderRegistry};
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
     use std::borrow::Cow;
     use std::convert::From;
@@ -126,10 +126,10 @@ fn standalone_manifest_fennel_macro_works() {
     let module = Module::NamedText(
         ModuleNamedText::new("manifest", module, ModuleFileType::Fennel).unwrap(),
     );
-    let env: Option<Env> = None;
-    assert!(Config::new(module.clone(), env).is_ok());
+    let loader_registry: Option<LoaderRegistry> = None;
+    assert!(Config::new(module.clone(), loader_registry).is_ok());
 
-    let mut env = Env::new();
-    env.insert(Cow::from("fennel-src"), fennel_src::loader);
-    assert!(Config::new(module, Some(env)).is_ok());
+    let mut loader_registry = LoaderRegistry::new();
+    loader_registry.insert(Cow::from("fennel-src"), fennel_src::loader);
+    assert!(Config::new(module, Some(loader_registry)).is_ok());
 }

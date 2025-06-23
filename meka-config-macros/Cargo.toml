@@ -1,0 +1,30 @@
+[package]
+name = "meka-config-macros"
+version = "0.1.0"
+edition = "2024"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-config-macros"
+readme = "README.md"
+description = "Proc macros for Meka config instantiation"
+
+[lib]
+proc-macro = true
+
+[features]
+default = []
+mlua-lua54 = ["mlua/lua54"]
+mlua-lua53 = ["mlua/lua53"]
+mlua-lua52 = ["mlua/lua52"]
+mlua-lua51 = ["mlua/lua51"]
+mlua-luajit = ["mlua/luajit"]
+mlua-luajit52 = ["mlua/luajit52"]
+mlua-luau = ["mlua/luau"]
+mlua-luau-jit = ["mlua/luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4"]
+mlua-vendored = ["mlua/vendored"]
+
+[dependencies]
+mlua = { workspace = true, default-features = false }
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }
+toml = { workspace = true }

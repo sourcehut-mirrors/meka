@@ -5,6 +5,14 @@ members = [
   "fennel-searcher",
   "fennel-src",
   "meka-config",
+  "meka-config-macros",
+  "meka-config-macros-test-empty-metadata",
+  "meka-config-macros-test-empty-metadata-section",
+  "meka-config-macros-test-graceful-degradation",
+  "meka-config-macros-test-invalid-loader-path",
+  "meka-config-macros-test-multiple-loaders",
+  "meka-config-macros-test-single-loader",
+  "meka-config-tests",
   "meka-macros",
   "meka-module-manifest",
   "meka-module-manifest-tests",
@@ -37,3 +45,4 @@ quote = { version = "1" }
 semver = { version = "1" }
 serial_test = { version = "3" }
 syn = { version = "2", features = ["full"] }
+toml = { version = "0.8" }
