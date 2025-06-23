@@ -3,7 +3,7 @@ mod tests {
     use fennel_compile::Compile;
     use fennel_mount::Mount;
     use fennel_searcher::AddSearcher;
-    use meka_types::CatMap;
+    use meka_types::CatCowMap;
     use mlua::{Lua, LuaOptions, StdLib, Table, Value};
     use serial_test::serial;
     use std::borrow::Cow;
@@ -403,7 +403,7 @@ mod tests {
     #[test]
     #[serial(lime)]
     fn add_cat_searcher_fnl_works() {
-        let mut lime = CatMap::new();
+        let mut lime = CatCowMap::new();
         lime.insert(
             Cow::from("lime.color"),
             Box::new(
@@ -430,7 +430,7 @@ mod tests {
     #[test]
     #[serial(fruit)]
     fn add_cat_searcher_fnl_macros_works() {
-        let mut hat = CatMap::new();
+        let mut hat = CatCowMap::new();
         hat.insert(
             Cow::from("fruit.hat"),
             Box::new(
@@ -446,7 +446,7 @@ mod tests {
             ),
         );
 
-        let mut stand = CatMap::new();
+        let mut stand = CatCowMap::new();
         stand.insert(
             Cow::from("fruit.stand"),
             Box::new(

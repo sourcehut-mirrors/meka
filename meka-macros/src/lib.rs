@@ -1,6 +1,6 @@
 use meka_config::{Config, Env};
 use meka_module_manifest::CompiledNamedTextManifest;
-use meka_types::CatMap;
+use meka_types::CatCowMap;
 use mlua::{Function, Lua, Table};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, NamedTextManifest};
 use optional_collections::InsertOrInit;
@@ -266,20 +266,20 @@ impl From<CompiledNamedTextManifest> for Include {
 
 struct Load {
     /// For use with `mlua::Lua.add_cat_searcher_fnl()`.
-    pub fnl: Option<CatMap>,
+    pub fnl: Option<CatCowMap>,
 
     /// For use with `mlua::Lua.add_cat_searcher_fnl_macros()`.
-    pub fnl_macros: Option<CatMap>,
+    pub fnl_macros: Option<CatCowMap>,
 
     /// For use with `mlua::Lua.add_cat_searcher()`.
-    pub lua: Option<CatMap>,
+    pub lua: Option<CatCowMap>,
 }
 
 impl From<NamedTextManifest> for Load {
     fn from(manifest: NamedTextManifest) -> Self {
-        let mut fnl: Option<CatMap> = None;
-        let mut fnl_macros: Option<CatMap> = None;
-        let mut lua: Option<CatMap> = None;
+        let mut fnl: Option<CatCowMap> = None;
+        let mut fnl_macros: Option<CatCowMap> = None;
+        let mut lua: Option<CatCowMap> = None;
         for module in manifest.modules.into_iter() {
             match module.file_type {
                 ModuleFileType::Fennel => {

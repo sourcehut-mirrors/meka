@@ -1,4 +1,4 @@
-use meka_types::CatMap;
+use meka_types::CatCowMap;
 use mlua::{Function, Lua, MetaMethod, RegistryKey, Table, UserData, UserDataMethods, Value};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -217,15 +217,15 @@ impl UserData for FunctionSearcher {
     }
 }
 
-/// Like `Searcher`, but with `CatMap` to facilitate indexing heterogenous strings and paths -
-/// all presumed to resolve to Lua module content - by module names in `modules`.
+/// Like `Searcher`, but with `CatCowMap` to facilitate indexing heterogenous strings and
+/// paths - all presumed to resolve to Lua module content - by module names in `modules`.
 struct CatSearcher {
-    modules: CatMap,
+    modules: CatCowMap,
     globals: RegistryKey,
 }
 
 impl CatSearcher {
-    fn new(modules: CatMap, globals: RegistryKey) -> Self {
+    fn new(modules: CatCowMap, globals: RegistryKey) -> Self {
         Self { modules, globals }
     }
 }
@@ -296,7 +296,7 @@ pub trait AddSearcher {
 
     /// Like `add_searcher`, except `modules` can contain heterogenous strings and paths
     /// indexed by module name.
-    fn add_cat_searcher(&self, modules: CatMap) -> Result<()>;
+    fn add_cat_searcher(&self, modules: CatCowMap) -> Result<()>;
 }
 
 impl AddSearcher for Lua {
@@ -371,7 +371,7 @@ impl AddSearcher for Lua {
             .map_err(|e| e.into())
     }
 
-    fn add_cat_searcher(&self, modules: CatMap) -> Result<()> {
+    fn add_cat_searcher(&self, modules: CatCowMap) -> Result<()> {
         let globals = self.globals();
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
