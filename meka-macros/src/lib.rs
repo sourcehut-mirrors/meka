@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use std::convert::{From, TryFrom};
 use std::vec::Vec;
 use syn::{
-    Expr, LitStr, Token, braced,
+    Ident, LitStr, Token, braced,
     parse::{Parse, ParseStream},
     parse_macro_input,
 };
@@ -29,7 +29,7 @@ pub fn meka_include(input: TokenStream) -> TokenStream {
 
 struct MekaInclude {
     pub key: Option<LitStr>,
-    pub map: Option<Vec<(LitStr, Expr)>>,
+    pub map: Option<Vec<(LitStr, Ident)>>,
 }
 
 impl Parse for MekaInclude {
@@ -77,8 +77,8 @@ impl Parse for MekaInclude {
     }
 }
 
-/// Parse a braced map of "string_key" => function_value pairs
-fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Expr)>> {
+/// Parse a braced map of "string_key" => function_ident pairs
+fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Ident)>> {
     let content;
     braced!(content in input);
 
@@ -89,8 +89,8 @@ fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Expr)>> {
         let key = content.parse::<LitStr>()?;
         content.parse::<Token![=>]>()?;
 
-        // Parse value as expression (should be a function pointer)
-        let value = content.parse::<Expr>()?;
+        // Parse value as identifier (function name)
+        let value = content.parse::<Ident>()?;
 
         pairs.push((key, value));
 
