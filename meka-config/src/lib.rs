@@ -174,16 +174,16 @@ impl Config {
         // Lua and C modules from system paths.
         Self::modify_paths(&lua)?;
 
+        // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
+        // local Fennel modules. Done before user library to enable local user-provided overrides.
+        Self::insert_fennel_searcher(&lua)?;
+
         // Set up "user library": enable importing user-defined libraries. Done before standard
-        // library to enable overrides.
+        // library to enable user-provided overrides.
         Self::setup_user_library(&lua, lreg)?;
 
         // Set up "standard library": enable importing fennel, fennel-src and meka.
         Self::setup_standard_library(&lua)?;
-
-        // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
-        // local Fennel modules.
-        Self::insert_fennel_searcher(&lua)?;
 
         // Get config module as Lua string, converting compile-to-Lua language config module
         // to Lua as needed.
