@@ -1,6 +1,6 @@
-# meka-macros
+# meka-searcher-macros
 
-Proc macros for Meka
+Proc macros for Meka searcher instantiation
 
 ## License
 

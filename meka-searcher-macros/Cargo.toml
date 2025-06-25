@@ -1,10 +1,10 @@
 [package]
-name = "meka-macros"
+name = "meka-searcher-macros"
 version = "0.1.0"
 edition = { workspace = true }
-homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-macros"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-searcher-macros"
 readme = "README.md"
-description = "Proc macros for Meka"
+description = "Proc macros for Meka searcher instantiation"
 
 [lib]
 proc-macro = true
@@ -38,7 +38,7 @@ syn = { workspace = true }
 
 [dev-dependencies]
 fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-meka-macros = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+meka-searcher-macros = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
