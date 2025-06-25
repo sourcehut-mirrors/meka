@@ -174,16 +174,15 @@ impl Config {
         // Lua and C modules from system paths.
         Self::modify_paths(&lua)?;
 
-        // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
-        // local Fennel modules. Done before user library to enable local user-provided overrides.
-        Self::insert_fennel_searcher(&lua)?;
-
-        // Set up "user library": enable importing user-defined libraries. Done before standard
-        // library to enable user-provided overrides.
-        Self::setup_user_library(&lua, lreg)?;
-
         // Set up "standard library": enable importing fennel, fennel-src and meka.
         Self::setup_standard_library(&lua)?;
+
+        // Set up "user library": enable importing user-defined libraries.
+        Self::setup_user_library(&lua, lreg)?;
+
+        // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
+        // local Fennel modules.
+        Self::insert_fennel_searcher(&lua)?;
 
         // Get config module as Lua string, converting compile-to-Lua language config module
         // to Lua as needed.
@@ -349,6 +348,8 @@ impl Config {
             Some(lreg) if !lreg.is_empty() => loader_registry.extend(lreg),
             _ => {}
         }
+        // TODO: insert library searcher before standard library searcher in `package.searchers`
+        // with bespoke implementation of `lua.add_function_searcher()`.
         lua.add_function_searcher(loader_registry)?;
         Ok(())
     }
@@ -357,6 +358,7 @@ impl Config {
     ///
     /// Requires: Fennel library is available for import
     fn insert_fennel_searcher(lua: &Lua) -> ConfigInitResult<()> {
+        // TODO: insert fennel searcher before user library searcher in `package.searchers`.
         let globals: Table = lua.globals();
 
         let require: Function = globals.get("require").map_err(|_| {
