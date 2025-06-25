@@ -1,7 +1,7 @@
 [package]
 name = "fennel-searcher"
 version = "0.1.0"
-edition = "2024"
+edition = { workspace = true }
 homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/fennel-searcher"
 readme = "README.md"
 description = "Require Fennel modules by name"
