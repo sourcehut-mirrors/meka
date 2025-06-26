@@ -65,6 +65,10 @@ check-meka-module-manifest:
 check-meka-module-manifest-tests:
   cargo check --package meka-module-manifest-tests
 
+# Run cargo check on meka-searcher
+check-meka-searcher:
+  cargo check --package meka-searcher --features fennel153,mlua-lua54,mlua-vendored
+
 # Run cargo check on meka-searcher-macros
 check-meka-searcher-macros:
   cargo check --package meka-searcher-macros --features mlua-lua54,mlua-vendored
@@ -152,6 +156,10 @@ test-meka-module-manifest:
 # Run cargo test on meka-module-manifest-tests
 test-meka-module-manifest-tests:
   cargo test --package meka-module-manifest-tests
+
+# Run cargo test on meka-searcher
+test-meka-searcher:
+  cargo test --package meka-searcher --features fennel153,mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-searcher-macros
 test-meka-searcher-macros:

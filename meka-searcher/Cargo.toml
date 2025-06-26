@@ -1,0 +1,36 @@
+[package]
+name = "meka-searcher"
+version = "0.1.0"
+edition = { workspace = true }
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-searcher"
+readme = "README.md"
+description = "Require Meka manifest by name"
+
+[features]
+default = ["fennel153"]
+fennel100 = ["fennel-searcher/fennel100", "meka-module-manifest/fennel100"]
+fennel153 = ["fennel-searcher/fennel153", "meka-module-manifest/fennel153"]
+mlua-lua54 = ["fennel-searcher/mlua-lua54", "meka-module-manifest/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-searcher/mlua-lua54"]
+mlua-lua53 = ["fennel-searcher/mlua-lua53", "meka-module-manifest/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53", "mlua-searcher/mlua-lua53"]
+mlua-lua52 = ["fennel-searcher/mlua-lua52", "meka-module-manifest/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52", "mlua-searcher/mlua-lua52"]
+mlua-lua51 = ["fennel-searcher/mlua-lua51", "meka-module-manifest/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51", "mlua-searcher/mlua-lua51"]
+mlua-luajit = ["fennel-searcher/mlua-luajit", "meka-module-manifest/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit", "mlua-searcher/mlua-luajit"]
+mlua-luajit52 = ["fennel-searcher/mlua-luajit52", "meka-module-manifest/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52", "mlua-searcher/mlua-luajit52"]
+mlua-luau = ["fennel-searcher/mlua-luau", "meka-module-manifest/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau", "mlua-searcher/mlua-luau"]
+mlua-luau-jit = ["fennel-searcher/mlua-luau-jit", "meka-module-manifest/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit", "mlua-searcher/mlua-luau-jit"]
+mlua-luau-vector4 = ["fennel-searcher/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4", "mlua-searcher/mlua-luau-vector4"]
+mlua-vendored = ["fennel-searcher/mlua-vendored", "meka-module-manifest/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored", "mlua-searcher/mlua-vendored"]
+
+[dependencies]
+fennel-searcher = { path = "../fennel-searcher", default-features = false }
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+meka-types = { path = "../meka-types" }
+mlua = { workspace = true }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
+mlua-searcher = { path = "../mlua-searcher", default-features = false }
+optional-collections = { workspace = true }
+
+[dev-dependencies]
+meka-searcher = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+meka-types = { path = "../meka-types" }
+mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }

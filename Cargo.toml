@@ -15,6 +15,7 @@ members = [
   "meka-config-tests",
   "meka-module-manifest",
   "meka-module-manifest-tests",
+  "meka-searcher",
   "meka-searcher-macros",
   "meka-types",
   "meka-utils",
