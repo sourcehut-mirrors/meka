@@ -1,5 +1,5 @@
 use fennel_compile::Compile;
-use fennel_searcher::AddSearcher as AddFennelSearcher;
+use fennel_searcher::AddSearcher as _;
 #[cfg(feature = "fennel100")]
 use fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
@@ -7,7 +7,7 @@ use fennel_src::FENNEL153;
 use meka_config_macros::loader_registry_from_cargo_manifest;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
-use mlua_searcher::AddSearcher;
+use mlua_searcher::AddSearcher as _;
 use mlua_utils::{IntoCharArray, IsList};
 use std::borrow::Cow;
 use std::collections::HashMap;
