@@ -131,10 +131,10 @@ impl MekaInclude {
 
                 // For improved error messages.
                 let selected_path: String;
-                let path_fnl_str = path_fnl.to_string_lossy();
-                let path_init_fnl_str = path_init_fnl.to_string_lossy();
-                let path_lua_str = path_lua.to_string_lossy();
-                let path_init_lua_str = path_init_lua.to_string_lossy();
+                let path_fnl_str = path_fnl.to_string_lossy().into_owned();
+                let path_init_fnl_str = path_init_fnl.to_string_lossy().into_owned();
+                let path_lua_str = path_lua.to_string_lossy().into_owned();
+                let path_init_lua_str = path_init_lua.to_string_lossy().into_owned();
 
                 let module = if path_fnl.is_file() {
                     selected_path = path_fnl_str;
@@ -145,7 +145,7 @@ impl MekaInclude {
                         ));
                     Module::File(module)
                 } else if path_init_fnl.is_file() {
-                    selected_path = path_init_fnl;
+                    selected_path = path_init_fnl_str;
                     let module =
                         ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel))
                             .expect(&format!(
@@ -154,7 +154,7 @@ impl MekaInclude {
                             ));
                     Module::File(module)
                 } else if path_lua.is_file() {
-                    selected_path = path_lua;
+                    selected_path = path_lua_str;
                     let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua))
                         .expect(&format!(
                             "Sorry, couldn't instantiate Module from path {:?}",
@@ -162,7 +162,7 @@ impl MekaInclude {
                         ));
                     Module::File(module)
                 } else if path_init_lua.is_file() {
-                    selected_path = path_init_lua;
+                    selected_path = path_init_lua_str;
                     let module = ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua))
                         .expect(&format!(
                             "Sorry, couldn't instantiate Module from path {:?}",
