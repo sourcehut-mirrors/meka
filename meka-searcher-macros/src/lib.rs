@@ -138,31 +138,36 @@ impl MekaInclude {
 
                 let module = if path_fnl.is_file() {
                     selected_path = path_fnl_str;
-                    let module = ModuleFile::new(path_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
-                        "Sorry, couldn't instantiate Module from path {:?}",
-                        path_fnl
-                    ));
+                    let module = ModuleFile::new(path_fnl.clone(), Some(ModuleFileType::Fennel))
+                        .expect(&format!(
+                            "Sorry, couldn't instantiate Module from path {:?}",
+                            path_fnl
+                        ));
                     Module::File(module)
                 } else if path_init_fnl.is_file() {
                     selected_path = path_init_fnl;
-                    let module = ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
-                        "Sorry, couldn't instantiate Module from path {:?}",
-                        path_init_fnl
-                    ));
+                    let module =
+                        ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel))
+                            .expect(&format!(
+                                "Sorry, couldn't instantiate Module from path {:?}",
+                                path_init_fnl
+                            ));
                     Module::File(module)
                 } else if path_lua.is_file() {
                     selected_path = path_lua;
-                    let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
-                        "Sorry, couldn't instantiate Module from path {:?}",
-                        path_lua
-                    ));
+                    let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua))
+                        .expect(&format!(
+                            "Sorry, couldn't instantiate Module from path {:?}",
+                            path_lua
+                        ));
                     Module::File(module)
                 } else if path_init_lua.is_file() {
                     selected_path = path_init_lua;
-                    let module = ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
-                        "Sorry, couldn't instantiate Module from path {:?}",
-                        path_init_lua
-                    ));
+                    let module = ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua))
+                        .expect(&format!(
+                            "Sorry, couldn't instantiate Module from path {:?}",
+                            path_init_lua
+                        ));
                     Module::File(module)
                 } else {
                     panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
