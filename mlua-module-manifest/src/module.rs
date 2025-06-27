@@ -265,21 +265,6 @@ impl TryFrom<ModuleNamedFile> for ModuleNamedText {
     }
 }
 
-impl From<&ModuleNamedText> for (Cow<'static, str>, Cow<'static, str>) {
-    fn from(
-        ModuleNamedText {
-            name,
-            text,
-            file_type: _,
-        }: &ModuleNamedText,
-    ) -> Self {
-        (
-            name.clone().into_owned().into(),
-            text.clone().into_owned().into(),
-        )
-    }
-}
-
 impl Name for ModuleNamedText {
     fn name(&self) -> Cow<'static, str> {
         self.name.clone()
