@@ -1,6 +1,6 @@
 use meka_config::{Config, LoaderRegistry};
 use meka_module_manifest::CompiledNamedTextManifest;
-use meka_types::CatCowMap;
+use meka_searcher::MekaSearcher;
 use mlua::{Function, Lua, Table};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, NamedTextManifest};
 use optional_collections::InsertOrInit;
@@ -115,79 +115,77 @@ impl MekaInclude {
                     let key_str = &key.value();
                     quote! {
                         let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
-                        env.insert(::std::borrow::Cow::from(#key_str), #value);
+                        loader_registry.insert(::std::borrow::Cow::from(#key_str), #value);
                     }
                 });
+
                 let map_entries_len = map_entries.len();
 
                 let runtime_root =
-                    meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
+                    ::meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
 
                 let path_fnl = runtime_root.join("manifest.fnl");
                 let path_init_fnl = runtime_root.join("manifest").join("init.fnl");
                 let path_lua = runtime_root.join("manifest.lua");
                 let path_init_lua = runtime_root.join("manifest").join("init.lua");
 
+                // For improved error messages.
+                let selected_path: String;
+                let path_fnl_str = path_fnl.to_string_lossy();
+                let path_init_fnl_str = path_init_fnl.to_string_lossy();
+                let path_lua_str = path_lua.to_string_lossy();
+                let path_init_lua_str = path_init_lua.to_string_lossy();
+
                 let module = if path_fnl.is_file() {
-                    Module::File(
-                        ModuleFile::new(path_fnl, Some(ModuleFileType::Fennel)).expect(&format!(
-                            "Sorry, couldn't instantiate Module from path {:?}",
-                            path_fnl
-                        )),
-                    )
+                    selected_path = path_fnl_str;
+                    let module = ModuleFile::new(path_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
+                        "Sorry, couldn't instantiate Module from path {:?}",
+                        path_fnl
+                    ));
+                    Module::File(module)
                 } else if path_init_fnl.is_file() {
-                    Module::File(
-                        ModuleFile::new(path_init_fnl, Some(ModuleFileType::Fennel)).expect(
-                            &format!(
-                                "Sorry, couldn't instantiate Module from path {:?}",
-                                path_init_fnl
-                            ),
-                        ),
-                    )
+                    selected_path = path_init_fnl;
+                    let module = ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
+                        "Sorry, couldn't instantiate Module from path {:?}",
+                        path_init_fnl
+                    ));
+                    Module::File(module)
                 } else if path_lua.is_file() {
-                    Module::File(ModuleFile::new(path_lua, Some(ModuleFileType::Lua)).expect(
-                        &format!(
-                            "Sorry, couldn't instantiate Module from path {:?}",
-                            path_lua
-                        ),
-                    ))
+                    selected_path = path_lua;
+                    let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
+                        "Sorry, couldn't instantiate Module from path {:?}",
+                        path_lua
+                    ));
+                    Module::File(module)
                 } else if path_init_lua.is_file() {
-                    Module::File(
-                        ModuleFile::new(path_init_lua, Some(ModuleFileType::Lua)).expect(&format!(
-                            "Sorry, couldn't instantiate Module from path {:?}",
-                            path_init_lua
-                        )),
-                    )
+                    selected_path = path_init_lua;
+                    let module = ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
+                        "Sorry, couldn't instantiate Module from path {:?}",
+                        path_init_lua
+                    ));
+                    Module::File(module)
                 } else {
                     panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
                 };
 
-                quote! {
-                    {
-                        let key = #key;
-                        let mut env: ::std::collections::HashMap<::std::borrow::Cow<'static, ::std::primitive::str>, fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function>> = ::std::collections::HashMap::with_capacity(#map_entries_len);
-                        #(#map_entries)*
+                quote! {{
+                    let key = #key;
+                    let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
+                    #(#map_entries)*
 
-                        let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(module, Some(env))
-                            .expect("Sorry, couldn't instantiate Config")
-                            .0;
+                    let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
+                        .expect("Sorry, couldn't instantiate Config")
+                        .0;
 
-                        let manifest = if let Some(manifest) = config.get(&key) {
-                            ::meka_module_manifest::CompiledNamedTextManifest::try_from(*manifest)
-                                .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
-                        } else {
-                            panic!("Sorry, couldn't find key {} in Meka manifest", key);
-                        };
+                    let manifest = if let Some(manifest) = config.get(&key) {
+                        ::meka_module_manifest::CompiledNamedTextManifest::try_from(*manifest)
+                            .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                    } else {
+                        panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #selected_path);
+                    };
 
-                        let include = Include::from(manifest);
-
-                        // TODO: Replace with your actual logic
-                        println!("Key: {}, Map has {} entries", key, map.len());
-                        for (k, _) in &map {
-                            println!("  Key: {}", k);
-                        }
-                    }
-                }
+                    ::meka_searcher::MekaSearcher::from(manifest)
+                }}
             }
             (Some(key), None) => {
                 // Only key present

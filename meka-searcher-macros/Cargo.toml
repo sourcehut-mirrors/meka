@@ -27,7 +27,6 @@ mlua-vendored = ["meka-config/mlua-vendored", "meka-module-manifest/mlua-vendore
 [dependencies]
 meka-config = { path = "../meka-config", default-features = false }
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
-meka-types = { path = "../meka-types" }
 meka-utils = { path = "../meka-utils" }
 mlua = { workspace = true, default-features = false }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
