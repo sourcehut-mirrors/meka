@@ -27,6 +27,8 @@ mlua-searcher = { path = "../mlua-searcher", default-features = false }
 mlua-utils = { path = "../mlua-utils", default-features = false }
 once_cell = { workspace = true }
 optional-collections = { workspace = true }
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
 
 [dev-dependencies]
 mlua-module-manifest = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

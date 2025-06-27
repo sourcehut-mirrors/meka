@@ -1,4 +1,5 @@
 use once_cell::sync::Lazy;
+use quote::{ToTokens, quote};
 use std::borrow::Cow;
 use std::clone::Clone;
 use std::convert::{From, TryFrom};
@@ -108,6 +109,19 @@ impl fmt::Display for ModuleFile {
     }
 }
 
+impl ToTokens for ModuleFile {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let path = self.path.to_string_lossy();
+        let file_type = self.file_type;
+        tokens.extend(quote! {
+            ::mlua_module_manifest::ModuleFile {
+                path: ::std::path::PathBuf::from(#path),
+                file_type: #file_type,
+            }
+        });
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ModuleNamedFile {
     pub name: Cow<'static, str>,
@@ -167,6 +181,21 @@ impl fmt::Display for ModuleNamedFile {
             self.file_type
         );
         write!(f, "{}", res)
+    }
+}
+
+impl ToTokens for ModuleNamedFile {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let name = self.name;
+        let path = self.path.to_string_lossy();
+        let file_type = self.file_type;
+        tokens.extend(quote! {
+            ::mlua_module_manifest::ModuleNamedFile {
+                name: ::std::borrow::Cow::Borrowed(#name),
+                path: ::std::path::PathBuf::from(#path),
+                file_type: #file_type,
+            }
+        });
     }
 }
 
@@ -269,6 +298,21 @@ impl fmt::Display for ModuleNamedText {
     }
 }
 
+impl ToTokens for ModuleNamedText {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let name = self.name;
+        let text = self.text;
+        let file_type = self.file_type;
+        tokens.extend(quote! {
+            ::mlua_module_manifest::ModuleNamedText {
+                name: ::std::borrow::Cow::Borrowed(#name),
+                text: ::std::borrow::Cow::Borrowed(#text),
+                file_type: #file_type,
+            }
+        });
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum Module {
     File(ModuleFile),
@@ -283,21 +327,6 @@ impl Name for Module {
             Module::NamedFile(module_named_file) => module_named_file.name(),
             Module::NamedText(module_named_text) => module_named_text.name(),
         }
-    }
-}
-
-impl fmt::Display for Module {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let res = match self {
-            Module::File(module_file) => format!("Module::File({})", module_file),
-            Module::NamedFile(module_named_file) => {
-                format!("Module::NamedFile({})", module_named_file)
-            }
-            Module::NamedText(module_named_text) => {
-                format!("Module::NamedText({})", module_named_text)
-            }
-        };
-        write!(f, "{}", res)
     }
 }
 
@@ -377,5 +406,37 @@ impl TryFrom<Dict> for Module {
                 }))
             }
         }
+    }
+}
+
+impl fmt::Display for Module {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let res = match self {
+            Module::File(module_file) => format!("Module::File({})", module_file),
+            Module::NamedFile(module_named_file) => {
+                format!("Module::NamedFile({})", module_named_file)
+            }
+            Module::NamedText(module_named_text) => {
+                format!("Module::NamedText({})", module_named_text)
+            }
+        };
+        write!(f, "{}", res)
+    }
+}
+
+impl ToTokens for Module {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let output = match self {
+            Module::File(module_file) => {
+                quote! { ::mlua_module_manifest::Module::File(#module_file) }
+            }
+            Module::NamedFile(named_file) => {
+                quote! { ::mlua_module_manifest::Module::NamedFile(#named_file) }
+            }
+            Module::NamedText(named_text) => {
+                quote! { ::mlua_module_manifest::Module::NamedText(#named_text) }
+            }
+        };
+        tokens.extend(output);
     }
 }

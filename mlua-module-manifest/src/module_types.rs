@@ -1,3 +1,4 @@
+use quote::{ToTokens, quote};
 use std::clone::Clone;
 use std::fmt;
 use std::fmt::Debug;
@@ -79,5 +80,18 @@ impl fmt::Display for ModuleFileType {
             ModuleFileType::Lua => "ModuleFileType::Lua",
         };
         write!(f, "{}", res)
+    }
+}
+
+impl ToTokens for ModuleFileType {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let variant = match self {
+            ModuleFileType::Fennel => quote! { ::mlua_module_manifest::ModuleFileType::Fennel },
+            ModuleFileType::FennelMacros => {
+                quote! { ::mlua_module_manifest::ModuleFileType::FennelMacros }
+            }
+            ModuleFileType::Lua => quote! { ::mlua_module_manifest::ModuleFileType::Lua },
+        };
+        tokens.extend(variant);
     }
 }
