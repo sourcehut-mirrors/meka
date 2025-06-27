@@ -112,7 +112,7 @@ impl fmt::Display for ModuleFile {
 impl ToTokens for ModuleFile {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let path = self.path.to_string_lossy();
-        let file_type = self.file_type;
+        let file_type = &self.file_type;
         tokens.extend(quote! {
             ::mlua_module_manifest::ModuleFile {
                 path: ::std::path::PathBuf::from(#path),
@@ -186,9 +186,9 @@ impl fmt::Display for ModuleNamedFile {
 
 impl ToTokens for ModuleNamedFile {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let name = self.name;
+        let name = &self.name;
         let path = self.path.to_string_lossy();
-        let file_type = self.file_type;
+        let file_type = &self.file_type;
         tokens.extend(quote! {
             ::mlua_module_manifest::ModuleNamedFile {
                 name: ::std::borrow::Cow::Borrowed(#name),
@@ -285,9 +285,9 @@ impl fmt::Display for ModuleNamedText {
 
 impl ToTokens for ModuleNamedText {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let name = self.name;
-        let text = self.text;
-        let file_type = self.file_type;
+        let name = &self.name;
+        let text = &self.text;
+        let file_type = &self.file_type;
         tokens.extend(quote! {
             ::mlua_module_manifest::ModuleNamedText {
                 name: ::std::borrow::Cow::Borrowed(#name),
