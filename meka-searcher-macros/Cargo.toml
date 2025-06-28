@@ -35,10 +35,3 @@ optional-collections = { workspace = true }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
 syn = { workspace = true }
-
-[dev-dependencies]
-fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-meka-module-manifest = { path = "../meka-module-manifest", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-meka-searcher-macros = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
-mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

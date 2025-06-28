@@ -17,6 +17,7 @@ members = [
   "meka-module-manifest-tests",
   "meka-searcher",
   "meka-searcher-macros",
+  "meka-searcher-macros-tests",
   "meka-types",
   "meka-utils",
   "mlua-module-manifest",

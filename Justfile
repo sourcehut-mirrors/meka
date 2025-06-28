@@ -73,6 +73,10 @@ check-meka-searcher:
 check-meka-searcher-macros:
   cargo check --package meka-searcher-macros --features mlua-lua54,mlua-vendored
 
+# Run cargo check on meka-searcher-macros-tests
+check-meka-searcher-macros-tests:
+  cargo check --package meka-searcher-macros-tests
+
 # Run cargo check on meka-types
 check-meka-types:
   cargo check --package meka-types
@@ -164,6 +168,10 @@ test-meka-searcher:
 # Run cargo test on meka-searcher-macros
 test-meka-searcher-macros:
   cargo test --package meka-searcher-macros --features mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-searcher-macros-tests
+test-meka-searcher-macros-tests:
+  cargo test --package meka-searcher-macros-tests
 
 # Run cargo test on meka-types
 test-meka-types:
