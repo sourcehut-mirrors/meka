@@ -111,84 +111,22 @@ impl MekaInclude {
         let tokens = match (self.key, self.map) {
             (Some(key), Some(map)) => {
                 // Both key and map present
-                let map_entries = map.iter().map(|(key, value)| {
-                    let key_str = &key.value();
-                    quote! {
-                        let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
-                        loader_registry.insert(::std::borrow::Cow::from(#key_str), #value);
-                    }
-                });
-
+                let map_entries = map_entries(map);
                 let map_entries_len = map_entries.len();
-
-                let runtime_root =
-                    ::meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
-
-                let path_fnl = runtime_root.join("manifest.fnl");
-                let path_init_fnl = runtime_root.join("manifest").join("init.fnl");
-                let path_lua = runtime_root.join("manifest.lua");
-                let path_init_lua = runtime_root.join("manifest").join("init.lua");
-
-                // For improved error messages.
-                let selected_path: String;
-                let path_fnl_str = path_fnl.to_string_lossy().into_owned();
-                let path_init_fnl_str = path_init_fnl.to_string_lossy().into_owned();
-                let path_lua_str = path_lua.to_string_lossy().into_owned();
-                let path_init_lua_str = path_init_lua.to_string_lossy().into_owned();
-
-                let module = if path_fnl.is_file() {
-                    selected_path = path_fnl_str;
-                    let module = ModuleFile::new(path_fnl.clone(), Some(ModuleFileType::Fennel))
-                        .expect(&format!(
-                            "Sorry, couldn't instantiate Module from path {:?}",
-                            path_fnl
-                        ));
-                    Module::File(module)
-                } else if path_init_fnl.is_file() {
-                    selected_path = path_init_fnl_str;
-                    let module =
-                        ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel))
-                            .expect(&format!(
-                                "Sorry, couldn't instantiate Module from path {:?}",
-                                path_init_fnl
-                            ));
-                    Module::File(module)
-                } else if path_lua.is_file() {
-                    selected_path = path_lua_str;
-                    let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua))
-                        .expect(&format!(
-                            "Sorry, couldn't instantiate Module from path {:?}",
-                            path_lua
-                        ));
-                    Module::File(module)
-                } else if path_init_lua.is_file() {
-                    selected_path = path_init_lua_str;
-                    let module = ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua))
-                        .expect(&format!(
-                            "Sorry, couldn't instantiate Module from path {:?}",
-                            path_init_lua
-                        ));
-                    Module::File(module)
-                } else {
-                    panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
-                };
-
+                let (module, selected_path) = module_from_path();
                 quote! {{
                     let key = #key;
                     let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
                     #(#map_entries)*
-
                     let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
                         .expect("Sorry, couldn't instantiate Config")
                         .0;
-
                     let manifest = if let Some(manifest) = config.get(&key) {
                         ::meka_module_manifest::CompiledNamedTextManifest::try_from(*manifest)
                             .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
                     } else {
                         panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #selected_path);
                     };
-
                     ::meka_searcher::MekaSearcher::from(manifest)
                 }}
             }
@@ -238,6 +176,71 @@ impl MekaInclude {
 
         Ok(tokens.into())
     }
+}
+
+fn module_from_path() -> (Module, String) {
+    let runtime_root =
+        ::meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
+
+    let path_fnl = runtime_root.join("manifest.fnl");
+    let path_init_fnl = runtime_root.join("manifest").join("init.fnl");
+    let path_lua = runtime_root.join("manifest.lua");
+    let path_init_lua = runtime_root.join("manifest").join("init.lua");
+
+    // For improved error messages.
+    let selected_path: String;
+    let path_fnl_str = path_fnl.to_string_lossy().into_owned();
+    let path_init_fnl_str = path_init_fnl.to_string_lossy().into_owned();
+    let path_lua_str = path_lua.to_string_lossy().into_owned();
+    let path_init_lua_str = path_init_lua.to_string_lossy().into_owned();
+
+    let module = if path_fnl.is_file() {
+        selected_path = path_fnl_str;
+        let module =
+            ModuleFile::new(path_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
+                "Sorry, couldn't instantiate Module from path {:?}",
+                path_fnl
+            ));
+        Module::File(module)
+    } else if path_init_fnl.is_file() {
+        selected_path = path_init_fnl_str;
+        let module =
+            ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
+                "Sorry, couldn't instantiate Module from path {:?}",
+                path_init_fnl
+            ));
+        Module::File(module)
+    } else if path_lua.is_file() {
+        selected_path = path_lua_str;
+        let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
+            "Sorry, couldn't instantiate Module from path {:?}",
+            path_lua
+        ));
+        Module::File(module)
+    } else if path_init_lua.is_file() {
+        selected_path = path_init_lua_str;
+        let module =
+            ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
+                "Sorry, couldn't instantiate Module from path {:?}",
+                path_init_lua
+            ));
+        Module::File(module)
+    } else {
+        panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
+    };
+
+    (module, selected_path)
+}
+
+fn map_entries(map: Vec<(LitStr, Ident)>) -> Vec<proc_macro2::TokenStream> {
+    let map_entries = map.iter().map(|(key, value)| {
+        let key_str = &key.value();
+        quote! {
+            let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
+            loader_registry.insert(::std::borrow::Cow::from(#key_str), #value);
+        }
+    }).collect();
+    map_entries
 }
 
 #[cfg(test)]
