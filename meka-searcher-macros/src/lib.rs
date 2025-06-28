@@ -115,14 +115,14 @@ impl MekaInclude {
                 let map_entries_len = map_entries.len();
                 let (module, selected_path) = module_from_path();
                 quote! {{
-                    let key = #key;
                     let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
                     #(#map_entries)*
                     let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
                         .expect("Sorry, couldn't instantiate Config")
                         .0;
-                    let manifest = if let Some(manifest) = config.get(&key) {
-                        ::meka_module_manifest::CompiledNamedTextManifest::try_from(*manifest)
+                    let key: &str = #key.as_ref();
+                    let manifest = if let Some(manifest) = config.get(key) {
+                        ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
                             .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
                     } else {
                         panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #selected_path);
@@ -143,16 +143,15 @@ impl MekaInclude {
             (None, Some(map)) => {
                 // Only map present
                 let map_entries = map.iter().map(|(key, value)| {
-                    let key_str = &key.value();
                     quote! {
-                        let _: fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function> = #value;
-                        map.insert(std::borrow::Cow::from(#key_str), #value);
+                        let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
+                        map.insert(::std::borrow::Cow::from(#key), #value);
                     }
                 });
 
                 quote! {
                     {
-                        let mut map: std::collections::HashMap<std::borrow::Cow<'static, std::primitive::str>, fn(&mlua::Lua, mlua::Table, &std::primitive::str) -> mlua::Result<mlua::Function>> = std::collections::HashMap::new();
+                        let mut map: ::std::collections::HashMap<::std::borrow::Cow<'static, ::std::primitive::str>, fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function>> = ::std::collections::HashMap::new();
                         #(#map_entries)*
 
                         // TODO: Replace with your actual logic
@@ -234,10 +233,9 @@ fn module_from_path() -> (Module, String) {
 
 fn map_entries(map: Vec<(LitStr, Path)>) -> Vec<proc_macro2::TokenStream> {
     let map_entries = map.iter().map(|(key, value)| {
-        let key_str = &key.value();
         quote! {
             let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
-            loader_registry.insert(::std::borrow::Cow::from(#key_str), #value);
+            loader_registry.insert(::std::borrow::Cow::from(#key), #value);
         }
     }).collect();
     map_entries
