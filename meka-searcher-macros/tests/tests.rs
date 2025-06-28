@@ -1,4 +1,4 @@
-use meka_macros::meka_include;
+use meka_searcher_macros::meka_include;
 use mlua::{Function, Lua, Table, UserData, UserDataMethods};
 
 struct Cartridge {

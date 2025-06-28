@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use std::convert::{From, TryFrom};
 use std::vec::Vec;
 use syn::{
-    Ident, LitStr, Token, braced,
+    LitStr, Path, Token, braced,
     parse::{Parse, ParseStream},
     parse_macro_input,
 };
@@ -29,7 +29,7 @@ pub fn meka_include(input: TokenStream) -> TokenStream {
 
 struct MekaInclude {
     pub key: Option<LitStr>,
-    pub map: Option<Vec<(LitStr, Ident)>>,
+    pub map: Option<Vec<(LitStr, Path)>>,
 }
 
 impl Parse for MekaInclude {
@@ -78,7 +78,7 @@ impl Parse for MekaInclude {
 }
 
 /// Parse a braced map of "string_key" => function_ident pairs
-fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Ident)>> {
+fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Path)>> {
     let content;
     braced!(content in input);
 
@@ -90,7 +90,7 @@ fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Ident)>> {
         content.parse::<Token![=>]>()?;
 
         // Parse value as identifier (function name)
-        let value = content.parse::<Ident>()?;
+        let value = content.parse::<Path>()?;
 
         pairs.push((key, value));
 
@@ -232,7 +232,7 @@ fn module_from_path() -> (Module, String) {
     (module, selected_path)
 }
 
-fn map_entries(map: Vec<(LitStr, Ident)>) -> Vec<proc_macro2::TokenStream> {
+fn map_entries(map: Vec<(LitStr, Path)>) -> Vec<proc_macro2::TokenStream> {
     let map_entries = map.iter().map(|(key, value)| {
         let key_str = &key.value();
         quote! {
