@@ -1,8 +1,8 @@
+use io_cat::CatKind;
 use meka_searcher::{AddMekaSearcher, MekaSearcher, RuntimeRead};
-use meka_types::CatCowMap;
+use meka_types::{CatCow, CatCowMap};
 use mlua::{Lua, LuaOptions, StdLib};
 use std::borrow::Cow;
-use std::boxed::Box;
 use std::convert::From;
 use std::env;
 use std::path::PathBuf;
@@ -19,7 +19,7 @@ fn add_meka_searcher_runtime_works() {
         let mut fnl = CatCowMap::new();
         fnl.insert(
             Cow::from("fruit.orchard"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(&cargo_manifest_dir)
                     .join("tests")
@@ -30,7 +30,7 @@ fn add_meka_searcher_runtime_works() {
         );
         fnl.insert(
             Cow::from("lime.color"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(&cargo_manifest_dir)
                     .join("tests")
@@ -39,12 +39,13 @@ fn add_meka_searcher_runtime_works() {
                     .join("color.fnl"),
             ),
         );
+        let fnl = CatCow(fnl);
         let fnl = Some(fnl);
 
         let mut fnl_macros = CatCowMap::new();
         fnl_macros.insert(
             Cow::from("fruit.hat"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(&cargo_manifest_dir)
                     .join("tests")
@@ -53,12 +54,13 @@ fn add_meka_searcher_runtime_works() {
                     .join("macros.fnl"),
             ),
         );
+        let fnl_macros = CatCow(fnl_macros);
         let fnl_macros = Some(fnl_macros);
 
         let mut lua = CatCowMap::new();
         lua.insert(
             Cow::from("lime.time"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(&cargo_manifest_dir)
                     .join("tests")
@@ -67,6 +69,7 @@ fn add_meka_searcher_runtime_works() {
                     .join("time.lua"),
             ),
         );
+        let lua = CatCow(lua);
         let lua = Some(lua);
 
         RuntimeRead {

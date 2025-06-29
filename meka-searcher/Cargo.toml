@@ -23,6 +23,7 @@ mlua-vendored = ["fennel-searcher/mlua-vendored", "meka-module-manifest/mlua-ven
 
 [dependencies]
 fennel-searcher = { path = "../fennel-searcher", default-features = false }
+io-cat = { workspace = true }
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
 meka-types = { path = "../meka-types" }
 mlua = { workspace = true }

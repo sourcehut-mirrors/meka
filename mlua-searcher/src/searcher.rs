@@ -1,4 +1,5 @@
-use meka_types::CatCowMap;
+use io_cat::Cat;
+use meka_types::CatCow;
 use mlua::{Function, Lua, MetaMethod, RegistryKey, Table, UserData, UserDataMethods, Value};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -217,15 +218,15 @@ impl UserData for FunctionSearcher {
     }
 }
 
-/// Like `Searcher`, but with `CatCowMap` to facilitate indexing heterogenous strings and
-/// paths - all presumed to resolve to Lua module content - by module names in `modules`.
+/// Like `Searcher`, but with `CatCow` to facilitate indexing heterogenous strings and paths -
+/// all presumed to resolve to Lua module content - by module names in `modules`.
 struct CatSearcher {
-    modules: CatCowMap,
+    modules: CatCow,
     globals: RegistryKey,
 }
 
 impl CatSearcher {
-    fn new(modules: CatCowMap, globals: RegistryKey) -> Self {
+    fn new(modules: CatCow, globals: RegistryKey) -> Self {
         Self { modules, globals }
     }
 }
@@ -237,7 +238,7 @@ impl UserData for CatSearcher {
     {
         methods.add_meta_method(MetaMethod::Call, |lua, this, name: String| {
             let name = Cow::from(name);
-            match this.modules.get(&name) {
+            match this.modules.0.get(&name) {
                 Some(content) => {
                     let content = content
                         .cat()
@@ -296,7 +297,7 @@ pub trait AddSearcher {
 
     /// Like `add_searcher`, except `modules` can contain heterogenous strings and paths
     /// indexed by module name.
-    fn add_cat_searcher(&self, modules: CatCowMap) -> Result<()>;
+    fn add_cat_searcher(&self, modules: CatCow) -> Result<()>;
 }
 
 impl AddSearcher for Lua {
@@ -371,7 +372,7 @@ impl AddSearcher for Lua {
             .map_err(|e| e.into())
     }
 
-    fn add_cat_searcher(&self, modules: CatCowMap) -> Result<()> {
+    fn add_cat_searcher(&self, modules: CatCow) -> Result<()> {
         let globals = self.globals();
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;

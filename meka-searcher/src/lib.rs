@@ -1,6 +1,7 @@
 use fennel_searcher::AddSearcher as _;
+use io_cat::CatKind;
 use meka_module_manifest::CompiledNamedTextManifest;
-use meka_types::CatCowMap;
+use meka_types::{CatCow, CatCowMap};
 use mlua::Lua;
 use mlua_module_manifest::{ModuleFileType, NamedTextManifest};
 use mlua_searcher::AddSearcher as _;
@@ -68,6 +69,24 @@ impl From<NamedTextManifest> for MekaSearcher {
     }
 }
 
+impl ToTokens for MekaSearcher {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let expanded = match self {
+            MekaSearcher::ComptimeEmbedded(comptime_embedded) => {
+                quote! {
+                    ::meka_searcher::MekaSearcher::ComptimeEmbedded(#comptime_embedded)
+                }
+            }
+            MekaSearcher::RuntimeRead(runtime_read) => {
+                quote! {
+                    ::meka_searcher::MekaSearcher::RuntimeRead(#runtime_read)
+                }
+            }
+        };
+        tokens.extend(expanded);
+    }
+}
+
 /// Pre-categorized Fennel macro and Lua modules text indexed by name, with modules content
 /// resolved at comptime.
 pub struct ComptimeEmbedded {
@@ -99,8 +118,8 @@ impl From<CompiledNamedTextManifest> for ComptimeEmbedded {
 
 impl ToTokens for ComptimeEmbedded {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let fnl_macros_tokens = to_tokens_for_cowmap(&self.fnl_macros);
-        let lua_tokens = to_tokens_for_cowmap(&self.lua);
+        let fnl_macros_tokens = to_tokens_for_optional_cowmap(&self.fnl_macros);
+        let lua_tokens = to_tokens_for_optional_cowmap(&self.lua);
         let expanded = quote! {
             ::meka_searcher::ComptimeEmbedded {
                 fnl_macros: #fnl_macros_tokens,
@@ -111,7 +130,7 @@ impl ToTokens for ComptimeEmbedded {
     }
 }
 
-fn to_tokens_for_cowmap(
+fn to_tokens_for_optional_cowmap(
     cowmap: &Option<HashMap<Cow<'static, str>, Cow<'static, str>>>,
 ) -> proc_macro2::TokenStream {
     match cowmap {
@@ -135,13 +154,13 @@ fn to_tokens_for_cowmap(
 /// modules content resolved at runtime.
 pub struct RuntimeRead {
     /// For use with `mlua::Lua.add_cat_searcher_fnl()`.
-    pub fnl: Option<CatCowMap>,
+    pub fnl: Option<CatCow>,
 
     /// For use with `mlua::Lua.add_cat_searcher_fnl_macros()`.
-    pub fnl_macros: Option<CatCowMap>,
+    pub fnl_macros: Option<CatCow>,
 
     /// For use with `mlua::Lua.add_cat_searcher()`.
-    pub lua: Option<CatCowMap>,
+    pub lua: Option<CatCow>,
 }
 
 impl From<NamedTextManifest> for RuntimeRead {
@@ -152,20 +171,68 @@ impl From<NamedTextManifest> for RuntimeRead {
         for module in manifest.modules.into_iter() {
             match module.file_type {
                 ModuleFileType::Fennel => {
-                    fnl.insert_or_init(module.name, Box::new(module.text));
+                    fnl.insert_or_init(module.name, CatKind::from_str(module.text));
                 }
                 ModuleFileType::FennelMacros => {
-                    fnl_macros.insert_or_init(module.name, Box::new(module.text));
+                    fnl_macros.insert_or_init(module.name, CatKind::from_str(module.text));
                 }
                 ModuleFileType::Lua => {
-                    lua.insert_or_init(module.name, Box::new(module.text));
+                    lua.insert_or_init(module.name, CatKind::from_str(module.text));
                 }
             }
         }
+        let fnl = if let Some(fnl) = fnl {
+            Some(CatCow(fnl))
+        } else {
+            None
+        };
+        let fnl_macros = if let Some(fnl_macros) = fnl_macros {
+            Some(CatCow(fnl_macros))
+        } else {
+            None
+        };
+        let lua = if let Some(lua) = lua {
+            Some(CatCow(lua))
+        } else {
+            None
+        };
         Self {
             fnl,
             fnl_macros,
             lua,
+        }
+    }
+}
+
+impl ToTokens for RuntimeRead {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let fnl_tokens = to_tokens_for_optional_catcow(&self.fnl);
+        let fnl_macros_tokens = to_tokens_for_optional_catcow(&self.fnl_macros);
+        let lua_tokens = to_tokens_for_optional_catcow(&self.lua);
+        let expanded = quote! {
+            ::meka_searcher::RuntimeRead {
+                fnl: #fnl_tokens,
+                fnl_macros: #fnl_macros_tokens,
+                lua: #lua_tokens,
+            }
+        };
+        tokens.extend(expanded);
+    }
+}
+
+fn to_tokens_for_optional_catcow(catcow: &Option<CatCow>) -> proc_macro2::TokenStream {
+    match catcow {
+        None => quote! { None },
+        Some(catcow) => {
+            let entries = catcow.0.iter().map(|(key, cat_kind)| {
+                let key_str = key.as_ref();
+                quote! {
+                    (::std::borrow::Cow::from(#key_str), #cat_kind)
+                }
+            });
+            quote! {
+                Some(::meka_types::CatCow(::meka_types::CatCowMap::from([#(#entries),*])))
+            }
         }
     }
 }

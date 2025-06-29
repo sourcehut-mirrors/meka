@@ -1,4 +1,5 @@
-use meka_types::CatCowMap;
+use io_cat::CatKind;
+use meka_types::{CatCow, CatCowMap};
 use mlua::{Function, Lua, Table, UserData, UserDataMethods, Value};
 use mlua_searcher::AddSearcher;
 use std::borrow::Cow;
@@ -291,8 +292,9 @@ fn add_cat_searcher_works() {
         .join("fixtures")
         .join("lume.lua");
     let mut map: CatCowMap = CatCowMap::new();
-    map.insert(name, Box::new(path));
-    map.insert(Cow::from("loon"), Box::new(r#"return "hello loon""#));
+    map.insert(name, CatKind::Path(path));
+    map.insert(Cow::from("loon"), CatKind::Static(r#"return "hello loon""#));
+    let map = CatCow(map);
 
     let lua = Lua::new();
 

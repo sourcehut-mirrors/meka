@@ -3,7 +3,8 @@ mod tests {
     use fennel_compile::Compile;
     use fennel_mount::Mount;
     use fennel_searcher::AddSearcher;
-    use meka_types::CatCowMap;
+    use io_cat::CatKind;
+    use meka_types::{CatCow, CatCowMap};
     use mlua::{Lua, LuaOptions, StdLib, Table, Value};
     use serial_test::serial;
     use std::borrow::Cow;
@@ -406,7 +407,7 @@ mod tests {
         let mut lime = CatCowMap::new();
         lime.insert(
             Cow::from("lime.color"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(
                         env::var_os("CARGO_MANIFEST_DIR")
@@ -418,6 +419,7 @@ mod tests {
                     .join("color.fnl"),
             ),
         );
+        let lime = CatCow(lime);
 
         let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 
@@ -433,7 +435,7 @@ mod tests {
         let mut hat = CatCowMap::new();
         hat.insert(
             Cow::from("fruit.hat"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(
                         env::var_os("CARGO_MANIFEST_DIR")
@@ -445,11 +447,12 @@ mod tests {
                     .join("macros.fnl"),
             ),
         );
+        let hat = CatCow(hat);
 
         let mut stand = CatCowMap::new();
         stand.insert(
             Cow::from("fruit.stand"),
-            Box::new(
+            CatKind::Path(
                 PathBuf::new()
                     .join(
                         env::var_os("CARGO_MANIFEST_DIR")
@@ -461,6 +464,7 @@ mod tests {
                     .join("orchard.fnl"),
             ),
         );
+        let stand = CatCow(stand);
 
         let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 

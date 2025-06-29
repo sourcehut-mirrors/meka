@@ -8,3 +8,5 @@ description = "Types for Meka"
 
 [dependencies]
 io-cat = { workspace = true }
+proc-macro2 = { workspace = true }
+quote = { workspace = true }

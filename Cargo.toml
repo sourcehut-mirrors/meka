@@ -41,7 +41,7 @@ repository = "https://git.sr.ht/~ioiojo/meka"
 derive_builder = { version = "0.20" }
 gpgrv = { version = "0.4" }
 ignore = { version = "0.4" }
-io-cat = { git = "https://git.sr.ht/~ioiojo/io-cat", rev = "3d03694e8d741c10e9818b7539b78bc85b0bf2b1" }
+io-cat = { git = "https://git.sr.ht/~ioiojo/io-cat", rev = "f1bc096673bf12d09cf91beb96d247ce4bf18d73" }
 mlua = { version = "0.10", default-features = false }
 once_cell = { version = "1" }
 optional-collections = { git = "https://git.sr.ht/~ioiojo/optional-collections", rev = "d9a0720d39b975bd0c117e42e12aba2c1d908a6d" }

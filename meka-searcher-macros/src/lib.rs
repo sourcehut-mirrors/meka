@@ -130,7 +130,8 @@ impl MekaInclude {
                 // Only key present
                 let config = config_new_without_map();
                 let (_, path_str, _) = selected_path();
-                let key: &str = key.value().as_ref();
+                let key = key.value();
+                let key: &str = key.as_ref();
                 let manifest = if let Some(manifest) = config.get(key) {
                     CompiledNamedTextManifest::try_from((*manifest).clone())
                         .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
@@ -287,6 +288,7 @@ mod inline_tests {
     }
 
     #[test]
+    #[ignore = "requires separate testcrate for manifest and associated modules"]
     fn expand_empty_works() {
         let input = quote! {};
         let parsed: MekaInclude = parse2(input).unwrap();

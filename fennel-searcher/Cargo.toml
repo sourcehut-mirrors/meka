@@ -24,13 +24,14 @@ mlua-vendored = ["fennel-compile/mlua-vendored", "fennel-mount/mlua-vendored", "
 [dependencies]
 fennel-compile = { path = "../fennel-compile", default-features = false }
 fennel-mount = { path = "../fennel-mount", default-features = false }
+io-cat = { workspace = true }
 meka-types = { path = "../meka-types" }
 mlua = { workspace = true }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }
 
 [dev-dependencies]
-serial_test = { workspace = true }
 fennel-compile = { path = "../fennel-compile", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
 fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 fennel-searcher = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }
+serial_test = { workspace = true }

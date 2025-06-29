@@ -1,6 +1,7 @@
 use fennel_compile::Compile;
 use fennel_mount::Mount;
-use meka_types::CatCowMap;
+use io_cat::Cat;
+use meka_types::CatCow;
 use mlua::{Function, Lua, MetaMethod, RegistryKey, Table, UserData, UserDataMethods, Value};
 use mlua_searcher::AddSearcher as _;
 use std::borrow::Cow;
@@ -116,12 +117,12 @@ where
 /// Like `MacroSearcher`, but with `modules` values given as either strings containing or
 /// paths to Fennel modules.
 struct CatSearcher {
-    modules: CatCowMap,
+    modules: CatCow,
     globals: RegistryKey,
 }
 
 impl CatSearcher {
-    fn new(modules: CatCowMap, globals: RegistryKey) -> Self {
+    fn new(modules: CatCow, globals: RegistryKey) -> Self {
         Self { modules, globals }
     }
 }
@@ -133,7 +134,7 @@ impl UserData for CatSearcher {
     {
         methods.add_meta_method(MetaMethod::Call, |lua, this, name: String| {
             let name = Cow::from(name);
-            match this.modules.get(&name) {
+            match this.modules.0.get(&name) {
                 Some(content) => {
                     lua.mount_fennel().map_err(|e| {
                         mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
@@ -159,12 +160,12 @@ impl UserData for CatSearcher {
 
 /// Like `CatSearcher`, but for modules containing Fennel macros.
 struct MacroCatSearcher {
-    modules: CatCowMap,
+    modules: CatCow,
     globals: RegistryKey,
 }
 
 impl MacroCatSearcher {
-    fn new(modules: CatCowMap, globals: RegistryKey) -> Self {
+    fn new(modules: CatCow, globals: RegistryKey) -> Self {
         Self { modules, globals }
     }
 }
@@ -176,7 +177,7 @@ impl UserData for MacroCatSearcher {
     {
         methods.add_meta_method(MetaMethod::Call, |lua, this, name: String| {
             let name = Cow::from(name);
-            match this.modules.get(&name) {
+            match this.modules.0.get(&name) {
                 Some(content) => {
                     lua.mount_fennel().map_err(|e| {
                         mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
@@ -229,10 +230,10 @@ pub trait AddSearcher {
 
     /// Like `add_path_searcher_fnl`, but accepts heterogenous strings and paths - assumed to
     /// contain Fennel text directly and by resolution, respectively - indexed by module name.
-    fn add_cat_searcher_fnl(&self, modules: CatCowMap) -> Result<()>;
+    fn add_cat_searcher_fnl(&self, modules: CatCow) -> Result<()>;
 
     /// Like `add_cat_searcher_fnl`, but for modules containing Fennel macros.
-    fn add_cat_searcher_fnl_macros(&self, modules: CatCowMap) -> Result<()>;
+    fn add_cat_searcher_fnl_macros(&self, modules: CatCow) -> Result<()>;
 }
 
 impl AddSearcher for Lua {
@@ -296,7 +297,7 @@ impl AddSearcher for Lua {
             .map_err(|e| e.into())
     }
 
-    fn add_cat_searcher_fnl(&self, modules: CatCowMap) -> Result<()> {
+    fn add_cat_searcher_fnl(&self, modules: CatCow) -> Result<()> {
         let globals = self.globals();
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
@@ -306,7 +307,7 @@ impl AddSearcher for Lua {
             .map_err(|e| e.into())
     }
 
-    fn add_cat_searcher_fnl_macros(&self, modules: CatCowMap) -> Result<()> {
+    fn add_cat_searcher_fnl_macros(&self, modules: CatCow) -> Result<()> {
         self.mount_fennel()
             .map_err(|e| mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e)))?;
         let globals: Table = self.globals();
