@@ -10,6 +10,7 @@ use std::borrow::Cow;
 use std::boxed::Box;
 use std::collections::HashMap;
 use std::convert::{From, TryFrom};
+use std::path::PathBuf;
 use std::vec::Vec;
 use syn::{
     LitStr, Path, Token, braced,
@@ -111,7 +112,8 @@ impl MekaInclude {
         let tokens = match (self.key, self.map) {
             (Some(key), Some(map)) => {
                 // Both key and map present
-                let (tokens, selected_path) = config_from_map(map);
+                let tokens = config_new_with_map(map);
+                let (_, path_str, _) = selected_path();
                 quote! {{
                     #tokens
                     let key: &str = #key.as_ref();
@@ -119,43 +121,55 @@ impl MekaInclude {
                         ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
                             .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
                     } else {
-                        panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #selected_path);
+                        panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
                     };
                     ::meka_searcher::MekaSearcher::from(manifest)
                 }}
             }
             (Some(key), None) => {
                 // Only key present
-                quote! {
-                    {
-                        let key = #key;
-                        // TODO: Replace with your actual logic
-                        println!("Key only: {}", key);
-                    }
-                }
+                let config = config_new_without_map();
+                let (_, path_str, _) = selected_path();
+                let key: &str = key.value().as_ref();
+                let manifest = if let Some(manifest) = config.get(key) {
+                    CompiledNamedTextManifest::try_from((*manifest).clone())
+                        .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                } else {
+                    panic!(
+                        "Sorry, couldn't find key {} in Meka manifest at {}",
+                        key, path_str
+                    );
+                };
+                let searcher = MekaSearcher::from(manifest);
+                quote! { #searcher }
             }
             (None, Some(map)) => {
                 // Only map present
-                let (tokens, selected_path) = config_from_map(map);
+                let tokens = config_new_with_map(map);
+                let (_, path_str, _) = selected_path();
                 quote! {{
                     #tokens
                     let manifest = if let Some(manifest) = config.get("") {
                         ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
                             .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
                     } else {
-                        panic!("Sorry, couldn't find Meka manifest at {}", #selected_path);
+                        panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
                     };
                     ::meka_searcher::MekaSearcher::from(manifest)
                 }}
             }
             (None, None) => {
                 // Empty macro call
-                quote! {
-                    {
-                        // TODO: Replace with your actual logic
-                        println!("Empty meka_include call");
-                    }
-                }
+                let config = config_new_without_map();
+                let (_, path_str, _) = selected_path();
+                let manifest = if let Some(manifest) = config.get("") {
+                    CompiledNamedTextManifest::try_from((*manifest).clone())
+                        .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                } else {
+                    panic!("Sorry, couldn't find Meka manifest at {}", path_str);
+                };
+                let searcher = MekaSearcher::from(manifest);
+                quote! { #searcher }
             }
         };
 
@@ -163,72 +177,17 @@ impl MekaInclude {
     }
 }
 
-fn module_from_path() -> (Module, String) {
-    let runtime_root =
-        ::meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
-
-    let path_fnl = runtime_root.join("manifest.fnl");
-    let path_init_fnl = runtime_root.join("manifest").join("init.fnl");
-    let path_lua = runtime_root.join("manifest.lua");
-    let path_init_lua = runtime_root.join("manifest").join("init.lua");
-
-    // For improved error messages.
-    let selected_path: String;
-    let path_fnl_str = path_fnl.to_string_lossy().into_owned();
-    let path_init_fnl_str = path_init_fnl.to_string_lossy().into_owned();
-    let path_lua_str = path_lua.to_string_lossy().into_owned();
-    let path_init_lua_str = path_init_lua.to_string_lossy().into_owned();
-
-    let module = if path_fnl.is_file() {
-        selected_path = path_fnl_str;
-        let module =
-            ModuleFile::new(path_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
-                "Sorry, couldn't instantiate Module from path {:?}",
-                path_fnl
-            ));
-        Module::File(module)
-    } else if path_init_fnl.is_file() {
-        selected_path = path_init_fnl_str;
-        let module =
-            ModuleFile::new(path_init_fnl.clone(), Some(ModuleFileType::Fennel)).expect(&format!(
-                "Sorry, couldn't instantiate Module from path {:?}",
-                path_init_fnl
-            ));
-        Module::File(module)
-    } else if path_lua.is_file() {
-        selected_path = path_lua_str;
-        let module = ModuleFile::new(path_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
-            "Sorry, couldn't instantiate Module from path {:?}",
-            path_lua
-        ));
-        Module::File(module)
-    } else if path_init_lua.is_file() {
-        selected_path = path_init_lua_str;
-        let module =
-            ModuleFile::new(path_init_lua.clone(), Some(ModuleFileType::Lua)).expect(&format!(
-                "Sorry, couldn't instantiate Module from path {:?}",
-                path_init_lua
-            ));
-        Module::File(module)
-    } else {
-        panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
-    };
-
-    (module, selected_path)
-}
-
-fn config_from_map(map: Vec<(LitStr, Path)>) -> (proc_macro2::TokenStream, String) {
+fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     let map_entries = map_entries(map);
     let map_entries_len = map_entries.len();
-    let (module, selected_path) = module_from_path();
-    let tokens = quote! {
+    let module = module_from_path();
+    quote! {
         let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
         #(#map_entries)*
         let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
             .expect("Sorry, couldn't instantiate Config")
             .0;
-    };
-    (tokens, selected_path)
+    }
 }
 
 fn map_entries(map: Vec<(LitStr, Path)>) -> Vec<proc_macro2::TokenStream> {
@@ -239,6 +198,50 @@ fn map_entries(map: Vec<(LitStr, Path)>) -> Vec<proc_macro2::TokenStream> {
         }
     }).collect();
     map_entries
+}
+
+fn module_from_path() -> Module {
+    let (path, path_str, file_type) = selected_path();
+    let module = ModuleFile::new(path.clone(), Some(file_type)).expect(&format!(
+        "Sorry, couldn't instantiate Module from path {}",
+        path_str
+    ));
+    Module::File(module)
+}
+
+fn selected_path() -> (PathBuf, String, ModuleFileType) {
+    let runtime_root =
+        ::meka_utils::runtime_root().expect("Sorry, couldn't get $CARGO_MANIFEST_DIR");
+
+    let path_fnl = runtime_root.join("manifest.fnl");
+    let path_init_fnl = runtime_root.join("manifest").join("init.fnl");
+    let path_lua = runtime_root.join("manifest.lua");
+    let path_init_lua = runtime_root.join("manifest").join("init.lua");
+
+    // For improved error messages.
+    let path_fnl_str = path_fnl.to_string_lossy().into_owned();
+    let path_init_fnl_str = path_init_fnl.to_string_lossy().into_owned();
+    let path_lua_str = path_lua.to_string_lossy().into_owned();
+    let path_init_lua_str = path_init_lua.to_string_lossy().into_owned();
+
+    if path_fnl.is_file() {
+        (path_fnl, path_fnl_str, ModuleFileType::Fennel)
+    } else if path_init_fnl.is_file() {
+        (path_init_fnl, path_init_fnl_str, ModuleFileType::Fennel)
+    } else if path_lua.is_file() {
+        (path_lua, path_lua_str, ModuleFileType::Lua)
+    } else if path_init_lua.is_file() {
+        (path_init_lua, path_init_lua_str, ModuleFileType::Lua)
+    } else {
+        panic!("Sorry, couldn't find Meka manifest in $CARGO_MANIFEST_DIR");
+    }
+}
+
+fn config_new_without_map() -> HashMap<String, Manifest> {
+    let module = module_from_path();
+    Config::new(module, None)
+        .expect("Sorry, couldn't instantiate Config")
+        .0
 }
 
 #[cfg(test)]
