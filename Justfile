@@ -73,9 +73,25 @@ check-meka-searcher:
 check-meka-searcher-macros:
   cargo check --package meka-searcher-macros --features mlua-lua54,mlua-vendored
 
-# Run cargo check on meka-searcher-macros-tests
-check-meka-searcher-macros-tests:
-  cargo check --package meka-searcher-macros-tests
+# Run cargo check on meka-searcher-macros-test-empty
+check-meka-searcher-macros-test-empty:
+  cargo check --package meka-searcher-macros-test-empty
+
+# Run cargo check on meka-searcher-macros-test-map-only
+check-meka-searcher-macros-test-map-only:
+  cargo check --package meka-searcher-macros-test-map-only
+
+# Run cargo check on meka-searcher-macros-test-string-and-map
+check-meka-searcher-macros-test-string-and-map:
+  cargo check --package meka-searcher-macros-test-string-and-map
+
+# Run cargo check on meka-searcher-macros-test-string-only
+check-meka-searcher-macros-test-string-only:
+  cargo check --package meka-searcher-macros-test-string-only
+
+# Run cargo check on meka-searcher-macros-test-trailing-comma
+check-meka-searcher-macros-test-trailing-comma:
+  cargo check --package meka-searcher-macros-test-trailing-comma
 
 # Run cargo check on meka-types
 check-meka-types:
@@ -169,9 +185,25 @@ test-meka-searcher:
 test-meka-searcher-macros:
   cargo test --package meka-searcher-macros --features mlua-lua54,mlua-vendored
 
-# Run cargo test on meka-searcher-macros-tests
-test-meka-searcher-macros-tests:
-  cargo test --package meka-searcher-macros-tests
+# Run cargo test on meka-searcher-macros-test-empty
+test-meka-searcher-macros-test-empty:
+  cargo test --package meka-searcher-macros-test-empty
+
+# Run cargo test on meka-searcher-macros-test-map-only
+test-meka-searcher-macros-test-map-only:
+  cargo test --package meka-searcher-macros-test-map-only
+
+# Run cargo test on meka-searcher-macros-test-string-and-map
+test-meka-searcher-macros-test-string-and-map:
+  cargo test --package meka-searcher-macros-test-string-and-map
+
+# Run cargo test on meka-searcher-macros-test-string-only
+test-meka-searcher-macros-test-string-only:
+  cargo test --package meka-searcher-macros-test-string-only
+
+# Run cargo test on meka-searcher-macros-test-trailing-comma
+test-meka-searcher-macros-test-trailing-comma:
+  cargo test --package meka-searcher-macros-test-trailing-comma
 
 # Run cargo test on meka-types
 test-meka-types:

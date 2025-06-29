@@ -1,5 +1,5 @@
 [package]
-name = "meka-searcher-macros-tests"
+name = "meka-searcher-macros-test-empty"
 version = "0.1.0"
 edition = { workspace = true }
 publish = false

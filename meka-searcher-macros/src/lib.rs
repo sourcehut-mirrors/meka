@@ -111,15 +111,9 @@ impl MekaInclude {
         let tokens = match (self.key, self.map) {
             (Some(key), Some(map)) => {
                 // Both key and map present
-                let map_entries = map_entries(map);
-                let map_entries_len = map_entries.len();
-                let (module, selected_path) = module_from_path();
+                let (tokens, selected_path) = config_from_map(map);
                 quote! {{
-                    let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
-                    #(#map_entries)*
-                    let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
-                        .expect("Sorry, couldn't instantiate Config")
-                        .0;
+                    #tokens
                     let key: &str = #key.as_ref();
                     let manifest = if let Some(manifest) = config.get(key) {
                         ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
@@ -142,25 +136,17 @@ impl MekaInclude {
             }
             (None, Some(map)) => {
                 // Only map present
-                let map_entries = map.iter().map(|(key, value)| {
-                    quote! {
-                        let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
-                        map.insert(::std::borrow::Cow::from(#key), #value);
-                    }
-                });
-
-                quote! {
-                    {
-                        let mut map: ::std::collections::HashMap<::std::borrow::Cow<'static, ::std::primitive::str>, fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function>> = ::std::collections::HashMap::new();
-                        #(#map_entries)*
-
-                        // TODO: Replace with your actual logic
-                        println!("Map only with {} entries", map.len());
-                        for (k, _) in &map {
-                            println!("  Key: {}", k);
-                        }
-                    }
-                }
+                let (tokens, selected_path) = config_from_map(map);
+                quote! {{
+                    #tokens
+                    let manifest = if let Some(manifest) = config.get("") {
+                        ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
+                            .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                    } else {
+                        panic!("Sorry, couldn't find Meka manifest at {}", #selected_path);
+                    };
+                    ::meka_searcher::MekaSearcher::from(manifest)
+                }}
             }
             (None, None) => {
                 // Empty macro call
@@ -229,6 +215,20 @@ fn module_from_path() -> (Module, String) {
     };
 
     (module, selected_path)
+}
+
+fn config_from_map(map: Vec<(LitStr, Path)>) -> (proc_macro2::TokenStream, String) {
+    let map_entries = map_entries(map);
+    let map_entries_len = map_entries.len();
+    let (module, selected_path) = module_from_path();
+    let tokens = quote! {
+        let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
+        #(#map_entries)*
+        let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
+            .expect("Sorry, couldn't instantiate Config")
+            .0;
+    };
+    (tokens, selected_path)
 }
 
 fn map_entries(map: Vec<(LitStr, Path)>) -> Vec<proc_macro2::TokenStream> {

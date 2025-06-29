@@ -1,0 +1,36 @@
+[package]
+name = "meka-searcher-macros-test-string-and-map"
+version = "0.1.0"
+edition = { workspace = true }
+publish = false
+
+[features]
+default = ["fennel153-lua54-vendored"]
+fennel153-lua54-vendored = ["fennel-src/fennel153",
+                            "fennel-src/mlua-lua54",
+                            "fennel-src/mlua-vendored",
+                            "meka-config/fennel153",
+                            "meka-config/mlua-lua54",
+                            "meka-config/mlua-vendored",
+                            "meka-module-manifest/fennel153",
+                            "meka-module-manifest/mlua-lua54",
+                            "meka-module-manifest/mlua-vendored",
+                            "meka-searcher/fennel153",
+                            "meka-searcher/mlua-lua54",
+                            "meka-searcher/mlua-vendored",
+                            "meka-searcher-macros/fennel153",
+                            "meka-searcher-macros/mlua-lua54",
+                            "meka-searcher-macros/mlua-vendored",
+                            "mlua/lua54",
+                            "mlua/vendored",
+                            "mlua-module-manifest/mlua-lua54",
+                            "mlua-module-manifest/mlua-vendored"]
+
+[dependencies]
+fennel-src = { path = "../fennel-src", default-features = false }
+meka-config = { path = "../meka-config", default-features = false }
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+meka-searcher = { path = "../meka-searcher", default-features = false }
+meka-searcher-macros = { path = "../meka-searcher-macros", default-features = false }
+mlua = { workspace = true, default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }

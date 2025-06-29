@@ -39,33 +39,6 @@ pub mod test_loaders {
             .set_environment(env)
             .into_function()?)
     }
-
-    pub fn lua_loader(lua: &Lua, env: Table, name: &str) -> mlua::Result<Function> {
-        // Mock lua loader
-        Ok(lua
-            .load("return function() return 'lua result' end")
-            .set_name(name)
-            .set_environment(env)
-            .into_function()?)
-    }
-}
-
-#[test]
-fn empty_macro_works() {
-    meka_include!();
-}
-
-#[test]
-fn string_only_works() {
-    meka_include!("test_component");
-}
-
-#[test]
-fn map_only_works() {
-    meka_include!({
-        "fennel-src" => fennel_src::loader,
-        "cartridge-src" => test_loaders::cartridge_loader
-    });
 }
 
 #[test]
@@ -74,12 +47,5 @@ fn string_and_map_works() {
         "fennel-src" => fennel_src::loader,
         "cartridge-src" => test_loaders::cartridge_loader
     });
-}
-
-#[test]
-fn trailing_comma_works() {
-    meka_include!({
-        "cartridge-src" => test_loaders::cartridge_loader,
-        "fennel-src" => fennel_src::loader,
-    });
+    assert!(true);
 }
