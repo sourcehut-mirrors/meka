@@ -29,6 +29,8 @@ mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }
 optional-collections = { workspace = true }
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
 
 [dev-dependencies]
 meka-searcher = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }

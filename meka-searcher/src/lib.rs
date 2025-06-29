@@ -5,6 +5,7 @@ use mlua::Lua;
 use mlua_module_manifest::{ModuleFileType, NamedTextManifest};
 use mlua_searcher::AddSearcher as _;
 use optional_collections::InsertOrInit;
+use quote::{ToTokens, quote};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::From;
@@ -93,6 +94,40 @@ impl From<CompiledNamedTextManifest> for ComptimeEmbedded {
             }
         }
         Self { fnl_macros, lua }
+    }
+}
+
+impl ToTokens for ComptimeEmbedded {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let fnl_macros_tokens = to_tokens_for_cowmap(&self.fnl_macros);
+        let lua_tokens = to_tokens_for_cowmap(&self.lua);
+        let expanded = quote! {
+            ::meka_searcher::ComptimeEmbedded {
+                fnl_macros: #fnl_macros_tokens,
+                lua: #lua_tokens,
+            }
+        };
+        tokens.extend(expanded);
+    }
+}
+
+fn to_tokens_for_cowmap(
+    cowmap: &Option<HashMap<Cow<'static, str>, Cow<'static, str>>>,
+) -> proc_macro2::TokenStream {
+    match cowmap {
+        None => quote! { None },
+        Some(map) => {
+            let entries = map.iter().map(|(key, value)| {
+                let key_str = key.as_ref();
+                let value_str = value.as_ref();
+                quote! {
+                    (::std::borrow::Cow::from(#key_str), ::std::borrow::Cow::from(#value_str))
+                }
+            });
+            quote! {
+                Some(::std::collections::HashMap::from([#(#entries),*]))
+            }
+        }
     }
 }
 
