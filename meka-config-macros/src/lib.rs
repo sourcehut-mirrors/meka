@@ -129,55 +129,34 @@ fn get_loaders_from_cargo_toml() -> Result<HashMap<String, String>, LoaderRegist
             ))?
     };
 
-    let loaders = {
-        let loader = metadata_table
-            .get("loader")
+    let loaders_table = {
+        let loaders = metadata_table
+            .get("loaders")
             .ok_or(LoaderRegistryError::MissingMetadata)?;
-        loader.as_array().ok_or_else(|| {
-            LoaderRegistryError::InvalidLoader(
-                "loader".to_string(),
-                "loader must be an array".to_string(),
+        loaders.as_table().ok_or_else(|| {
+            LoaderRegistryError::InvalidLoaderRegistry(
+                "loaders".to_string(),
+                "loaders must be a table".to_string(),
             )
         })?
     };
 
-    loaders
+    loaders_table
         .iter()
-        .enumerate()
-        .map(|(index, loader_entry)| parse_loader_entry(loader_entry, index))
+        .map(|(name, loader_path)| parse_loader_entry(name, loader_path))
         .collect::<Result<HashMap<String, String>, LoaderRegistryError>>()
 }
 
 fn parse_loader_entry(
-    loader_entry: &toml::Value,
-    index: usize,
+    name: &str,
+    loader_path: &toml::Value,
 ) -> Result<(String, String), LoaderRegistryError> {
-    let loader_table = loader_entry.as_table().ok_or_else(|| {
+    let loader_path = loader_path.as_str().ok_or_else(|| {
         LoaderRegistryError::InvalidLoader(
-            format!("loader[{}]", index),
-            "each loader entry must be a table".to_string(),
+            name.to_string(),
+            "loader path must be a string".to_string(),
         )
     })?;
-
-    let name = loader_table
-        .get("name")
-        .and_then(|n| n.as_str())
-        .ok_or_else(|| {
-            LoaderRegistryError::InvalidLoader(
-                format!("loader[{}]", index),
-                "missing 'name' field".to_string(),
-            )
-        })?;
-
-    let loader_path = loader_table
-        .get("loader")
-        .and_then(|l| l.as_str())
-        .ok_or_else(|| {
-            LoaderRegistryError::InvalidLoader(
-                name.to_string(),
-                "missing 'loader' field".to_string(),
-            )
-        })?;
 
     validate_loader_path(name, loader_path)?;
 

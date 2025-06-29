@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = { workspace = true }
 publish = false
 
-[[package.metadata.meka.loader]]
-name = "invalid"
-loader = "nonexistent_crate::nonexistent_function"
+[package.metadata.meka.loaders]
+invalid = "nonexistent_crate::nonexistent_function"
 
 [features]
 default = ["lua54-vendored"]

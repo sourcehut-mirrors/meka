@@ -4,17 +4,10 @@ version = "0.1.0"
 edition = { workspace = true }
 publish = false
 
-[[package.metadata.meka.loader]]
-name = "fennel-src"
-loader = "fennel_src::loader"
-
-[[package.metadata.meka.loader]]
-name = "lua-src"
-loader = "test_loaders::lua_loader"
-
-[[package.metadata.meka.loader]]
-name = "n64"
-loader = "test_loaders::cartridge_loader"
+[package.metadata.meka.loaders]
+fennel-src = "fennel_src::loader"
+lua-src = "test_loaders::lua_loader"
+n64 = "test_loaders::cartridge_loader"
 
 [features]
 default = ["fennel153-lua54-vendored"]
