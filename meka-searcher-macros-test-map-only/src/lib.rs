@@ -1,4 +1,4 @@
-use meka_searcher_macros::meka_include;
+use meka_searcher_macros::meka_searcher;
 
 pub mod test_loaders {
     use mlua::{Function, Lua, Table, UserData, UserDataMethods};
@@ -43,7 +43,7 @@ pub mod test_loaders {
 
 #[test]
 fn map_only_works() {
-    meka_include!({
+    meka_searcher!({
         "fennel-src" => fennel_src::loader,
         "cartridge-src" => test_loaders::cartridge_loader
     });

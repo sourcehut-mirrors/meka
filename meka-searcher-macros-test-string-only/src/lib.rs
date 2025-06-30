@@ -1,7 +1,7 @@
-use meka_searcher_macros::meka_include;
+use meka_searcher_macros::meka_searcher;
 
 #[test]
 fn string_only_works() {
-    meka_include!("test_component");
+    meka_searcher!("test_component");
     assert!(true);
 }

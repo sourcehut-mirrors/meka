@@ -351,7 +351,7 @@ mod inline_tests {
         // Works because we're using `proc_macro2::TokenStream`.
         let expanded_string = expanded.to_string();
         assert!(!expanded_string.is_empty());
-        assert!(expanded_string.contains("Empty meka_include call"));
+        assert!(expanded_string.contains("Empty meka_searcher call"));
     }
 
     #[test]

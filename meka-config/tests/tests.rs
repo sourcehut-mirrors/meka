@@ -11,7 +11,7 @@ fn it_works() {
 
 ;; Map Fennel module paths to the module names you wish to refer to them by in `mlua::Lua`.
 ;;
-;; N.B. the `name` field is optional and redundant in this case since Meka elides those same
+;; N.B. the `name` field is optional and redundant in this case since Meka derives those same
 ;; names from the paths given.
 (local kiwi (manifest.new {:name :kiwi.cite            :path :kiwi/cite.fnl}
                           {:name :kiwi.date            :path :kiwi/date.fnl}
@@ -25,7 +25,8 @@ fn it_works() {
                           ;; Embed Fennel via `fennel-src` crate. Enables `(require :fennel)`.
                           (fennel-src)))
 
-;; Refer to `kiwi` manifest in `meka_include!` or `meka_load!` by passing in the string "kiwi".
+;; Refer to `kiwi` manifest in `meka_searcher!` or `meka_searcher_hot!` by passing the string
+;; "kiwi" as first argument.
 {: kiwi}"#
         .into();
     let module = Module::NamedText(
@@ -111,7 +112,8 @@ fn standalone_manifest_fennel_macro_works() {
     let module: &str = r#"(import-macros {: manifest} :meka.macros)
     (local fennel-src (require :fennel-src))
 
-;; Refer to this manifest in `meka_include!` or `meka_load!` by omitting a string argument.
+;; Refer to this manifest in `meka_searcher!` or `meka_searcher_hot!` by omitting a string
+;; argument.
 (manifest {:name :kiwi.cite            :path :kiwi/cite.fnl
            :name :kiwi.date            :path :kiwi/date.fnl
            :name :kiwi.date-time       :path :kiwi/date-time.fnl
