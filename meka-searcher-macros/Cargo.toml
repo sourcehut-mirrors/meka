@@ -31,7 +31,6 @@ meka-searcher = { path = "../meka-searcher", default-features = false }
 meka-utils = { path = "../meka-utils" }
 mlua = { workspace = true, default-features = false }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
-optional-collections = { workspace = true }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
 syn = { workspace = true }

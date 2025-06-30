@@ -1,13 +1,9 @@
-use meka_config::{Config, LoaderRegistry};
+use meka_config::Config;
 use meka_module_manifest::CompiledNamedTextManifest;
 use meka_searcher::MekaSearcher;
-use mlua::{Function, Lua, Table};
-use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, NamedTextManifest};
-use optional_collections::InsertOrInit;
+use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType};
 use proc_macro::TokenStream;
 use quote::quote;
-use std::borrow::Cow;
-use std::boxed::Box;
 use std::collections::HashMap;
 use std::convert::{From, TryFrom};
 use std::path::PathBuf;
@@ -19,8 +15,8 @@ use syn::{
 };
 
 #[proc_macro]
-pub fn meka_include(input: TokenStream) -> TokenStream {
-    let parsed = parse_macro_input!(input as MekaInclude);
+pub fn meka_searcher(input: TokenStream) -> TokenStream {
+    let parsed = parse_macro_input!(input as MekaSearcherInput);
     parsed
         .expand()
         .unwrap_or_else(|err| err.to_compile_error())
@@ -28,16 +24,16 @@ pub fn meka_include(input: TokenStream) -> TokenStream {
         .into()
 }
 
-struct MekaInclude {
+struct MekaSearcherInput {
     pub key: Option<LitStr>,
     pub map: Option<Vec<(LitStr, Path)>>,
 }
 
-impl Parse for MekaInclude {
+impl Parse for MekaSearcherInput {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        // Handle empty input: meka_include!()
+        // Handle empty input: meka_searcher!()
         if input.is_empty() {
-            return Ok(MekaInclude {
+            return Ok(MekaSearcherInput {
                 key: None,
                 map: None,
             });
@@ -51,24 +47,24 @@ impl Parse for MekaInclude {
             let key = input.parse::<LitStr>()?;
 
             if input.is_empty() {
-                // Case: meka_include!("some-string")
-                Ok(MekaInclude {
+                // Case: meka_searcher!("some-string")
+                Ok(MekaSearcherInput {
                     key: Some(key),
                     map: None,
                 })
             } else {
-                // Case: meka_include!("some-string", {key => value, ...})
+                // Case: meka_searcher!("some-string", {key => value, ...})
                 input.parse::<Token![,]>()?;
                 let map = parse_function_map(input)?;
-                Ok(MekaInclude {
+                Ok(MekaSearcherInput {
                     key: Some(key),
                     map: Some(map),
                 })
             }
         } else if lookahead.peek(syn::token::Brace) {
-            // Case: meka_include!({key => value, ...})
+            // Case: meka_searcher!({key => value, ...})
             let map = parse_function_map(input)?;
-            Ok(MekaInclude {
+            Ok(MekaSearcherInput {
                 key: None,
                 map: Some(map),
             })
@@ -106,7 +102,7 @@ fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Path)>> {
     Ok(pairs)
 }
 
-impl MekaInclude {
+impl MekaSearcherInput {
     /// Returns `proc_macro2::TokenStream` for testability.
     fn expand(self) -> syn::Result<proc_macro2::TokenStream> {
         let tokens = match (self.key, self.map) {
@@ -174,7 +170,7 @@ impl MekaInclude {
             }
         };
 
-        Ok(tokens.into())
+        Ok(tokens)
     }
 }
 
@@ -254,7 +250,7 @@ mod inline_tests {
     #[test]
     fn empty_parse_works() {
         let input = quote! {};
-        let parsed: MekaInclude = parse2(input).unwrap();
+        let parsed: MekaSearcherInput = parse2(input).unwrap();
         assert!(parsed.key.is_none());
         assert!(parsed.map.is_none());
     }
@@ -262,7 +258,7 @@ mod inline_tests {
     #[test]
     fn string_only_works() {
         let input = quote! { "test" };
-        let parsed: MekaInclude = parse2(input).unwrap();
+        let parsed: MekaSearcherInput = parse2(input).unwrap();
         assert!(parsed.key.is_some());
         assert_eq!(parsed.key.unwrap().value(), "test");
         assert!(parsed.map.is_none());
@@ -271,7 +267,7 @@ mod inline_tests {
     #[test]
     fn map_only_works() {
         let input = quote! { {"key1" => func1, "key2" => func2} };
-        let parsed: MekaInclude = parse2(input).unwrap();
+        let parsed: MekaSearcherInput = parse2(input).unwrap();
         assert!(parsed.key.is_none());
         assert!(parsed.map.is_some());
         assert_eq!(parsed.map.unwrap().len(), 2);
@@ -280,7 +276,7 @@ mod inline_tests {
     #[test]
     fn string_and_map_works() {
         let input = quote! { "test", {"key1" => func1, "key2" => func2} };
-        let parsed: MekaInclude = parse2(input).unwrap();
+        let parsed: MekaSearcherInput = parse2(input).unwrap();
         assert!(parsed.key.is_some());
         assert_eq!(parsed.key.unwrap().value(), "test");
         assert!(parsed.map.is_some());
@@ -291,7 +287,7 @@ mod inline_tests {
     #[ignore = "requires separate testcrate for manifest and associated modules"]
     fn expand_empty_works() {
         let input = quote! {};
-        let parsed: MekaInclude = parse2(input).unwrap();
+        let parsed: MekaSearcherInput = parse2(input).unwrap();
         let expanded = parsed.expand().unwrap();
         // Works because we're using `proc_macro2::TokenStream`.
         let expanded_string = expanded.to_string();
@@ -301,8 +297,9 @@ mod inline_tests {
 
     #[test]
     fn invalid_syntax_fails() {
-        let input = quote! { 123 }; // Invalid: not a string or map
-        let result: Result<MekaInclude, _> = parse2(input);
+        // Invalid: not a string or map
+        let input = quote! { 123 };
+        let result: Result<MekaSearcherInput, _> = parse2(input);
         assert!(result.is_err());
     }
 }
