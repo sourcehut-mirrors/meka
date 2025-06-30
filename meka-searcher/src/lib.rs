@@ -3,7 +3,9 @@ use io_cat::CatKind;
 use meka_module_manifest::CompiledNamedTextManifest;
 use meka_types::{CatCow, CatCowMap};
 use mlua::Lua;
-use mlua_module_manifest::{ModuleFileType, NamedTextManifest};
+use mlua_module_manifest::{
+    Manifest, Module, ModuleFileType, ModuleNamedFile, ModuleNamedText, Name,
+};
 use mlua_searcher::AddSearcher as _;
 use optional_collections::InsertOrInit;
 use quote::{ToTokens, quote};
@@ -12,6 +14,7 @@ use std::collections::HashMap;
 use std::convert::From;
 use std::error;
 use std::fmt;
+use std::result::Result;
 
 #[derive(Debug)]
 pub enum AddMekaSearcherError {
@@ -63,8 +66,8 @@ impl From<CompiledNamedTextManifest> for MekaSearcher {
     }
 }
 
-impl From<NamedTextManifest> for MekaSearcher {
-    fn from(manifest: NamedTextManifest) -> Self {
+impl From<Manifest> for MekaSearcher {
+    fn from(manifest: Manifest) -> Self {
         MekaSearcher::RuntimeRead(RuntimeRead::from(manifest))
     }
 }
@@ -163,22 +166,57 @@ pub struct RuntimeRead {
     pub lua: Option<CatCow>,
 }
 
-impl From<NamedTextManifest> for RuntimeRead {
-    fn from(manifest: NamedTextManifest) -> Self {
+impl From<Manifest> for RuntimeRead {
+    fn from(manifest: Manifest) -> Self {
         let mut fnl: Option<CatCowMap> = None;
         let mut fnl_macros: Option<CatCowMap> = None;
         let mut lua: Option<CatCowMap> = None;
         for module in manifest.modules.into_iter() {
-            match module.file_type {
-                ModuleFileType::Fennel => {
-                    fnl.insert_or_init(module.name, CatKind::from_str(module.text));
+            match module {
+                Module::File(module_file) => {
+                    let name = module_file.name();
+                    match module_file.file_type {
+                        ModuleFileType::Fennel => {
+                            fnl.insert_or_init(name, CatKind::from_path(module_file.path));
+                        }
+                        ModuleFileType::FennelMacros => {
+                            fnl_macros.insert_or_init(name, CatKind::from_path(module_file.path));
+                        }
+                        ModuleFileType::Lua => {
+                            lua.insert_or_init(name, CatKind::from_path(module_file.path));
+                        }
+                    }
                 }
-                ModuleFileType::FennelMacros => {
-                    fnl_macros.insert_or_init(module.name, CatKind::from_str(module.text));
-                }
-                ModuleFileType::Lua => {
-                    lua.insert_or_init(module.name, CatKind::from_str(module.text));
-                }
+                Module::NamedFile(ModuleNamedFile {
+                    name,
+                    path,
+                    file_type,
+                }) => match file_type {
+                    ModuleFileType::Fennel => {
+                        fnl.insert_or_init(name, CatKind::from_path(path));
+                    }
+                    ModuleFileType::FennelMacros => {
+                        fnl_macros.insert_or_init(name, CatKind::from_path(path));
+                    }
+                    ModuleFileType::Lua => {
+                        lua.insert_or_init(name, CatKind::from_path(path));
+                    }
+                },
+                Module::NamedText(ModuleNamedText {
+                    name,
+                    text,
+                    file_type,
+                }) => match file_type {
+                    ModuleFileType::Fennel => {
+                        fnl.insert_or_init(name, CatKind::from_str(text));
+                    }
+                    ModuleFileType::FennelMacros => {
+                        fnl_macros.insert_or_init(name, CatKind::from_str(text));
+                    }
+                    ModuleFileType::Lua => {
+                        lua.insert_or_init(name, CatKind::from_str(text));
+                    }
+                },
             }
         }
         let fnl = if let Some(fnl) = fnl {
