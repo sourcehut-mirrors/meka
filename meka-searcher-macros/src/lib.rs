@@ -18,9 +18,20 @@ use syn::{
 pub fn meka_searcher(input: TokenStream) -> TokenStream {
     let parsed = parse_macro_input!(input as MekaSearcherInput);
     parsed
-        .expand()
+        // true = embed modules at comptime
+        .expand(true)
         .unwrap_or_else(|err| err.to_compile_error())
         // Convert `proc_macro2::TokenStream` to `proc_macro::TokenStream`.
+        .into()
+}
+
+#[proc_macro]
+pub fn meka_searcher_hot(input: TokenStream) -> TokenStream {
+    let parsed = parse_macro_input!(input as MekaSearcherInput);
+    parsed
+        // true = read modules at runtime
+        .expand(false)
+        .unwrap_or_else(|err| err.to_compile_error())
         .into()
 }
 
@@ -104,23 +115,36 @@ fn parse_function_map(input: ParseStream) -> syn::Result<Vec<(LitStr, Path)>> {
 
 impl MekaSearcherInput {
     /// Returns `proc_macro2::TokenStream` for testability.
-    fn expand(self) -> syn::Result<proc_macro2::TokenStream> {
+    fn expand(self, embed: bool) -> syn::Result<proc_macro2::TokenStream> {
         let tokens = match (self.key, self.map) {
             (Some(key), Some(map)) => {
                 // Both key and map present
                 let tokens = config_new_with_map(map);
                 let (_, path_str, _) = selected_path();
-                quote! {{
-                    #tokens
-                    let key: &str = #key.as_ref();
-                    let manifest = if let Some(manifest) = config.get(key) {
-                        ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
-                            .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
-                    } else {
-                        panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
-                    };
-                    ::meka_searcher::MekaSearcher::from(manifest)
-                }}
+                if embed {
+                    quote! {{
+                        #tokens
+                        let key: &str = #key.as_ref();
+                        let manifest = if let Some(manifest) = config.get(key) {
+                            ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
+                                .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                        } else {
+                            panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
+                        };
+                        ::meka_searcher::MekaSearcher::from(manifest)
+                    }}
+                } else {
+                    quote! {{
+                        #tokens
+                        let key: &str = #key.as_ref();
+                        let manifest = if let Some(manifest) = config.get(key) {
+                            (*manifest).clone()
+                        } else {
+                            panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
+                        };
+                        ::meka_searcher::MekaSearcher::from(manifest)
+                    }}
+                }
             }
             (Some(key), None) => {
                 // Only key present
@@ -128,44 +152,79 @@ impl MekaSearcherInput {
                 let (_, path_str, _) = selected_path();
                 let key = key.value();
                 let key: &str = key.as_ref();
-                let manifest = if let Some(manifest) = config.get(key) {
-                    CompiledNamedTextManifest::try_from((*manifest).clone())
-                        .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                let searcher = if embed {
+                    let manifest = if let Some(manifest) = config.get(key) {
+                        CompiledNamedTextManifest::try_from((*manifest).clone()).expect(
+                            "Sorry, couldn't convert Manifest into CompiledNamedTextManifest",
+                        )
+                    } else {
+                        panic!(
+                            "Sorry, couldn't find key {} in Meka manifest at {}",
+                            key, path_str
+                        );
+                    };
+                    MekaSearcher::from(manifest)
                 } else {
-                    panic!(
-                        "Sorry, couldn't find key {} in Meka manifest at {}",
-                        key, path_str
-                    );
+                    let manifest = if let Some(manifest) = config.get(key) {
+                        (*manifest).clone()
+                    } else {
+                        panic!(
+                            "Sorry, couldn't find key {} in Meka manifest at {}",
+                            key, path_str
+                        );
+                    };
+                    MekaSearcher::from(manifest)
                 };
-                let searcher = MekaSearcher::from(manifest);
                 quote! { #searcher }
             }
             (None, Some(map)) => {
                 // Only map present
                 let tokens = config_new_with_map(map);
                 let (_, path_str, _) = selected_path();
-                quote! {{
-                    #tokens
-                    let manifest = if let Some(manifest) = config.get("") {
-                        ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
-                            .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
-                    } else {
-                        panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
-                    };
-                    ::meka_searcher::MekaSearcher::from(manifest)
-                }}
+                if embed {
+                    quote! {{
+                        #tokens
+                        let manifest = if let Some(manifest) = config.get("") {
+                            ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
+                                .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                        } else {
+                            panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
+                        };
+                        ::meka_searcher::MekaSearcher::from(manifest)
+                    }}
+                } else {
+                    quote! {{
+                        #tokens
+                        let manifest = if let Some(manifest) = config.get("") {
+                            (*manifest).clone()
+                        } else {
+                            panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
+                        };
+                        ::meka_searcher::MekaSearcher::from(manifest)
+                    }}
+                }
             }
             (None, None) => {
                 // Empty macro call
                 let config = config_new_without_map();
                 let (_, path_str, _) = selected_path();
-                let manifest = if let Some(manifest) = config.get("") {
-                    CompiledNamedTextManifest::try_from((*manifest).clone())
-                        .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                let searcher = if embed {
+                    let manifest = if let Some(manifest) = config.get("") {
+                        CompiledNamedTextManifest::try_from((*manifest).clone()).expect(
+                            "Sorry, couldn't convert Manifest into CompiledNamedTextManifest",
+                        )
+                    } else {
+                        panic!("Sorry, couldn't find Meka manifest at {}", path_str);
+                    };
+                    MekaSearcher::from(manifest)
                 } else {
-                    panic!("Sorry, couldn't find Meka manifest at {}", path_str);
+                    let manifest = if let Some(manifest) = config.get("") {
+                        (*manifest).clone()
+                    } else {
+                        panic!("Sorry, couldn't find Meka manifest at {}", path_str);
+                    };
+                    MekaSearcher::from(manifest)
                 };
-                let searcher = MekaSearcher::from(manifest);
                 quote! { #searcher }
             }
         };
@@ -288,7 +347,7 @@ mod inline_tests {
     fn expand_empty_works() {
         let input = quote! {};
         let parsed: MekaSearcherInput = parse2(input).unwrap();
-        let expanded = parsed.expand().unwrap();
+        let expanded = parsed.expand(true).unwrap();
         // Works because we're using `proc_macro2::TokenStream`.
         let expanded_string = expanded.to_string();
         assert!(!expanded_string.is_empty());

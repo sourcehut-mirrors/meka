@@ -148,7 +148,10 @@ fn main() {
     //      # Specify manifest-loader functions in Cargo.toml (equivalent, recommended)
     //      [package.metadata.meka.loaders]
     //      fennel-src = "fennel_src::loader"
+    #[cfg(not(debug_assertions))]
     let kiwi = meka_searcher!("kiwi", {"fennel-src" => fennel_src::loader});
+    #[cfg(debug_assertions)]
+    let kiwi = meka_searcher_hot!("kiwi", {"fennel-src" => fennel_src::loader});
 
     // In release builds:
     //
