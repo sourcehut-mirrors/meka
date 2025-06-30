@@ -103,8 +103,8 @@ Or, simply:
 `main.rs`:
 
 ```rust
-// Add `add_meka_searcher` method to `mlua::Lua`, and get `meka_searcher!` macro.
-use meka::{AddMekaSearcher, meka_searcher};
+// Add `add_meka_searcher` method to `mlua::Lua`, import macros.
+use meka::{AddMekaSearcher, meka_searcher, meka_searcher_hot};
 use mlua::{Lua, LuaOptions, StdLib};
 
 fn main() {
