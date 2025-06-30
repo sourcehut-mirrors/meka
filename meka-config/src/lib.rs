@@ -21,6 +21,10 @@ use std::path::Path;
 use std::result::Result;
 use std::vec::Vec;
 
+pub mod prelude {
+    pub use crate::{Config, ConfigInitError, ConfigInitResult, LoaderRegistry};
+}
+
 #[cfg(target_family = "windows")]
 macro_rules! path_separator {
     () => {

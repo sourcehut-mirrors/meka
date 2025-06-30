@@ -1,6 +1,10 @@
 use quote::{ToTokens, quote};
 use std::borrow::Cow;
 
+pub mod prelude {
+    pub use crate::{CatCow, CatCowMap};
+}
+
 pub type CatCowMap = io_cat::CatMap<Cow<'static, str>>;
 pub struct CatCow(pub CatCowMap);
 

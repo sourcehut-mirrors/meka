@@ -3,6 +3,13 @@ use std::error;
 use std::fmt;
 use std::vec::Vec;
 
+pub mod prelude {
+    pub use crate::{
+        InputStringError, InputStringResult, IntoCharArray, IsList, TryIntoString,
+        extract_non_system_lua_paths, package_config, package_cpath, package_path, typename,
+    };
+}
+
 /// Error message designed for running `path.chars().nth(n)` on `path` verified to contain
 /// at least n+1 chars.
 const PATH_CHARS_NTH_EXPECT: &str = "Unexpectedly couldn't get nth char from pre-checked path";

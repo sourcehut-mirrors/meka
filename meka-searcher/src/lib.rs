@@ -16,6 +16,13 @@ use std::error;
 use std::fmt;
 use std::result::Result;
 
+pub mod prelude {
+    pub use crate::{
+        AddMekaSearcher, AddMekaSearcherError, AddMekaSearcherResult, ComptimeEmbedded,
+        MekaSearcher, RuntimeRead,
+    };
+}
+
 #[derive(Debug)]
 pub enum AddMekaSearcherError {
     FennelSearcherError(fennel_searcher::Error),

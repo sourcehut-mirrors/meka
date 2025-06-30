@@ -1,3 +1,37 @@
+[package]
+name = "meka"
+version = "0.1.0"
+edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+homepage = "https://sr.ht/~ioiojo/meka"
+repository = { workspace = true }
+description = "Embed Lua and compile-to-Lua language modules in Rust"
+
+[features]
+default = ["fennel153"]
+fennel100 = ["meka-config/fennel100", "meka-module-manifest/fennel100", "meka-searcher/fennel100", "meka-searcher-macros/fennel100"]
+fennel153 = ["meka-config/fennel153", "meka-module-manifest/fennel153", "meka-searcher/fennel153", "meka-searcher-macros/fennel153"]
+mlua-lua54 = ["meka-config/mlua-lua54", "meka-module-manifest/mlua-lua54", "meka-searcher/mlua-lua54", "meka-searcher-macros/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["meka-config/mlua-lua53", "meka-module-manifest/mlua-lua53", "meka-searcher/mlua-lua53", "meka-searcher-macros/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["meka-config/mlua-lua52", "meka-module-manifest/mlua-lua52", "meka-searcher/mlua-lua52", "meka-searcher-macros/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["meka-config/mlua-lua51", "meka-module-manifest/mlua-lua51", "meka-searcher/mlua-lua51", "meka-searcher-macros/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["meka-config/mlua-luajit", "meka-module-manifest/mlua-luajit", "meka-searcher/mlua-luajit", "meka-searcher-macros/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["meka-config/mlua-luajit52", "meka-module-manifest/mlua-luajit52", "meka-searcher/mlua-luajit52", "meka-searcher-macros/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["meka-config/mlua-luau", "meka-module-manifest/mlua-luau", "meka-searcher/mlua-luau", "meka-searcher-macros/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["meka-config/mlua-luau-jit", "meka-module-manifest/mlua-luau-jit", "meka-searcher/mlua-luau-jit", "meka-searcher-macros/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "meka-searcher/mlua-luau-vector4", "meka-searcher-macros/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-vendored = ["meka-config/mlua-vendored", "meka-module-manifest/mlua-vendored", "meka-searcher/mlua-vendored", "meka-searcher-macros/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
+
+[dependencies]
+meka-config = { path = "./meka-config", default-features = false }
+meka-module-manifest = { path = "./meka-module-manifest", default-features = false }
+meka-searcher = { path = "./meka-searcher", default-features = false }
+meka-searcher-macros = { path = "./meka-searcher-macros", default-features = false }
+mlua = { workspace = true }
+mlua-module-manifest = { path = "./mlua-module-manifest", default-features = false }
+
 [workspace]
 members = [
   "fennel-compile",
