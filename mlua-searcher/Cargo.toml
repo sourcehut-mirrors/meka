@@ -21,7 +21,7 @@ mlua-luau-vector4 = ["mlua/luau-vector4"]
 mlua-vendored = ["mlua/vendored"]
 
 [dependencies]
-io-cat = { workspace = true }
+io-cat = { path = "../io-cat" }
 meka-types = { path = "../meka-types" }
 mlua = { workspace = true }
 

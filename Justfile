@@ -21,6 +21,10 @@ check-fennel-searcher:
 check-fennel-src:
   cargo check --package fennel-src --features mlua-lua54,mlua-vendored
 
+# Run cargo check on io-cat
+check-io-cat:
+  cargo check --package io-cat
+
 # Run cargo check on meka-config
 check-meka-config:
   cargo check --package meka-config --features mlua-lua54,mlua-vendored
@@ -132,6 +136,10 @@ test-fennel-searcher:
 # Run cargo test on fennel-src
 test-fennel-src:
   cargo test --package fennel-src --features mlua-lua54,mlua-vendored
+
+# Run cargo test on io-cat
+test-io-cat:
+  cargo test --package io-cat
 
 # Run cargo test on meka-config
 test-meka-config:

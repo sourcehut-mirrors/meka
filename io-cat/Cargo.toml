@@ -1,12 +1,11 @@
 [package]
-name = "meka-types"
+name = "io-cat"
 version = "0.1.0"
 edition = { workspace = true }
-homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-types"
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/io-cat"
 readme = "README.md"
-description = "Types for Meka"
+description = "Trait for types which can be read to string"
 
 [dependencies]
-io-cat = { path = "../io-cat" }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }

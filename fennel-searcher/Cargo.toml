@@ -24,7 +24,7 @@ mlua-vendored = ["fennel-compile/mlua-vendored", "fennel-mount/mlua-vendored", "
 [dependencies]
 fennel-compile = { path = "../fennel-compile", default-features = false }
 fennel-mount = { path = "../fennel-mount", default-features = false }
-io-cat = { workspace = true }
+io-cat = { path = "../io-cat" }
 meka-types = { path = "../meka-types" }
 mlua = { workspace = true }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }

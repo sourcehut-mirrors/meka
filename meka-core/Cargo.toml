@@ -22,6 +22,7 @@ mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-module-manifest/mlua
 mlua-vendored = ["meka-config/mlua-vendored", "meka-module-manifest/mlua-vendored", "meka-searcher/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]
+io-cat = { path = "../io-cat" }
 meka-config = { path = "../meka-config", default-features = false }
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
 meka-searcher = { path = "../meka-searcher", default-features = false }
