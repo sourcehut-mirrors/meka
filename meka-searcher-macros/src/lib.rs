@@ -1,4 +1,4 @@
-use meka::{
+use meka_core::{
     CompiledNamedTextManifest, Config, Manifest, MekaSearcher, Module, ModuleFile, ModuleFileType,
 };
 use proc_macro::TokenStream;

@@ -1,6 +1,6 @@
-# meka-searcher-macros
+# meka-core
 
-Proc macros for Meka searcher instantiation
+Core implementation crate for use by Meka - not intended for direct use
 
 ## License
 
