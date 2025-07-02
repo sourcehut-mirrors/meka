@@ -42,13 +42,13 @@ impl ToTokens for CatKind {
         let expanded = match self {
             CatKind::Path(p) => {
                 let path_str = p.to_string_lossy();
-                quote! { CatKind::Path(::std::path::PathBuf::from(#path_str)) }
+                quote! { ::meka::CatKind::Path(::std::path::PathBuf::from(#path_str)) }
             }
             CatKind::String(s) => {
-                quote! { CatKind::String(#s.to_string()) }
+                quote! { ::meka::CatKind::String(#s.to_string()) }
             }
             CatKind::Static(s) => {
-                quote! { CatKind::Static(#s) }
+                quote! { ::meka::CatKind::Static(#s) }
             }
         };
         tokens.extend(expanded);

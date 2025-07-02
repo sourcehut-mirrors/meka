@@ -26,5 +26,6 @@ io-cat = { path = "../io-cat" }
 meka-config = { path = "../meka-config", default-features = false }
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
 meka-searcher = { path = "../meka-searcher", default-features = false }
+meka-types = { path = "../meka-types", default-features = false }
 mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }

@@ -276,7 +276,7 @@ fn to_tokens_for_optional_catcow(catcow: &Option<CatCow>) -> proc_macro2::TokenS
                 }
             });
             quote! {
-                Some(::meka_types::CatCow(::meka_types::CatCowMap::from([#(#entries),*])))
+                Some(::meka::CatCow(::meka::CatCowMap::from([#(#entries),*])))
             }
         }
     }
