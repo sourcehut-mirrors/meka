@@ -114,7 +114,7 @@ impl ToTokens for ModuleFile {
         let path = self.path.to_string_lossy();
         let file_type = &self.file_type;
         tokens.extend(quote! {
-            ::mlua_module_manifest::ModuleFile {
+            ::meka::ModuleFile {
                 path: ::std::path::PathBuf::from(#path),
                 file_type: #file_type,
             }
@@ -190,8 +190,8 @@ impl ToTokens for ModuleNamedFile {
         let path = self.path.to_string_lossy();
         let file_type = &self.file_type;
         tokens.extend(quote! {
-            ::mlua_module_manifest::ModuleNamedFile {
-                name: ::std::borrow::Cow::Borrowed(#name),
+            ::meka::ModuleNamedFile {
+                name: ::std::borrow::Cow::from(#name),
                 path: ::std::path::PathBuf::from(#path),
                 file_type: #file_type,
             }
@@ -304,9 +304,9 @@ impl ToTokens for ModuleNamedText {
         let text = &self.text;
         let file_type = &self.file_type;
         tokens.extend(quote! {
-            ::mlua_module_manifest::ModuleNamedText {
-                name: ::std::borrow::Cow::Borrowed(#name),
-                text: ::std::borrow::Cow::Borrowed(#text),
+            ::meka::ModuleNamedText {
+                name: ::std::borrow::Cow::from(#name),
+                text: ::std::borrow::Cow::from(#text),
                 file_type: #file_type,
             }
         });
@@ -428,13 +428,13 @@ impl ToTokens for Module {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let output = match self {
             Module::File(module_file) => {
-                quote! { ::mlua_module_manifest::Module::File(#module_file) }
+                quote! { ::meka::Module::File(#module_file) }
             }
             Module::NamedFile(named_file) => {
-                quote! { ::mlua_module_manifest::Module::NamedFile(#named_file) }
+                quote! { ::meka::Module::NamedFile(#named_file) }
             }
             Module::NamedText(named_text) => {
-                quote! { ::mlua_module_manifest::Module::NamedText(#named_text) }
+                quote! { ::meka::Module::NamedText(#named_text) }
             }
         };
         tokens.extend(output);

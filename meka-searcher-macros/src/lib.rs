@@ -1,7 +1,6 @@
-use meka_config::Config;
-use meka_module_manifest::CompiledNamedTextManifest;
-use meka_searcher::MekaSearcher;
-use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType};
+use meka::{
+    CompiledNamedTextManifest, Config, Manifest, MekaSearcher, Module, ModuleFile, ModuleFileType,
+};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::collections::HashMap;

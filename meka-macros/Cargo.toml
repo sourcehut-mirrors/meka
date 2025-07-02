@@ -1,0 +1,25 @@
+[package]
+name = "meka-macros"
+version = "0.1.0"
+edition = { workspace = true }
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-macros"
+readme = "README.md"
+description = "Proc macros for Meka"
+
+[features]
+default = ["fennel153"]
+fennel100 = ["meka-searcher-macros/fennel100"]
+fennel153 = ["meka-searcher-macros/fennel153"]
+mlua-lua54 = ["meka-searcher-macros/mlua-lua54"]
+mlua-lua53 = ["meka-searcher-macros/mlua-lua53"]
+mlua-lua52 = ["meka-searcher-macros/mlua-lua52"]
+mlua-lua51 = ["meka-searcher-macros/mlua-lua51"]
+mlua-luajit = ["meka-searcher-macros/mlua-luajit"]
+mlua-luajit52 = ["meka-searcher-macros/mlua-luajit52"]
+mlua-luau = ["meka-searcher-macros/mlua-luau"]
+mlua-luau-jit = ["meka-searcher-macros/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-searcher-macros/mlua-luau-vector4"]
+mlua-vendored = ["meka-searcher-macros/mlua-vendored"]
+
+[dependencies]
+meka-searcher-macros = { path = "../meka-searcher-macros", default-features = false }

@@ -84,12 +84,12 @@ impl ToTokens for MekaSearcher {
         let expanded = match self {
             MekaSearcher::ComptimeEmbedded(comptime_embedded) => {
                 quote! {
-                    ::meka_searcher::MekaSearcher::ComptimeEmbedded(#comptime_embedded)
+                    ::meka::MekaSearcher::ComptimeEmbedded(#comptime_embedded)
                 }
             }
             MekaSearcher::RuntimeRead(runtime_read) => {
                 quote! {
-                    ::meka_searcher::MekaSearcher::RuntimeRead(#runtime_read)
+                    ::meka::MekaSearcher::RuntimeRead(#runtime_read)
                 }
             }
         };
@@ -131,7 +131,7 @@ impl ToTokens for ComptimeEmbedded {
         let fnl_macros_tokens = to_tokens_for_optional_cowmap(&self.fnl_macros);
         let lua_tokens = to_tokens_for_optional_cowmap(&self.lua);
         let expanded = quote! {
-            ::meka_searcher::ComptimeEmbedded {
+            ::meka::ComptimeEmbedded {
                 fnl_macros: #fnl_macros_tokens,
                 lua: #lua_tokens,
             }
@@ -255,7 +255,7 @@ impl ToTokens for RuntimeRead {
         let fnl_macros_tokens = to_tokens_for_optional_catcow(&self.fnl_macros);
         let lua_tokens = to_tokens_for_optional_catcow(&self.lua);
         let expanded = quote! {
-            ::meka_searcher::RuntimeRead {
+            ::meka::RuntimeRead {
                 fnl: #fnl_tokens,
                 fnl_macros: #fnl_macros_tokens,
                 lua: #lua_tokens,

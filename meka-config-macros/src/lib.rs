@@ -82,7 +82,7 @@ fn generate_loader_registry_tokens(loaders: HashMap<String, String>) -> TokenStr
 
         quote! {
             let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #path_tokens;
-            map.insert(::std::borrow::Cow::Borrowed(#name), #path_tokens);
+            map.insert(::std::borrow::Cow::from(#name), #path_tokens);
         }
     });
 

@@ -86,11 +86,11 @@ impl fmt::Display for ModuleFileType {
 impl ToTokens for ModuleFileType {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let variant = match self {
-            ModuleFileType::Fennel => quote! { ::mlua_module_manifest::ModuleFileType::Fennel },
+            ModuleFileType::Fennel => quote! { ::meka::ModuleFileType::Fennel },
             ModuleFileType::FennelMacros => {
-                quote! { ::mlua_module_manifest::ModuleFileType::FennelMacros }
+                quote! { ::meka::ModuleFileType::FennelMacros }
             }
-            ModuleFileType::Lua => quote! { ::mlua_module_manifest::ModuleFileType::Lua },
+            ModuleFileType::Lua => quote! { ::meka::ModuleFileType::Lua },
         };
         tokens.extend(variant);
     }
