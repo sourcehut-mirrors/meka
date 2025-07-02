@@ -126,12 +126,12 @@ impl MekaSearcherInput {
                         #tokens
                         let key: &str = #key.as_ref();
                         let manifest = if let Some(manifest) = config.get(key) {
-                            ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
+                            ::meka::CompiledNamedTextManifest::try_from((*manifest).clone())
                                 .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
                         } else {
                             panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
                         };
-                        ::meka_searcher::MekaSearcher::from(manifest)
+                        ::meka::MekaSearcher::from(manifest)
                     }}
                 } else {
                     quote! {{
@@ -142,7 +142,7 @@ impl MekaSearcherInput {
                         } else {
                             panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
                         };
-                        ::meka_searcher::MekaSearcher::from(manifest)
+                        ::meka::MekaSearcher::from(manifest)
                     }}
                 }
             }
@@ -185,12 +185,12 @@ impl MekaSearcherInput {
                     quote! {{
                         #tokens
                         let manifest = if let Some(manifest) = config.get("") {
-                            ::meka_module_manifest::CompiledNamedTextManifest::try_from((*manifest).clone())
+                            ::meka::CompiledNamedTextManifest::try_from((*manifest).clone())
                                 .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
                         } else {
                             panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
                         };
-                        ::meka_searcher::MekaSearcher::from(manifest)
+                        ::meka::MekaSearcher::from(manifest)
                     }}
                 } else {
                     quote! {{
@@ -200,7 +200,7 @@ impl MekaSearcherInput {
                         } else {
                             panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
                         };
-                        ::meka_searcher::MekaSearcher::from(manifest)
+                        ::meka::MekaSearcher::from(manifest)
                     }}
                 }
             }
@@ -238,9 +238,9 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     let map_entries_len = map_entries.len();
     let module = module_from_path();
     quote! {
-        let mut loader_registry = ::meka_config::LoaderRegistry::with_capacity(#map_entries_len);
+        let mut loader_registry = ::meka::LoaderRegistry::with_capacity(#map_entries_len);
         #(#map_entries)*
-        let config: ::std::collections::HashMap<::std::string::String, ::mlua_module_manifest::Manifest> = ::meka_config::Config::new(#module, Some(loader_registry))
+        let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(loader_registry))
             .expect("Sorry, couldn't instantiate Config")
             .0;
     }
