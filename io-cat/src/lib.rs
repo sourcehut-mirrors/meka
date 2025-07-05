@@ -13,7 +13,7 @@ pub mod prelude {
 
 pub type CatMap<K> = HashMap<K, CatKind>;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum CatKind {
     // Normalizes all path types to PathBuf
     Path(PathBuf),

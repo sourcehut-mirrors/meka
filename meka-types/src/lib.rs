@@ -6,6 +6,8 @@ pub mod prelude {
 }
 
 pub type CatCowMap = io_cat::CatMap<Cow<'static, str>>;
+
+#[derive(Clone, Debug)]
 pub struct CatCow(pub CatCowMap);
 
 impl ToTokens for CatCow {
