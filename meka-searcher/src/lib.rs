@@ -307,11 +307,11 @@ impl AddMekaSearcher for Lua {
     fn add_meka_searcher(&self, meka_searcher: MekaSearcher) -> AddMekaSearcherResult<()> {
         match meka_searcher {
             MekaSearcher::ComptimeEmbedded(ComptimeEmbedded { fnl_macros, lua }) => {
-                if let Some(fnl_macros) = fnl_macros {
-                    self.add_searcher_fnl_macros(fnl_macros)?;
-                }
                 if let Some(lua) = lua {
                     self.add_searcher(lua)?;
+                }
+                if let Some(fnl_macros) = fnl_macros {
+                    self.add_searcher_fnl_macros(fnl_macros)?;
                 }
             }
             MekaSearcher::RuntimeRead(RuntimeRead {
@@ -319,14 +319,14 @@ impl AddMekaSearcher for Lua {
                 fnl_macros,
                 lua,
             }) => {
+                if let Some(lua) = lua {
+                    self.add_cat_searcher(lua)?;
+                }
                 if let Some(fnl) = fnl {
                     self.add_cat_searcher_fnl(fnl)?;
                 }
                 if let Some(fnl_macros) = fnl_macros {
                     self.add_cat_searcher_fnl_macros(fnl_macros)?;
-                }
-                if let Some(lua) = lua {
-                    self.add_cat_searcher(lua)?;
                 }
             }
         }
