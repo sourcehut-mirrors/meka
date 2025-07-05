@@ -60,6 +60,7 @@ pub type AddMekaSearcherResult<A> = Result<A, AddMekaSearcherError>;
 ///
 /// The enum variants are named after the stage at which the modules contained therein might
 /// plausibly be available for reading.
+#[derive(Clone, Debug)]
 pub enum MekaSearcher {
     /// Modules contained herein may be available for reading at comptime.
     ComptimeEmbedded(ComptimeEmbedded),
@@ -99,6 +100,7 @@ impl ToTokens for MekaSearcher {
 
 /// Pre-categorized Fennel macro and Lua modules text indexed by name, with modules content
 /// resolved at comptime.
+#[derive(Clone, Debug)]
 pub struct ComptimeEmbedded {
     /// For use with `mlua::Lua.add_searcher_fnl_macros()`.
     pub fnl_macros: Option<HashMap<Cow<'static, str>, Cow<'static, str>>>,
@@ -162,6 +164,7 @@ fn to_tokens_for_optional_cowmap(
 
 /// Pre-categorized Fennel, Fennel macro and Lua modules paths/text indexed by name, with
 /// modules content resolved at runtime.
+#[derive(Clone, Debug)]
 pub struct RuntimeRead {
     /// For use with `mlua::Lua.add_cat_searcher_fnl()`.
     pub fnl: Option<CatCow>,
