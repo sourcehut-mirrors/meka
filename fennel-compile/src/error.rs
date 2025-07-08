@@ -1,5 +1,7 @@
 #[derive(Debug)]
 pub enum Error {
+    /// Could not import Fennel by module name "fennel".
+    FailedToImportFennel(mlua::Error),
     /// Could not find `fennel.compileString` function.
     MissingFennelCompileStringFunction,
 
@@ -35,13 +37,16 @@ impl From<Error> for mlua::Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let res = match self {
+            Error::FailedToImportFennel(e) => {
+                format!("Could not import Fennel by module name \"fennel\": {:?}", e)
+            }
             Error::MissingFennelCompileStringFunction => {
                 "Could not find fennel.compileString function".to_string()
             }
 
-            Error::Io(e) => format!("IO error:\n{:#?}", e),
-            Error::Lua(e) => format!("mlua error:\n{:#?}", e),
-            Error::Str(e) => format!("UTF-8 error:\n{:#?}", e),
+            Error::Io(e) => format!("IO error: {:?}", e),
+            Error::Lua(e) => format!("mlua error: {:?}", e),
+            Error::Str(e) => format!("UTF-8 error: {:?}", e),
         };
         write!(f, "{}", res)
     }

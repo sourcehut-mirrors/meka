@@ -317,10 +317,12 @@ impl AddSearcher for Lua {
     {
         let transform = Box::new(|path| {
             let mut content = String::new();
-            let mut file = File::open(path)
-                .map_err(|e| mlua::Error::RuntimeError(format!("io error: {:#?}", e)))?;
-            file.read_to_string(&mut content)
-                .map_err(|e| mlua::Error::RuntimeError(format!("io error: {:#?}", e)))?;
+            let mut file = File::open(path).map_err(|e| {
+                mlua::Error::RuntimeError(format!("mlua-searcher error: io error: {:?}", e))
+            })?;
+            file.read_to_string(&mut content).map_err(|e| {
+                mlua::Error::RuntimeError(format!("mlua-searcher error: io error: {:?}", e))
+            })?;
             Ok(content)
         });
         self.add_path_searcher_poly(modules, transform)

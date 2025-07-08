@@ -8,8 +8,8 @@ description = "Compiled Lua-only text version of ~ioiojo/mlua-module-manifest"
 
 [features]
 default = ["fennel153"]
-fennel100 = ["fennel-mount/fennel100", "fennel-searcher/fennel100"]
-fennel153 = ["fennel-mount/fennel153", "fennel-searcher/fennel153"]
+fennel100 = ["fennel-mount/fennel100"]
+fennel153 = ["fennel-mount/fennel153"]
 mlua-lua54 = ["fennel-compile/mlua-lua54", "fennel-mount/mlua-lua54", "fennel-searcher/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
 mlua-lua53 = ["fennel-compile/mlua-lua53", "fennel-mount/mlua-lua53", "fennel-searcher/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]
 mlua-lua52 = ["fennel-compile/mlua-lua52", "fennel-mount/mlua-lua52", "fennel-searcher/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52"]

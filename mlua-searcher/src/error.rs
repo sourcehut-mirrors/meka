@@ -18,7 +18,7 @@ impl From<Error> for mlua::Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let res = match self {
-            Error::Lua(e) => format!("mlua error:\n{:#?}", e),
+            Error::Lua(e) => format!("mlua error: {:?}", e),
         };
         write!(f, "{}", res)
     }

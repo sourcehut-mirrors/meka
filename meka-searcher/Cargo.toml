@@ -8,8 +8,8 @@ description = "Require Meka manifest by name"
 
 [features]
 default = ["fennel153"]
-fennel100 = ["fennel-searcher/fennel100", "meka-module-manifest/fennel100"]
-fennel153 = ["fennel-searcher/fennel153", "meka-module-manifest/fennel153"]
+fennel100 = ["meka-module-manifest/fennel100"]
+fennel153 = ["meka-module-manifest/fennel153"]
 mlua-lua54 = ["fennel-searcher/mlua-lua54", "meka-module-manifest/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-searcher/mlua-lua54"]
 mlua-lua53 = ["fennel-searcher/mlua-lua53", "meka-module-manifest/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53", "mlua-searcher/mlua-lua53"]
 mlua-lua52 = ["fennel-searcher/mlua-lua52", "meka-module-manifest/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52", "mlua-searcher/mlua-lua52"]
@@ -34,6 +34,7 @@ proc-macro2 = { workspace = true }
 quote = { workspace = true }
 
 [dev-dependencies]
+fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 meka-searcher = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 meka-types = { path = "../meka-types" }
 mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }

@@ -17,11 +17,11 @@ impl fmt::Display for MirError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             MirError::Input { errors } => format!(
-                "`Manifest` instantiation function got malformed input: {:#?}",
+                "`Manifest` instantiation function got malformed input: {:?}",
                 errors
             ),
             MirError::ModuleInitError(e) => format!(
-                "`Manifest` instantiation function got malformed module: {:#?}",
+                "`Manifest` instantiation function got malformed module: {:?}",
                 e
             ),
         };
@@ -57,7 +57,7 @@ impl IntoLua for MirError {
                 Ok(Value::String(lua.create_string(&errors)?))
             }
             MirError::ModuleInitError(e) => {
-                Ok(Value::String(lua.create_string(format!("{:#?}", e))?))
+                Ok(Value::String(lua.create_string(format!("{:?}", e))?))
             }
         }
     }
@@ -215,11 +215,11 @@ impl fmt::Display for DictErrorKind {
                     .to_string()
             }
             DictErrorKind::Malformed(dict_error) => format!(
-                "`Manifest` instantiation function got malformed table input: {:#?}",
+                "`Manifest` instantiation function got malformed table input: {:?}",
                 dict_error
             ),
             DictErrorKind::UnexpectedMalformed(dict_error) => format!(
-                "`Manifest` instantiation function got malformed table input in an unexpected position: {:#?}",
+                "`Manifest` instantiation function got malformed table input in an unexpected position: {:?}",
                 dict_error
             ),
         };
@@ -242,7 +242,7 @@ impl fmt::Display for DictError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             DictError::Malformed { unsupported, .. } => format!(
-                "Got invalid `Manifest` instantiation input table: {:#?}",
+                "Got invalid `Manifest` instantiation input table: {:?}",
                 unsupported
             ),
         };

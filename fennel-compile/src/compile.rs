@@ -27,7 +27,8 @@ impl Compile for Lua {
     }
 
     fn compile_fennel_string(&self, fnl_str: &str) -> Result<String> {
-        let fennel: Table = self.load(r#"require("fennel")"#).eval()?;
+        let fennel = mlua_utils::require::<Table>(self, "fennel")
+            .map_err(|e| Error::FailedToImportFennel(e))?;
         let compile_string: Value = fennel.get::<Value>("compileString")?;
         let compile_string: Function = match compile_string {
             Value::Function(f) => f,

@@ -8,21 +8,21 @@ description = "Compile Fennel source code to Lua"
 
 [features]
 default = []
-mlua-lua54 = ["fennel-mount/mlua-lua54", "mlua/lua54"]
-mlua-lua53 = ["fennel-mount/mlua-lua53", "mlua/lua53"]
-mlua-lua52 = ["fennel-mount/mlua-lua52", "mlua/lua52"]
-mlua-lua51 = ["fennel-mount/mlua-lua51", "mlua/lua51"]
-mlua-luajit = ["fennel-mount/mlua-luajit", "mlua/luajit"]
-mlua-luajit52 = ["fennel-mount/mlua-luajit52", "mlua/luajit52"]
-mlua-luau = ["fennel-mount/mlua-luau", "mlua/luau"]
-mlua-luau-jit = ["fennel-mount/mlua-luau-jit", "mlua/luau-jit"]
-mlua-luau-vector4 = ["fennel-mount/mlua-luau-vector4", "mlua/luau-vector4"]
-mlua-vendored = ["fennel-mount/mlua-vendored", "mlua/vendored"]
+mlua-lua54 = ["mlua/lua54", "mlua-utils/mlua-lua54"]
+mlua-lua53 = ["mlua/lua53", "mlua-utils/mlua-lua53"]
+mlua-lua52 = ["mlua/lua52", "mlua-utils/mlua-lua52"]
+mlua-lua51 = ["mlua/lua51", "mlua-utils/mlua-lua51"]
+mlua-luajit = ["mlua/luajit", "mlua-utils/mlua-luajit"]
+mlua-luajit52 = ["mlua/luajit52", "mlua-utils/mlua-luajit52"]
+mlua-luau = ["mlua/luau", "mlua-utils/mlua-luau"]
+mlua-luau-jit = ["mlua/luau-jit", "mlua-utils/mlua-luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4", "mlua-utils/mlua-luau-vector4"]
+mlua-vendored = ["mlua/vendored", "mlua-utils/mlua-vendored"]
 
 [dependencies]
 mlua = { workspace = true }
+mlua-utils = { path = "../mlua-utils", default-features = false }
 
 [dev-dependencies]
 fennel-compile = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
 fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-mlua = { workspace = true, default-features = false, features = ["lua54", "vendored"] }

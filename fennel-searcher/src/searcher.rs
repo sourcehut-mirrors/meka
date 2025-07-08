@@ -1,5 +1,4 @@
 use fennel_compile::Compile;
-use fennel_mount::Mount;
 use io_cat::Cat;
 use meka_types::CatCow;
 use mlua::{Function, Lua, MetaMethod, RegistryKey, Table, UserData, UserDataMethods, Value};
@@ -10,6 +9,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+use crate::error::Error;
 use crate::types::Result;
 
 /// Stores Fennel macro modules indexed by module name, and provides an `mlua::MetaMethod`
@@ -42,10 +42,13 @@ impl UserData for MacroSearcher {
                         Cow::Borrowed(content) => content,
                         Cow::Owned(content) => content.as_str(),
                     };
+                    let fennel = mlua_utils::require::<Table>(lua, "fennel").map_err(|e| {
+                        mlua::Error::RuntimeError(format!("fennel-searcher error: {}", e))
+                    })?;
                     let globals = lua.globals();
                     globals.set("content", content.to_string())?;
-                    let load = r#"local fennel = require("fennel")
-                    return fennel.eval(content, {env = "_COMPILER"})"#;
+                    globals.set("fennel", fennel)?;
+                    let load = r#"return fennel.eval(content, {env = "_COMPILER"})"#;
                     Ok(Value::Function(
                         lua.load(load)
                             .set_name(name.as_ref())
@@ -93,14 +96,25 @@ where
                 Some(ref path) => {
                     let path = path.as_ref();
                     let mut content = String::new();
-                    let mut file = File::open(path)
-                        .map_err(|e| mlua::Error::RuntimeError(format!("io error: {:#?}", e)))?;
-                    file.read_to_string(&mut content)
-                        .map_err(|e| mlua::Error::RuntimeError(format!("io error: {:#?}", e)))?;
+                    let mut file = File::open(path).map_err(|e| {
+                        mlua::Error::RuntimeError(format!(
+                            "fennel-searcher error: io error: {:?}",
+                            e
+                        ))
+                    })?;
+                    file.read_to_string(&mut content).map_err(|e| {
+                        mlua::Error::RuntimeError(format!(
+                            "fennel-searcher error: io error: {:?}",
+                            e
+                        ))
+                    })?;
+                    let fennel = mlua_utils::require::<Table>(lua, "fennel").map_err(|e| {
+                        mlua::Error::RuntimeError(format!("fennel-searcher error: {}", e))
+                    })?;
                     let globals = lua.globals();
                     globals.set("content", content)?;
-                    let load = r#"local fennel = require("fennel")
-                    return fennel.eval(content, {env = "_COMPILER"})"#;
+                    globals.set("fennel", fennel)?;
+                    let load = r#"return fennel.eval(content, {env = "_COMPILER"})"#;
                     Ok(Value::Function(
                         lua.load(load)
                             .set_name(name.as_ref())
@@ -136,14 +150,11 @@ impl UserData for CatSearcher {
             let name = Cow::from(name);
             match this.modules.0.get(&name) {
                 Some(content) => {
-                    lua.mount_fennel().map_err(|e| {
-                        mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
+                    let content = content.cat().map_err(|e| {
+                        mlua::Error::RuntimeError(format!("fennel-searcher error: io error: {}", e))
                     })?;
-                    let content = content
-                        .cat()
-                        .map_err(|e| mlua::Error::RuntimeError(format!("io error: {}", e)))?;
                     let content = lua.compile_fennel_string(&content).map_err(|e| {
-                        mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
+                        mlua::Error::RuntimeError(format!("fennel-searcher error: {:?}", e))
                     })?;
                     Ok(Value::Function(
                         lua.load(&content)
@@ -179,15 +190,16 @@ impl UserData for MacroCatSearcher {
             let name = Cow::from(name);
             match this.modules.0.get(&name) {
                 Some(content) => {
-                    lua.mount_fennel().map_err(|e| {
-                        mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
+                    let content = content.cat().map_err(|e| {
+                        mlua::Error::RuntimeError(format!("fennel-searcher error: io error: {}", e))
                     })?;
-                    let content = content
-                        .cat()
-                        .map_err(|e| mlua::Error::RuntimeError(format!("io error: {}", e)))?;
+                    let fennel = mlua_utils::require::<Table>(lua, "fennel").map_err(|e| {
+                        mlua::Error::RuntimeError(format!("fennel-searcher error: {}", e))
+                    })?;
                     let globals = lua.globals();
                     globals.set("content", content.to_string())?;
-                    let load = r#"return require("fennel").eval(content, {env = "_COMPILER"})"#;
+                    globals.set("fennel", fennel)?;
+                    let load = r#"return fennel.eval(content, {env = "_COMPILER"})"#;
                     Ok(Value::Function(
                         lua.load(load)
                             .set_name(name.as_ref())
@@ -201,8 +213,7 @@ impl UserData for MacroCatSearcher {
     }
 }
 
-/// Extend `mlua::Lua` to support `require`ing Fennel modules and importing Fennel macros
-/// by name.
+/// Extend `mlua::Lua` to support `require`ing Fennel modules and importing Fennel macros by name.
 pub trait AddSearcher {
     /// Add a `HashMap` of Fennel macro modules indexed by module name to Fennel's
     /// `fennel.macro-searchers` table in an `mlua::Lua`, with lookup functionality
@@ -242,7 +253,8 @@ impl AddSearcher for Lua {
         modules: HashMap<Cow<'static, str>, Cow<'static, str>>,
     ) -> Result<()> {
         let globals: Table = self.globals();
-        let fennel: Table = self.load(r#"return require("fennel")"#).eval()?;
+        let fennel = mlua_utils::require::<Table>(self, "fennel")
+            .map_err(|e| Error::FailedToImportFennel(e))?;
         let macro_searchers: Table = fennel.get("macro-searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let macro_searcher = MacroSearcher::new(modules, registry_key);
@@ -264,11 +276,8 @@ impl AddSearcher for Lua {
                 let loader: Box<dyn Fn(&Lua, Table, &str) -> mlua::Result<Function> + Send> =
                     Box::new(move |lua, env, name| {
                         let path = p.as_ref();
-                        lua.mount_fennel().map_err(|e| {
-                            mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
-                        })?;
                         let content = lua.compile_fennel_file(path).map_err(|e| {
-                            mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e))
+                            mlua::Error::RuntimeError(format!("fennel-searcher error: {:?}", e))
                         })?;
                         Ok(lua
                             .load(&content)
@@ -288,7 +297,8 @@ impl AddSearcher for Lua {
         P: 'static + AsRef<Path> + Send,
     {
         let globals: Table = self.globals();
-        let fennel: Table = self.load(r#"return require("fennel")"#).eval()?;
+        let fennel = mlua_utils::require::<Table>(self, "fennel")
+            .map_err(|e| Error::FailedToImportFennel(e))?;
         let macro_searchers: Table = fennel.get("macro-searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let macro_searcher = MacroPathSearcher::new(modules, registry_key);
@@ -308,10 +318,9 @@ impl AddSearcher for Lua {
     }
 
     fn add_cat_searcher_fnl_macros(&self, modules: CatCow) -> Result<()> {
-        self.mount_fennel()
-            .map_err(|e| mlua::Error::RuntimeError(format!("fennel-compile error: {:#?}", e)))?;
         let globals: Table = self.globals();
-        let fennel: Table = self.load(r#"return require("fennel")"#).eval()?;
+        let fennel = mlua_utils::require::<Table>(self, "fennel")
+            .map_err(|e| Error::FailedToImportFennel(e))?;
         let macro_searchers: Table = fennel.get("macro-searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let macro_searcher = MacroCatSearcher::new(modules, registry_key);

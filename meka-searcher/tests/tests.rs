@@ -1,3 +1,4 @@
+use fennel_mount::Mount;
 use io_cat::CatKind;
 use meka_searcher::{AddMekaSearcher, MekaSearcher, RuntimeRead};
 use meka_types::{CatCow, CatCowMap};
@@ -83,6 +84,7 @@ fn add_meka_searcher_runtime_works() {
 
     let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 
+    lua.mount_fennel().unwrap();
     lua.add_meka_searcher(meka_searcher)
         .expect("Unexpectedly couldn't add MekaSearcher");
 

@@ -25,8 +25,8 @@ impl From<mlua_searcher::Error> for Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let res = match self {
-            Error::Lua(e) => format!("mlua error:\n{:#?}", e),
-            Error::LuaSearcher(e) => format!("mlua-searcher error:\n{:#?}", e),
+            Error::Lua(e) => format!("mlua error: {:?}", e),
+            Error::LuaSearcher(e) => format!("mlua-searcher error: {:?}", e),
         };
         write!(f, "{}", res)
     }

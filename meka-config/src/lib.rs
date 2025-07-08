@@ -362,15 +362,7 @@ impl Config {
     /// Requires: Fennel library is available for import
     fn insert_fennel_searcher(lua: &Lua) -> ConfigInitResult<()> {
         // TODO: insert fennel searcher before user library searcher in `package.searchers`.
-        let globals: Table = lua.globals();
-
-        let require: Function = globals.get("require").map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka-config new function couldn't get require function".to_string(),
-            )
-        })?;
-
-        let fennel: Table = require.call("fennel").map_err(|_| {
+        let fennel = mlua_utils::require::<Table>(lua, "fennel").map_err(|_| {
             mlua::Error::RuntimeError("meka-config new function couldn't import Fennel".to_string())
         })?;
 
@@ -386,7 +378,7 @@ impl Config {
             )
         })?;
 
-        let package: Table = globals.get("package").map_err(|_| {
+        let package: Table = lua.globals().get("package").map_err(|_| {
             mlua::Error::RuntimeError(
                 "meka-config new function couldn't get Lua package table".to_string(),
             )

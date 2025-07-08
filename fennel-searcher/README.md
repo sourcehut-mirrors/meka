@@ -6,36 +6,15 @@ Require [Fennel](https://fennel-lang.org/) modules by name at runtime.
 
 ### In your Cargo manifest:
 
-If you wish to accept the default Fennel release version provided by
-[fennel-src][fennel-src]:
-
 ```toml
 [dependencies]
 fennel-searcher = "*"
 ```
 
-If you wish to specify a Fennel release version:
-
-```toml
-# basic
-[dependencies]
-fennel-searcher = { version = "*", default-features = false, features = ["fennel153"] }
-```
-
-```toml
-# advanced
-[features]
-default = ["fennel153"]
-fennel153 = ["fennel-searcher/fennel153"]
-
-[dependencies]
-fennel-searcher = { version = "*", default-features = false }
-```
-
 ### Code
 
 ```rust
-use fennel_searcher::AddSearcherFnl;
+use fennel_searcher::AddSearcher;
 use mlua::Lua;
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -75,6 +54,3 @@ Unless you explicitly state otherwise, any contribution intentionally
 submitted for inclusion in the work by you, as defined in the Apache-2.0
 license, shall be dual licensed as above, without any additional terms
 or conditions.
-
-
-[fennel-src]: https://git.sr.ht/~ioiojo/meka/tree/master/item/fennel-src

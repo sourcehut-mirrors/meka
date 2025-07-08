@@ -1,5 +1,8 @@
 #[derive(Debug)]
 pub enum Error {
+    /// Could not import Fennel by module name "fennel".
+    FailedToImportFennel(mlua::Error),
+
     FennelCompile(fennel_compile::Error),
     Lua(mlua::Error),
     LuaSearcher(mlua_searcher::Error),
@@ -26,9 +29,13 @@ impl From<mlua_searcher::Error> for Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let res = match self {
-            Error::FennelCompile(e) => format!("fennel-compile error:\n{:#?}", e),
-            Error::Lua(e) => format!("mlua error:\n{:#?}", e),
-            Error::LuaSearcher(e) => format!("mlua-searcher error:\n{:#?}", e),
+            Error::FailedToImportFennel(e) => {
+                format!("Could not import Fennel by module name \"fennel\": {:?}", e)
+            }
+
+            Error::FennelCompile(e) => format!("fennel-compile error: {:?}", e),
+            Error::Lua(e) => format!("mlua error: {:?}", e),
+            Error::LuaSearcher(e) => format!("mlua-searcher error: {:?}", e),
         };
         write!(f, "{}", res)
     }

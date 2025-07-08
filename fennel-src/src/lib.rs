@@ -91,13 +91,13 @@ pub fn loader(lua: &Lua, env: Table, name: &str) -> mlua::Result<Function> {
                                 Ok(key) => match &*key {
                                     "version" => {
                                         let value = value.try_into_string().map_err(|e| {
-                                            mlua::Error::RuntimeError(format!("fennel-src loader function couldn't process 'version' value string found in table argument: {:#?}", e))
+                                            mlua::Error::RuntimeError(format!("fennel-src loader function couldn't process 'version' value string found in table argument: {:?}", e))
                                         })?;
                                         version = Some(value);
                                     }
                                     "as" => {
                                         let value = value.try_into_string().map_err(|e| {
-                                            mlua::Error::RuntimeError(format!("fennel-src loader function couldn't process 'as' value string found in table argument: {:#?}", e))
+                                            mlua::Error::RuntimeError(format!("fennel-src loader function couldn't process 'as' value string found in table argument: {:?}", e))
                                         })?;
                                         name = Some(value);
                                     }
@@ -106,7 +106,7 @@ pub fn loader(lua: &Lua, env: Table, name: &str) -> mlua::Result<Function> {
                                     }
                                 }
                                 Err(e) => {
-                                    return Err(mlua::Error::RuntimeError(format!("fennel-src loader function couldn't process string argument: {:#?}", e)));
+                                    return Err(mlua::Error::RuntimeError(format!("fennel-src loader function couldn't process string argument: {:?}", e)));
                                 }
                             }
                         }

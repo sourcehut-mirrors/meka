@@ -1,4 +1,4 @@
-use mlua::{Lua, Table, Value};
+use mlua::{FromLua, Function, Lua, Table, Value};
 use std::error;
 use std::fmt;
 use std::vec::Vec;
@@ -268,6 +268,42 @@ pub fn package_cpath(lua: &Lua) -> mlua::Result<String> {
     Ok(package_cpath)
 }
 
+/// Return Lua's `package.loaded` as `Table`.
+pub fn package_loaded(lua: &Lua) -> mlua::Result<Table> {
+    let globals: Table = lua.globals();
+    let package: Table = globals.get("package").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_loaded function couldn't get Lua package table".to_string(),
+        )
+    })?;
+    let package_loaded: Value = package.get("loaded").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_loaded function couldn't get Lua package.loaded value".to_string(),
+        )
+    })?;
+    let package_loaded: Table = match package_loaded {
+        Value::Table(package_loaded) => package_loaded,
+        val => {
+            return Err(mlua::Error::RuntimeError(format!(
+                "mlua-utils package_loaded function expected table value for Lua's package.loaded, but got {}",
+                typename(&val)
+            )));
+        }
+    };
+    Ok(package_loaded)
+}
+
+/// Check if Lua's `package.loaded` table contains key.
+pub fn package_loaded_contains(lua: &Lua, key: &str) -> mlua::Result<bool> {
+    let package_loaded = package_loaded(lua).map_err(|e| {
+        mlua::Error::RuntimeError(format!("mlua-utils package_loaded_contains function couldn't get Lua's package.loaded table: {:?}", e))
+    })?;
+    let contains = package_loaded.contains_key(key).map_err(|_| {
+        mlua::Error::RuntimeError(format!("mlua-utils package_loaded_contains function couldn't check if package.loaded table contains key {}", key))
+    })?;
+    Ok(contains)
+}
+
 /// Return Lua's `package.path` as `String`.
 pub fn package_path(lua: &Lua) -> mlua::Result<String> {
     let globals: Table = lua.globals();
@@ -301,6 +337,57 @@ pub fn package_path(lua: &Lua) -> mlua::Result<String> {
     Ok(package_path)
 }
 
+/// Import a Lua module with `pcall(require, module_name)`.
+pub fn pcall_require(lua: &Lua, module_name: &str) -> mlua::Result<(bool, Value)> {
+    let globals: Table = lua.globals();
+    let pcall: Function = globals.get("pcall").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils pcall_require function couldn't get pcall function".to_string(),
+        )
+    })?;
+    let require: Function = globals.get("require").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils pcall_require function couldn't get require function".to_string(),
+        )
+    })?;
+    let result: (bool, Value) = pcall.call((require, module_name)).map_err(|_| {
+        mlua::Error::RuntimeError(format!(
+            "mlua-utils pcall_require function unexpectedly failed to call pcall(require, {})",
+            module_name
+        ))
+    })?;
+    Ok(result)
+}
+
+/// Import a Lua module with `pcall(require, module_name)` with success value return type
+/// specified as generic type parameter.
+pub fn pcall_require_into<T>(lua: &Lua, module_name: &str) -> mlua::Result<(bool, T)>
+where
+    T: FromLua,
+{
+    let result: (bool, Value) = pcall_require(lua, module_name).map_err(|e| {
+        mlua::Error::RuntimeError(format!("mlua-utils pcall_require_into function unexpectedly failed to call pcall(require, {}): {:?}", module_name, e))
+    })?;
+    let value: T = T::from_lua(result.1, lua).map_err(|_| {
+        mlua::Error::RuntimeError(format!("mlua-utils pcall_require_into function couldn't convert success value returned from pcall(require, {}) to requested type", module_name))
+    })?;
+    Ok((result.0, value))
+}
+
+/// Import a Lua module with `require(module_name)`.
+pub fn require<T>(lua: &Lua, module_name: &str) -> mlua::Result<T>
+where
+    T: FromLua,
+{
+    let globals: Table = lua.globals();
+    let require: Function = globals.get("require").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils require function couldn't get require function".to_string(),
+        )
+    })?;
+    require.call::<T>(module_name)
+}
+
 /// Convert an `mlua::Value` into type `String`.
 pub fn typename(val: &Value) -> &'static str {
     match val {
@@ -329,4 +416,21 @@ pub fn typename(val: &Value) -> &'static str {
         Value::Error(_) => "error",
         Value::Other(_) => "other",
     }
+}
+
+/// Remove a module from Lua's `package.loaded` table.
+pub fn unload_module(lua: &Lua, key: &str) -> mlua::Result<()> {
+    let package_loaded = package_loaded(lua).map_err(|e| {
+        mlua::Error::RuntimeError(format!(
+            "mlua-utils unload_module function couldn't get Lua's package.loaded table: {:?}",
+            e
+        ))
+    })?;
+    package_loaded.set(key, Value::Nil).map_err(|_| {
+        mlua::Error::RuntimeError(format!(
+            "mlua-utils unload_module function couldn't set Lua's package.loaded[{}] to nil",
+            key
+        ))
+    })?;
+    Ok(())
 }
