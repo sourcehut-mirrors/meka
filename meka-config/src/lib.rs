@@ -1,9 +1,6 @@
 use fennel_compile::Compile;
+use fennel_mount::Mount;
 use fennel_searcher::AddSearcher as _;
-#[cfg(feature = "fennel100")]
-use fennel_src::FENNEL100;
-#[cfg(feature = "fennel153")]
-use fennel_src::FENNEL153;
 use meka_config_macros::loader_registry_from_cargo_manifest;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
@@ -68,6 +65,7 @@ pub enum ConfigInitError {
     InvalidConfigModuleResultUserData,
 
     FennelCompileError(fennel_compile::Error),
+    FennelMountError(fennel_mount::Error),
     FennelSearcherError(fennel_searcher::Error),
     Io(io::Error),
     Lua(mlua::Error),
@@ -88,6 +86,7 @@ impl fmt::Display for ConfigInitError {
             ConfigInitError::InvalidConfigModuleResultUserData => "Expected config module to return Manifest userdata, but found unsupported userdata type".to_string(),
 
             ConfigInitError::FennelCompileError(error) => format!("{}", error),
+            ConfigInitError::FennelMountError(error) => format!("{}", error),
             ConfigInitError::FennelSearcherError(error) => format!("{}", error),
             ConfigInitError::Io(error) => format!("{}", error),
             ConfigInitError::Lua(error) => format!("{}", error),
@@ -102,6 +101,12 @@ impl fmt::Display for ConfigInitError {
 impl From<fennel_compile::Error> for ConfigInitError {
     fn from(error: fennel_compile::Error) -> Self {
         ConfigInitError::FennelCompileError(error)
+    }
+}
+
+impl From<fennel_mount::Error> for ConfigInitError {
+    fn from(error: fennel_mount::Error) -> Self {
+        ConfigInitError::FennelMountError(error)
     }
 }
 
@@ -288,23 +293,17 @@ impl Config {
     }
 
     fn setup_standard_library(lua: &Lua) -> ConfigInitResult<()> {
-        let mut searcher = HashMap::with_capacity(1);
-
-        // Enable importing Fennel at "fennel".
-        #[cfg(feature = "fennel100")]
-        searcher.insert(Cow::from("fennel"), Cow::from(FENNEL100));
-        #[cfg(feature = "fennel153")]
-        searcher.insert(Cow::from("fennel"), Cow::from(FENNEL153));
-
-        lua.add_searcher(searcher)?;
-
         let mut searcher: HashMap<
             Cow<'static, str>,
             fn(&Lua, Table, &str) -> mlua::Result<Function>,
-        > = HashMap::with_capacity(1);
+        > = HashMap::with_capacity(2);
+
+        // Enable importing Fennel at "fennel".
+        lua.mount_fennel()?;
 
         // Enabling importing `fennel_src::loader` at "fennel-src".
         searcher.insert(Cow::from("fennel-src"), fennel_src::loader);
+
         // Enabling importing `meka_loader` at "meka".
         searcher.insert(Cow::from("meka"), Self::meka_loader);
 
