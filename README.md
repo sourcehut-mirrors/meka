@@ -4,9 +4,7 @@ Embed Lua and compile-to-Lua language modules in Rust.
 
 ## Synopsis
 
-Assume we have the following directory structure, where `.` is a simple
-Rust library crate containing subdirectory `taon`. Inside `taon` are
-Fennel modules to embed:
+Assume we have the following directory structure, where `.` is a simple Rust library crate containing subdirectory `taon`. Inside `taon` are Fennel modules to embed:
 
 ```bash
 $ tree
@@ -185,7 +183,4 @@ at your option.
 
 ## Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in the work by you, as defined in the Apache-2.0
-license, shall be dual licensed as above, without any additional terms
-or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

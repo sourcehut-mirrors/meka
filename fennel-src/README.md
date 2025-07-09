@@ -1,14 +1,12 @@
 # fennel-src
 
-Contains [Fennel](https://fennel-lang.org/) release sources. Checks
-release sources against @technomancy PGP signatures during build.
+Contains [Fennel](https://fennel-lang.org/) release sources. Checks release sources against @technomancy PGP signatures during build.
 
 ## Synopsis
 
 ### In your Cargo manifest:
 
-If you wish to accept the default Fennel release version provided by
-`fennel-src`:
+If you wish to accept the default Fennel release version provided by `fennel-src`:
 
 ```toml
 [dependencies]
@@ -61,12 +59,8 @@ Licensed under either of
 
 at your option.
 
-All unmodified works from [Fennel](https://fennel-lang.org/) included
-are made available under the terms of the original license.
+All unmodified works from [Fennel](https://fennel-lang.org/) included are made available under the terms of the original license.
 
 ## Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in the work by you, as defined in the Apache-2.0
-license, shall be dual licensed as above, without any additional terms
-or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

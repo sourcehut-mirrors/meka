@@ -2,15 +2,13 @@
 
 ## Description
 
-Make [Fennel](https://fennel-lang.org/) available in `mlua::Lua` instance
-via [fennel-src][fennel-src] crate.
+Make [Fennel](https://fennel-lang.org/) available in `mlua::Lua` instance via [fennel-src][fennel-src] crate.
 
 ## Synopsis
 
 ### In your Cargo manifest:
 
-If you wish to accept the default Fennel release version provided by
-[fennel-src][fennel-src]:
+If you wish to accept the default Fennel release version provided by [fennel-src][fennel-src]:
 
 ```toml
 [dependencies]
@@ -62,10 +60,7 @@ at your option.
 
 ## Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in the work by you, as defined in the Apache-2.0
-license, shall be dual licensed as above, without any additional terms
-or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
 
 
 [fennel-src]: https://git.sr.ht/~ioiojo/meka/tree/master/item/fennel-src
