@@ -5,13 +5,15 @@ Embed Lua and compile-to-Lua language modules in Rust.
 ## Synopsis
 
 Assume we have the following directory structure, where `.` is a simple
-Rust library crate containing subdirectory `kiwi`. Inside `kiwi` are
+Rust library crate containing subdirectory `taon`. Inside `taon` are
 Fennel modules to embed:
 
 ```bash
 $ tree
 .
-├── kiwi
+├── src
+│   └── lib.rs
+├── taon
 │   ├── dine
 │   │   ├── init.fnl
 │   │   └── proximates.fnl
@@ -23,8 +25,6 @@ $ tree
 │   ├── date.fnl
 │   ├── time.fnl
 │   └── utils.fnl
-├── src
-│   └── lib.rs
 └── Cargo.toml
 
 4 directories, 11 files
@@ -42,21 +42,21 @@ Create `manifest.fnl` alongside `Cargo.toml` in `$CARGO_MANIFEST_DIR`:
 ;;
 ;; N.B. the `name` field is optional and redundant in this case since Meka derives those same
 ;; names from the paths given.
-(local kiwi (manifest.new {:name :kiwi.cite            :path :kiwi/cite.fnl}
-                          {:name :kiwi.date            :path :kiwi/date.fnl}
-                          {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
-                          {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
-                          {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
-                          {:name :kiwi.food            :path :kiwi/food/init.fnl}
-                          {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
-                          {:name :kiwi.time            :path :kiwi/time.fnl}
-                          {:name :kiwi.utils           :path :kiwi/utils.fnl}
+(local taon (manifest.new {:name :taon.cite            :path :taon/cite.fnl}
+                          {:name :taon.date            :path :taon/date.fnl}
+                          {:name :taon.date-time       :path :taon/date-time.fnl}
+                          {:name :taon.dine            :path :taon/dine/init.fnl}
+                          {:name :taon.dine.proximates :path :taon/dine/proximates.fnl}
+                          {:name :taon.food            :path :taon/food/init.fnl}
+                          {:name :taon.food.proximates :path :taon/food/proximates.fnl}
+                          {:name :taon.time            :path :taon/time.fnl}
+                          {:name :taon.utils           :path :taon/utils.fnl}
                           ;; Embed Fennel via `fennel-src` crate. Enables `(require :fennel)`.
                           (fennel-src)))
 
-;; Refer to `kiwi` manifest in `meka_searcher!` or `meka_searcher_hot!` by passing the string
-;; "kiwi" as first argument.
-{: kiwi}
+;; Refer to `taon` manifest in `meka_searcher!` or `meka_searcher_hot!` by passing the string
+;; "taon" as first argument.
+{: taon}
 ```
 
 Or, equivalently:
@@ -65,19 +65,19 @@ Or, equivalently:
 (import-macros {: manifest} :meka.macros)
 (local fennel-src (require :fennel-src))
 
-(local kiwi (manifest {:name :kiwi.cite            :path :kiwi/cite.fnl}
-                      {:name :kiwi.date            :path :kiwi/date.fnl}
-                      {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
-                      {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
-                      {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
-                      {:name :kiwi.food            :path :kiwi/food/init.fnl}
-                      {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
-                      {:name :kiwi.time            :path :kiwi/time.fnl}
-                      {:name :kiwi.utils           :path :kiwi/utils.fnl}
+(local taon (manifest {:name :taon.cite            :path :taon/cite.fnl}
+                      {:name :taon.date            :path :taon/date.fnl}
+                      {:name :taon.date-time       :path :taon/date-time.fnl}
+                      {:name :taon.dine            :path :taon/dine/init.fnl}
+                      {:name :taon.dine.proximates :path :taon/dine/proximates.fnl}
+                      {:name :taon.food            :path :taon/food/init.fnl}
+                      {:name :taon.food.proximates :path :taon/food/proximates.fnl}
+                      {:name :taon.time            :path :taon/time.fnl}
+                      {:name :taon.utils           :path :taon/utils.fnl}
                       ;; Embed Fennel via `fennel-src` crate. Enables `(require :fennel)`.
                       (fennel-src)))
 
-{: kiwi}
+{: taon}
 ```
 
 Or, simply:
@@ -88,15 +88,15 @@ Or, simply:
 
 ;; Refer to this manifest in `meka_searcher!` or `meka_searcher_hot!` by omitting a string
 ;; argument.
-(manifest {:name :kiwi.cite            :path :kiwi/cite.fnl}
-          {:name :kiwi.date            :path :kiwi/date.fnl}
-          {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
-          {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
-          {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
-          {:name :kiwi.food            :path :kiwi/food/init.fnl}
-          {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
-          {:name :kiwi.time            :path :kiwi/time.fnl}
-          {:name :kiwi.utils           :path :kiwi/utils.fnl}
+(manifest {:name :taon.cite            :path :taon/cite.fnl}
+          {:name :taon.date            :path :taon/date.fnl}
+          {:name :taon.date-time       :path :taon/date-time.fnl}
+          {:name :taon.dine            :path :taon/dine/init.fnl}
+          {:name :taon.dine.proximates :path :taon/dine/proximates.fnl}
+          {:name :taon.food            :path :taon/food/init.fnl}
+          {:name :taon.food.proximates :path :taon/food/proximates.fnl}
+          {:name :taon.time            :path :taon/time.fnl}
+          {:name :taon.utils           :path :taon/utils.fnl}
           (fennel-src))
 ```
 
@@ -118,19 +118,19 @@ fn main() {
 
     // In release builds:
     //
-    // Embed Fennel/Lua modules specified in `kiwi` manifest in `manifest.fnl`, with Fennel
+    // Embed Fennel/Lua modules specified in `taon` manifest in `manifest.fnl`, with Fennel
     // sources AOT-compiled to Lua during Rust comptime.
     //
     // In debug builds:
     //
-    // Read Fennel modules specified in `kiwi` manifest in `manifest.fnl` to string at runtime
-    // and compile to Lua on demand. Read Lua modules specified in `kiwi` manifest at runtime
+    // Read Fennel modules specified in `taon` manifest in `manifest.fnl` to string at runtime
+    // and compile to Lua on demand. Read Lua modules specified in `taon` manifest at runtime
     // on demand.
     //
     // In all builds:
     //
     // Our source code can access Fennel via `require("fennel")` because we add the manifest
-    // returned by `(fennel-src)` - which makes Fennel available at `fennel` - to our `kiwi`
+    // returned by `(fennel-src)` - which makes Fennel available at `fennel` - to our `taon`
     // manifest.
     //
     // Notes:
@@ -151,21 +151,21 @@ fn main() {
     //      [package.metadata.meka.loaders]
     //      fennel-src = "fennel_src::loader"
     #[cfg(not(debug_assertions))]
-    let kiwi = meka_searcher!("kiwi", {"fennel-src" => fennel_src::loader});
+    let taon = meka_searcher!("taon", {"fennel-src" => fennel_src::loader});
     #[cfg(debug_assertions)]
-    let kiwi = meka_searcher_hot!("kiwi", {"fennel-src" => fennel_src::loader});
+    let taon = meka_searcher_hot!("taon", {"fennel-src" => fennel_src::loader});
 
     // In release builds:
     //
     // Enable Lua's `require` to find embedded Fennel modules (AOT-compiled to Lua) and embedded
-    // Lua modules by the names configured in the `kiwi` manifest.
+    // Lua modules by the names configured in the `taon` manifest.
     //
     // In debug builds:
     //
-    // Enable Lua's `require` to find Fennel/Lua modules declared in the `kiwi` manifest.
-    lua.add_meka_searcher(kiwi).unwrap();
+    // Enable Lua's `require` to find Fennel/Lua modules declared in the `taon` manifest.
+    lua.add_meka_searcher(taon).unwrap();
 
-    let uuid = lua.load(r#"require("kiwi.utils").uuid()"#).eval().unwrap();
+    let uuid = lua.load(r#"require("taon.utils").uuid()"#).eval().unwrap();
     // e.g. "d717c6d8-ebed-47ca-8c21-2b6624846ddc"
     eprintln!("{}", uuid);
 

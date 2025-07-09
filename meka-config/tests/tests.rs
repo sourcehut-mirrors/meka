@@ -13,21 +13,21 @@ fn it_works() {
 ;;
 ;; N.B. the `name` field is optional and redundant in this case since Meka derives those same
 ;; names from the paths given.
-(local kiwi (manifest.new {:name :kiwi.cite            :path :kiwi/cite.fnl}
-                          {:name :kiwi.date            :path :kiwi/date.fnl}
-                          {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
-                          {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
-                          {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
-                          {:name :kiwi.food            :path :kiwi/food/init.fnl}
-                          {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
-                          {:name :kiwi.time            :path :kiwi/time.fnl}
-                          {:name :kiwi.utils           :path :kiwi/utils.fnl}
+(local taon (manifest.new {:name :taon.cite            :path :taon/cite.fnl}
+                          {:name :taon.date            :path :taon/date.fnl}
+                          {:name :taon.date-time       :path :taon/date-time.fnl}
+                          {:name :taon.dine            :path :taon/dine/init.fnl}
+                          {:name :taon.dine.proximates :path :taon/dine/proximates.fnl}
+                          {:name :taon.food            :path :taon/food/init.fnl}
+                          {:name :taon.food.proximates :path :taon/food/proximates.fnl}
+                          {:name :taon.time            :path :taon/time.fnl}
+                          {:name :taon.utils           :path :taon/utils.fnl}
                           ;; Embed Fennel via `fennel-src` crate. Enables `(require :fennel)`.
                           (fennel-src)))
 
-;; Refer to `kiwi` manifest in `meka_searcher!` or `meka_searcher_hot!` by passing the string
-;; "kiwi" as first argument.
-{: kiwi}"#
+;; Refer to `taon` manifest in `meka_searcher!` or `meka_searcher_hot!` by passing the string
+;; "taon" as first argument.
+{: taon}"#
         .into();
     let module = Module::NamedText(
         ModuleNamedText::new("manifest", module, ModuleFileType::Fennel).unwrap(),
@@ -44,17 +44,17 @@ fn it_works() {
     let module: &str = r#"local fennel_src = require("fennel-src")
 local meka = require("meka")
 local manifest = meka.manifest
-local kiwi = manifest.new({name = "kiwi.cite",            path = "kiwi/cite.fnl"},
-                          {name = "kiwi.date",            path = "kiwi/date.fnl"},
-                          {name = "kiwi.date-time",       path = "kiwi/date-time.fnl"},
-                          {name = "kiwi.dine",            path = "kiwi/dine/init.fnl"},
-                          {name = "kiwi.dine.proximates", path = "kiwi/dine/proximates.fnl"},
-                          {name = "kiwi.food",            path = "kiwi/food/init.fnl"},
-                          {name = "kiwi.food.proximates", path = "kiwi/food/proximates.fnl"},
-                          {name = "kiwi.time",            path = "kiwi/time.fnl"},
-                          {name = "kiwi.utils",           path = "kiwi/utils.fnl"},
+local taon = manifest.new({name = "taon.cite",            path = "taon/cite.fnl"},
+                          {name = "taon.date",            path = "taon/date.fnl"},
+                          {name = "taon.date-time",       path = "taon/date-time.fnl"},
+                          {name = "taon.dine",            path = "taon/dine/init.fnl"},
+                          {name = "taon.dine.proximates", path = "taon/dine/proximates.fnl"},
+                          {name = "taon.food",            path = "taon/food/init.fnl"},
+                          {name = "taon.food.proximates", path = "taon/food/proximates.fnl"},
+                          {name = "taon.time",            path = "taon/time.fnl"},
+                          {name = "taon.utils",           path = "taon/utils.fnl"},
                           fennel_src())
-return {kiwi = kiwi}"#;
+return {taon = taon}"#;
     let module =
         Module::NamedText(ModuleNamedText::new("manifest", module, ModuleFileType::Lua).unwrap());
 
@@ -75,21 +75,21 @@ fn manifest_fennel_macro_works() {
 
 ;; Meka automatically imports the manifest macro. The following is short for:
 ;;
-;;     (local kiwi ((. (require :meka) :manifest :new) {...}))
+;;     (local taon ((. (require :meka) :manifest :new) {...}))
 ;;
-(local kiwi (manifest {:name :kiwi.cite            :path :kiwi/cite.fnl}
-                      {:name :kiwi.date            :path :kiwi/date.fnl}
-                      {:name :kiwi.date-time       :path :kiwi/date-time.fnl}
-                      {:name :kiwi.dine            :path :kiwi/dine/init.fnl}
-                      {:name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl}
-                      {:name :kiwi.food            :path :kiwi/food/init.fnl}
-                      {:name :kiwi.food.proximates :path :kiwi/food/proximates.fnl}
-                      {:name :kiwi.time            :path :kiwi/time.fnl}
-                      {:name :kiwi.utils           :path :kiwi/utils.fnl}
+(local taon (manifest {:name :taon.cite            :path :taon/cite.fnl}
+                      {:name :taon.date            :path :taon/date.fnl}
+                      {:name :taon.date-time       :path :taon/date-time.fnl}
+                      {:name :taon.dine            :path :taon/dine/init.fnl}
+                      {:name :taon.dine.proximates :path :taon/dine/proximates.fnl}
+                      {:name :taon.food            :path :taon/food/init.fnl}
+                      {:name :taon.food.proximates :path :taon/food/proximates.fnl}
+                      {:name :taon.time            :path :taon/time.fnl}
+                      {:name :taon.utils           :path :taon/utils.fnl}
                       ;; Embed Fennel via `fennel-src` crate. Enables `(require :fennel)`.
                       (fennel-src)))
 
-{: kiwi}"#
+{: taon}"#
         .into();
     let module = Module::NamedText(
         ModuleNamedText::new("manifest", module, ModuleFileType::Fennel).unwrap(),
@@ -114,15 +114,15 @@ fn standalone_manifest_fennel_macro_works() {
 
 ;; Refer to this manifest in `meka_searcher!` or `meka_searcher_hot!` by omitting a string
 ;; argument.
-(manifest {:name :kiwi.cite            :path :kiwi/cite.fnl
-           :name :kiwi.date            :path :kiwi/date.fnl
-           :name :kiwi.date-time       :path :kiwi/date-time.fnl
-           :name :kiwi.dine            :path :kiwi/dine/init.fnl
-           :name :kiwi.dine.proximates :path :kiwi/dine/proximates.fnl
-           :name :kiwi.food            :path :kiwi/food/init.fnl
-           :name :kiwi.food.proximates :path :kiwi/food/proximates.fnl
-           :name :kiwi.time            :path :kiwi/time.fnl
-           :name :kiwi.utils           :path :kiwi/utils.fnl}
+(manifest {:name :taon.cite            :path :taon/cite.fnl
+           :name :taon.date            :path :taon/date.fnl
+           :name :taon.date-time       :path :taon/date-time.fnl
+           :name :taon.dine            :path :taon/dine/init.fnl
+           :name :taon.dine.proximates :path :taon/dine/proximates.fnl
+           :name :taon.food            :path :taon/food/init.fnl
+           :name :taon.food.proximates :path :taon/food/proximates.fnl
+           :name :taon.time            :path :taon/time.fnl
+           :name :taon.utils           :path :taon/utils.fnl}
           (fennel-src))"#
         .into();
     let module = Module::NamedText(
