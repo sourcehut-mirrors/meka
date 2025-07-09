@@ -172,6 +172,56 @@ fn main() {
 }
 ```
 
+## Other topics
+
+### Embedding Fennel Macro modules
+
+It's about as easy to embed Fennel macro modules as it is to embed regular Fennel or Lua modules:
+
+```fennel
+(import-macros {: manifest} :meka.macros)
+(local fennel-src (require :fennel-src))
+(manifest ;; Paths with a `.fnlm` file extension are automatically recognized as Fennel macro
+          ;; modules:
+          {:name :taon.mu :path :taon/mu.fnlm}
+          ;; As are paths whose last segment is `init-macros.fnl`:
+          {:name :taon.nu :path :taon/nu/init-macros.fnl}
+          ;; Otherwise, the module's `:type` key must be set to `:fennel-macros` in order for
+          ;; it to be treated as a Fennel macro module.
+          {:name :taon.macros :path :taon/macros.fnl :type :fennel-macros}
+          ;; To use embedded Fennel macro modules, Fennel itself must be available for import.
+          (fennel-src))
+```
+
+However, *using* the Fennel macro modules declared in a manifest (and embedded in a `MekaSearcher`) isn't possible unless Fennel itself is available for import under the module name "fennel".
+
+Meka will make Fennel available for import under module name "fennel" when you add a suitable declaration to your manifest, either by using the `fennel-src` crate per the above example, or by hand, as in this one:
+
+```fennel
+;; Functionally equivalent to above example assuming `fennel.lua` contains identical Fennel:
+(import-macros {: manifest} :meka.macros)
+(local fennel-src (require :fennel-src))
+(manifest {:name :taon.mu :path :taon/mu.fnlm}
+          {:name :taon.nu :path :taon/nu/init-macros.fnl}
+          ;; N.B. `macros.fnl` isn't automatically detected as being a Fennel macros module.
+          ;; (see: `fennel.macro-path`)
+          {:name :taon.macros :path :taon/macros.fnl :type :fennel-macros}
+          ;; Make Fennel available for import by module name "fennel":
+          {:name :fennel :path :path/to/fennel.lua})
+```
+
+Here's why this is necessary. *Using* embedded Fennel macro modules entails:
+
+a) Adding a bespoke Fennel macro module searcher which has direct access to said embedded Fennel macro modules to the `fennel.macro-searchers` table.
+
+Meka achieves this via the `MekaSearcher` data structure and the `AddMekaSearcher` trait. This enables the embedded Fennel macro modules to be imported via `import-macros` in Fennel source code much like they would be if they were files on disk being referenced in a normal Fennel project.
+
+b) Calling `fennel.eval(content, {env = "_COMPILER"})`, where `content` is the content of a Fennel macros module.
+
+Meka implements this via the `fennel-searcher` crate's `AddSearcher` trait. This evaluates the given Fennel macros module in the special `_COMPILER` environment, which makes functions/macros defined therein available at compile time.
+
+One way or another, at the point Fennel macro modules are to be used (not just kept around as embedded text), Fennel itself must be available for import under module name "fennel". Again, Meka will do this automatically for you if, as in the two examples above, you declare Fennel as part of your manifest. Another possible solution is to use the `fennel-mount` crate's `Mount` trait to call `mount_fennel()` on an `mlua::Lua` instance. Alternatively, it can be done with bespoke Rust code. Or you might consider circumventing all this by AOT-compiling your Fennel code to Lua (as part of your project's build process, for example). No Fennel macro modules to worry about that way.
+
 ## License
 
 Licensed under either of
