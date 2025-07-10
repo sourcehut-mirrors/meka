@@ -220,7 +220,7 @@ b) Calling `fennel.eval(content, {env = "_COMPILER"})`, where `content` is the c
 
 Meka implements this via the `fennel-searcher` crate's `AddSearcher` trait. This evaluates the given Fennel macros module in the special `_COMPILER` environment, which makes functions/macros defined therein available at compile time.
 
-One way or another, at the point Fennel macro modules are to be used (not just kept around as embedded text), Fennel itself must be available for import under module name "fennel". Again, Meka will do this automatically for you if, as in the two examples above, you declare Fennel as part of your manifest. Another possible solution is to use the `fennel-mount` crate's `Mount` trait to call `mount_fennel()` on an `mlua::Lua` instance. Alternatively, it can be done with bespoke Rust code. Or you might consider circumventing all this by AOT-compiling your Fennel code to Lua (as part of your project's build process, for example). No Fennel macro modules to worry about that way.
+One way or another, at the point Fennel macro modules are to be used (not just kept around as embedded text), Fennel itself must be available for import under module name "fennel". Again, Meka will handle this automatically for you if, as in the two examples above, you declare Fennel as part of your manifest. Another possible solution is to use the `fennel-mount` crate's `Mount` trait to call `mount_fennel()` on an `mlua::Lua` instance. Alternatively, you might consider circumventing all this by AOT-compiling your Fennel code to Lua (as part of your project's build process, for example).
 
 ## License
 
