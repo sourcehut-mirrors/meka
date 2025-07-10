@@ -21,6 +21,10 @@ check-fennel-searcher:
 check-fennel-src:
   cargo check --package fennel-src --features mlua-lua54,mlua-vendored
 
+# Run cargo check on fennel-utils
+check-fennel-utils:
+  cargo check --package fennel-utils --features mlua-lua54,mlua-vendored
+
 # Run cargo check on io-cat
 check-io-cat:
   cargo check --package io-cat
@@ -136,6 +140,10 @@ test-fennel-searcher:
 # Run cargo test on fennel-src
 test-fennel-src:
   cargo test --package fennel-src --features mlua-lua54,mlua-vendored
+
+# Run cargo test on fennel-utils
+test-fennel-utils:
+  cargo test --package fennel-utils --features mlua-lua54,mlua-vendored
 
 # Run cargo test on io-cat
 test-io-cat:

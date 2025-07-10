@@ -1,0 +1,28 @@
+[package]
+name = "fennel-utils"
+version = "0.1.0"
+edition = { workspace = true }
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/fennel-utils"
+readme = "README.md"
+description = "Utility functions for Fennel"
+
+[features]
+default = []
+mlua-lua54 = ["mlua/lua54", "mlua-utils/mlua-lua54"]
+mlua-lua53 = ["mlua/lua53", "mlua-utils/mlua-lua53"]
+mlua-lua52 = ["mlua/lua52", "mlua-utils/mlua-lua52"]
+mlua-lua51 = ["mlua/lua51", "mlua-utils/mlua-lua51"]
+mlua-luajit = ["mlua/luajit", "mlua-utils/mlua-luajit"]
+mlua-luajit52 = ["mlua/luajit52", "mlua-utils/mlua-luajit52"]
+mlua-luau = ["mlua/luau", "mlua-utils/mlua-luau"]
+mlua-luau-jit = ["mlua/luau-jit", "mlua-utils/mlua-luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4", "mlua-utils/mlua-luau-vector4"]
+mlua-vendored = ["mlua/vendored", "mlua-utils/mlua-vendored"]
+
+[dependencies]
+mlua = { workspace = true }
+mlua-utils = { path = "../mlua-utils", default-features = false }
+
+[dev-dependencies]
+fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+fennel-utils = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

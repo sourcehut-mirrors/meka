@@ -34,6 +34,7 @@ members = [
   "fennel-mount",
   "fennel-searcher",
   "fennel-src",
+  "fennel-utils",
   "io-cat",
   "meka-config",
   "meka-config-macros",
