@@ -5,11 +5,11 @@ pub mod prelude {
 }
 
 pub trait FennelView {
-    fn fennel_view(&self, value: Value) -> mlua::Result<String>;
+    fn fennel_view(&self, value: Value, opts: Option<Table>) -> mlua::Result<String>;
 }
 
 impl FennelView for Lua {
-    fn fennel_view(&self, value: Value) -> mlua::Result<String> {
+    fn fennel_view(&self, value: Value, opts: Option<Table>) -> mlua::Result<String> {
         let fennel = mlua_utils::require::<Table>(self, "fennel").map_err(|e| {
             mlua::Error::RuntimeError(format!(
                 "fennel-utils fennel_view function couldn't import Fennel: {}",
@@ -22,6 +22,10 @@ impl FennelView for Lua {
                 e
             ))
         })?;
-        view.call(value)
+        if let Some(opts) = opts {
+            view.call((value, opts))
+        } else {
+            view.call(value)
+        }
     }
 }

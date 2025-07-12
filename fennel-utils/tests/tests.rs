@@ -10,6 +10,12 @@ fn fennel_view_works() {
     lua.mount_fennel().unwrap();
 
     let val: Value = lua.load(r#"return "mlua""#).eval().unwrap();
-    let got = lua.fennel_view(val).unwrap();
-    assert_eq!(&got, r#""mlua""#)
+    let got = lua.fennel_view(val, None).unwrap();
+    assert_eq!(&got, r#""mlua""#);
+
+    let opts = lua.create_table().unwrap();
+    opts.set("prefer-colon?", true).unwrap();
+    let val: Value = lua.load(r#"return "mlua""#).eval().unwrap();
+    let got = lua.fennel_view(val, Some(opts)).unwrap();
+    assert_eq!(&got, ":mlua");
 }
