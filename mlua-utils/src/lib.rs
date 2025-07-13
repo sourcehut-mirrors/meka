@@ -6,7 +6,9 @@ use std::vec::Vec;
 pub mod prelude {
     pub use crate::{
         InputStringError, InputStringResult, IntoCharArray, IsList, TryIntoString,
-        extract_non_system_lua_paths, package_config, package_cpath, package_path, typename,
+        extract_non_system_lua_paths, package_config, package_cpath, package_loaded,
+        package_loaded_contains, package_path, pcall_require, pcall_require_into, require,
+        typename,
     };
 }
 
