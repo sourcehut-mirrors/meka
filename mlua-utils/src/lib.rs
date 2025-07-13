@@ -417,20 +417,3 @@ pub fn typename(val: &Value) -> &'static str {
         Value::Other(_) => "other",
     }
 }
-
-/// Remove a module from Lua's `package.loaded` table.
-pub fn unload_module(lua: &Lua, key: &str) -> mlua::Result<()> {
-    let package_loaded = package_loaded(lua).map_err(|e| {
-        mlua::Error::RuntimeError(format!(
-            "mlua-utils unload_module function couldn't get Lua's package.loaded table: {:?}",
-            e
-        ))
-    })?;
-    package_loaded.set(key, Value::Nil).map_err(|_| {
-        mlua::Error::RuntimeError(format!(
-            "mlua-utils unload_module function couldn't set Lua's package.loaded[{}] to nil",
-            key
-        ))
-    })?;
-    Ok(())
-}
