@@ -23,4 +23,6 @@ mlua-vendored = ["mlua/vendored"]
 mlua = { workspace = true }
 
 [dev-dependencies]
+fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+fennel-utils = { path = "../fennel-utils", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
 mlua-utils = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

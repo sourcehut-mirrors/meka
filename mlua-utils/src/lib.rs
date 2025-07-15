@@ -419,3 +419,47 @@ pub fn typename(val: &Value) -> &'static str {
         Value::Other(_) => "other",
     }
 }
+
+/// Replace `getmetatable` with function that circumvents mlua safety features.
+pub fn unrestrict_getmetatable(lua: &Lua) -> mlua::Result<()> {
+    let getmetatable = lua
+        .create_function(|lua, value: Value| -> mlua::Result<Value> {
+            unsafe {
+                lua.exec_raw(value, |state| {
+                    // The value is now at stack index -1
+                    let has_metatable = mlua::ffi::lua_getmetatable(state, -1);
+
+                    if has_metatable == 0 {
+                        // No metatable exists
+                        // Pop the original value and push nil
+                        mlua::ffi::lua_pop(state, 1);
+                        mlua::ffi::lua_pushnil(state);
+                    } else {
+                        // Metatable was pushed on top of the stack
+                        // Stack now has: [-2] = value, [-1] = metatable
+                        // Remove the original value, keeping only the metatable
+                        mlua::ffi::lua_remove(state, -2);
+                    }
+                })
+            }
+        })
+        .map_err(|_| {
+            mlua::Error::RuntimeError(
+                "mlua-utils unrestrict_getmetatable function couldn't create Lua function"
+                    .to_string(),
+            )
+        })?;
+    let globals = lua.globals();
+    globals.set("getmetatable", getmetatable).map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils unrestrict_getmetatable function couldn't set _G.getmetatable".to_string(),
+        )
+    })?;
+    lua.set_globals(globals).map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils unrestrict_getmetatable function got error upon calling lua.set_globals()"
+                .to_string(),
+        )
+    })?;
+    Ok(())
+}
