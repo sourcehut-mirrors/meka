@@ -127,7 +127,7 @@ pub fn loader(lua: &Lua, env: Table, name: &str) -> mlua::Result<Function> {
         Ok(manifest)
     })?;
     mt.set("__call", call)?;
-    tbl.set_metatable(Some(mt));
+    tbl.set_metatable(Some(mt))?;
     let globals = lua.globals();
     globals.set("fennel_src", tbl)?;
     Ok(lua
