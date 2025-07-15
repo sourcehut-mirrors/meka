@@ -28,7 +28,7 @@ impl Mount for Lua {
             (true, _) => {
                 // Remove `fennel` module from `package.loaded` cache unless it was there already.
                 if !package_loaded_contains_fennel {
-                    self.unload("fennel")?;
+                    self.unload_module("fennel")?;
                 }
             }
             (false, _) => {
