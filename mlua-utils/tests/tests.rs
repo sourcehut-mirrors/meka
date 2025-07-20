@@ -250,5 +250,8 @@ fn unrestrict_getmetatable_works() {
         lua.fennel_view(Value::UserData(cartridge), None)
             .expect("fennel.view function unexpectedly failed with Cartridge argument")
     };
-    assert_eq!("Super Smash Brothers 64", cartridge_fennel_view_unrestricted);
+    assert_eq!(
+        "Super Smash Brothers 64",
+        cartridge_fennel_view_unrestricted
+    );
 }
