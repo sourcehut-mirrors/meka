@@ -306,9 +306,7 @@ impl AddSearcher for Lua {
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = Searcher::new(modules, registry_key);
-        searchers
-            .set(searchers.len()? + 1, searcher)
-            .map_err(|e| e.into())
+        searchers.raw_insert(2, searcher).map_err(|e| e.into())
     }
 
     fn add_path_searcher<P>(&self, modules: HashMap<Cow<'static, str>, P>) -> Result<()>
@@ -340,9 +338,7 @@ impl AddSearcher for Lua {
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = PathSearcherPoly::new(modules, registry_key, transform);
-        searchers
-            .set(searchers.len()? + 1, searcher)
-            .map_err(|e| e.into())
+        searchers.raw_insert(2, searcher).map_err(|e| e.into())
     }
 
     fn add_closure_searcher(
@@ -356,9 +352,7 @@ impl AddSearcher for Lua {
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = ClosureSearcher::new(modules, registry_key);
-        searchers
-            .set(searchers.len()? + 1, searcher)
-            .map_err(|e| e.into())
+        searchers.raw_insert(2, searcher).map_err(|e| e.into())
     }
 
     fn add_function_searcher(
@@ -369,9 +363,7 @@ impl AddSearcher for Lua {
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = FunctionSearcher::new(modules, registry_key);
-        searchers
-            .set(searchers.len()? + 1, searcher)
-            .map_err(|e| e.into())
+        searchers.raw_insert(2, searcher).map_err(|e| e.into())
     }
 
     fn add_cat_searcher(&self, modules: CatCow) -> Result<()> {
@@ -379,8 +371,6 @@ impl AddSearcher for Lua {
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = CatSearcher::new(modules, registry_key);
-        searchers
-            .set(searchers.len()? + 1, searcher)
-            .map_err(|e| e.into())
+        searchers.raw_insert(2, searcher).map_err(|e| e.into())
     }
 }

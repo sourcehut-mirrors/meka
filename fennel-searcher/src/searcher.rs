@@ -259,7 +259,7 @@ impl AddSearcher for Lua {
         let registry_key = self.create_registry_value(globals)?;
         let macro_searcher = MacroSearcher::new(modules, registry_key);
         macro_searchers
-            .set(macro_searchers.len()? + 1, macro_searcher)
+            .raw_insert(1, macro_searcher)
             .map_err(|e| e.into())
     }
 
@@ -303,7 +303,7 @@ impl AddSearcher for Lua {
         let registry_key = self.create_registry_value(globals)?;
         let macro_searcher = MacroPathSearcher::new(modules, registry_key);
         macro_searchers
-            .set(macro_searchers.len()? + 1, macro_searcher)
+            .raw_insert(1, macro_searcher)
             .map_err(|e| e.into())
     }
 
@@ -312,9 +312,7 @@ impl AddSearcher for Lua {
         let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = CatSearcher::new(modules, registry_key);
-        searchers
-            .set(searchers.len()? + 1, searcher)
-            .map_err(|e| e.into())
+        searchers.raw_insert(2, searcher).map_err(|e| e.into())
     }
 
     fn add_cat_searcher_fnl_macros(&self, modules: CatCow) -> Result<()> {
@@ -325,7 +323,7 @@ impl AddSearcher for Lua {
         let registry_key = self.create_registry_value(globals)?;
         let macro_searcher = MacroCatSearcher::new(modules, registry_key);
         macro_searchers
-            .set(macro_searchers.len()? + 1, macro_searcher)
+            .raw_insert(1, macro_searcher)
             .map_err(|e| e.into())
     }
 }
