@@ -1,6 +1,7 @@
 use fennel_compile::Compile;
 use fennel_mount::Mount;
 use fennel_searcher::AddSearcher as _;
+use fennel_utils::InsertFennelSearcher;
 use meka_config_macros::loader_registry_from_cargo_manifest;
 use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
@@ -49,10 +50,6 @@ const MEKA_MACROS: &str = include_str!(concat!(
 /// wraps in `Result` to facilitate lazily converting Lua types to Rust. Presumably this
 /// can only fail if the user requests a Rust type which doesn't implement `FromLua`.
 const PAIRS_EXPECT: &str = "`mlua::TablePairs::pairs()` unexpectedly failed";
-
-/// Error message designed for running `table.get(key)` on `mlua::Table` `table` verified to
-/// contain key `key`.
-const TABLE_GET_EXPECT: &str = "Unexpectedly couldn't get key from pre-checked table";
 
 #[derive(Debug)]
 pub enum ConfigInitError {
@@ -191,7 +188,12 @@ impl Config {
 
         // Set up Lua environment: add Fennel searcher to `package.loaders` to enable importing
         // local Fennel modules.
-        Self::insert_fennel_searcher(&lua)?;
+        lua.insert_fennel_searcher().map_err(|e| {
+            mlua::Error::RuntimeError(format!(
+                "meka-config new function failed to insert Fennel searcher: {}",
+                e
+            ))
+        })?;
 
         // Get config module as Lua string, converting compile-to-Lua language config module
         // to Lua as needed.
@@ -352,64 +354,6 @@ impl Config {
             _ => {}
         }
         lua.add_function_searcher(loader_registry)?;
-        Ok(())
-    }
-
-    /// Insert Fennel's searcher function in `package.searchers` (or `package.loaders`).
-    ///
-    /// Requires: Fennel library is available for import
-    fn insert_fennel_searcher(lua: &Lua) -> ConfigInitResult<()> {
-        // TODO: insert fennel searcher before user library searcher in `package.searchers`.
-        let fennel = mlua_utils::require::<Table>(lua, "fennel").map_err(|_| {
-            mlua::Error::RuntimeError("meka-config new function couldn't import Fennel".to_string())
-        })?;
-
-        let fennel_make_searcher: Function = fennel.get("make-searcher").map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka-config new function couldn't get fennel.make-searcher function".to_string(),
-            )
-        })?;
-
-        let fennel_searcher: Function = fennel_make_searcher.call(()).map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka-config new function called fennel.make-searcher and got error".to_string(),
-            )
-        })?;
-
-        let package: Table = lua.globals().get("package").map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka-config new function couldn't get Lua package table".to_string(),
-            )
-        })?;
-
-        let package_loaders: Table = if package.contains_key("loaders").map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka-config new function couldn't check if package table contains loaders key"
-                    .to_string(),
-            )
-        })? {
-            package.get("loaders").expect(TABLE_GET_EXPECT)
-        } else if package.contains_key("searchers").map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka-config new function couldn't check if package table contains searchers key"
-                    .to_string(),
-            )
-        })? {
-            package.get("searchers").expect(TABLE_GET_EXPECT)
-        } else {
-            return Err(ConfigInitError::from(mlua::Error::RuntimeError("meka-config new function couldn't find either Lua package.loaders or package.searchers table".to_string())));
-        };
-
-        let package_loaders_len = package_loaders.len().map_err(|_| {
-            mlua::Error::RuntimeError("meka-config new function couldn't get length of Lua package.loaders (or package.searchers) table".to_string())
-        })?;
-
-        package_loaders
-            .set(package_loaders_len + 1, fennel_searcher)
-            .map_err(|_| {
-                mlua::Error::RuntimeError("meka-config new function couldn't append Fennel searcher to package.loaders (or package.searchers) table".to_string())
-            })?;
-
         Ok(())
     }
 

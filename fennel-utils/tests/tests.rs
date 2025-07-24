@@ -19,3 +19,15 @@ fn fennel_view_works() {
     let got = lua.fennel_view(val, Some(opts)).unwrap();
     assert_eq!(&got, ":mlua");
 }
+
+#[test]
+fn insert_fennel_searcher_works() {
+    use fennel_mount::Mount;
+    use fennel_utils::InsertFennelSearcher;
+
+    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+
+    lua.mount_fennel().unwrap();
+
+    assert!(lua.insert_fennel_searcher().is_ok());
+}
