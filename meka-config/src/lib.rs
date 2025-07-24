@@ -351,8 +351,6 @@ impl Config {
             Some(lreg) if !lreg.is_empty() => loader_registry.extend(lreg),
             _ => {}
         }
-        // TODO: insert library searcher before standard library searcher in `package.searchers`
-        // with bespoke implementation of `lua.add_function_searcher()`.
         lua.add_function_searcher(loader_registry)?;
         Ok(())
     }
