@@ -22,6 +22,7 @@ mlua-luajit52 = ["meka-core/mlua-luajit52", "mlua/luajit52"]
 mlua-luau = ["meka-core/mlua-luau", "mlua/luau"]
 mlua-luau-jit = ["meka-core/mlua-luau-jit", "mlua/luau-jit"]
 mlua-luau-vector4 = ["meka-core/mlua-luau-vector4", "mlua/luau-vector4"]
+mlua-module = ["meka-core/mlua-module", "mlua/module"]
 mlua-vendored = ["meka-core/mlua-vendored", "mlua/vendored"]
 
 [dependencies]

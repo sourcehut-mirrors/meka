@@ -19,6 +19,7 @@ mlua-luajit52 = ["meka-config/mlua-luajit52", "meka-module-manifest/mlua-luajit5
 mlua-luau = ["meka-config/mlua-luau", "meka-module-manifest/mlua-luau", "meka-searcher/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
 mlua-luau-jit = ["meka-config/mlua-luau-jit", "meka-module-manifest/mlua-luau-jit", "meka-searcher/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
 mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "meka-searcher/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-module = ["meka-config/mlua-module", "meka-module-manifest/mlua-module", "meka-searcher/mlua-module", "mlua/module", "mlua-module-manifest/mlua-module"]
 mlua-vendored = ["meka-config/mlua-vendored", "meka-module-manifest/mlua-vendored", "meka-searcher/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]

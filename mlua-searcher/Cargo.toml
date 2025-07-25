@@ -7,7 +7,6 @@ readme = "README.md"
 description = "Require Lua modules by name"
 
 [features]
-# mlua doesn't enable any features by default, so neither do we
 default = []
 mlua-lua54 = ["mlua/lua54"]
 mlua-lua53 = ["mlua/lua53"]
@@ -18,6 +17,7 @@ mlua-luajit52 = ["mlua/luajit52"]
 mlua-luau = ["mlua/luau"]
 mlua-luau-jit = ["mlua/luau-jit"]
 mlua-luau-vector4 = ["mlua/luau-vector4"]
+mlua-module = ["mlua/module"]
 mlua-vendored = ["mlua/vendored"]
 
 [dependencies]

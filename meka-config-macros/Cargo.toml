@@ -20,6 +20,7 @@ mlua-luajit52 = ["mlua/luajit52"]
 mlua-luau = ["mlua/luau"]
 mlua-luau-jit = ["mlua/luau-jit"]
 mlua-luau-vector4 = ["mlua/luau-vector4"]
+mlua-module = ["mlua/module"]
 mlua-vendored = ["mlua/vendored"]
 
 [dependencies]

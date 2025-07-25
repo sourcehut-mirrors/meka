@@ -22,6 +22,7 @@ mlua-luajit52 = ["meka-core/mlua-luajit52", "meka-searcher-macros/mlua-luajit52"
 mlua-luau = ["meka-core/mlua-luau", "meka-searcher-macros/mlua-luau"]
 mlua-luau-jit = ["meka-core/mlua-luau-jit", "meka-searcher-macros/mlua-luau-jit"]
 mlua-luau-vector4 = ["meka-core/mlua-luau-vector4", "meka-searcher-macros/mlua-luau-vector4"]
+mlua-module = ["meka-core/mlua-module", "meka-searcher-macros/mlua-module"]
 mlua-vendored = ["meka-core/mlua-vendored", "meka-searcher-macros/mlua-vendored"]
 
 [dependencies]
