@@ -86,15 +86,15 @@ Or, simply:
 
 ;; Refer to this manifest in `meka_searcher!` or `meka_searcher_hot!` by omitting a string
 ;; argument.
-(manifest {:name :taon.cite            :path :taon/cite.fnl}
-          {:name :taon.date            :path :taon/date.fnl}
-          {:name :taon.date-time       :path :taon/date-time.fnl}
-          {:name :taon.dine            :path :taon/dine/init.fnl}
-          {:name :taon.dine.proximates :path :taon/dine/proximates.fnl}
-          {:name :taon.food            :path :taon/food/init.fnl}
-          {:name :taon.food.proximates :path :taon/food/proximates.fnl}
-          {:name :taon.time            :path :taon/time.fnl}
-          {:name :taon.utils           :path :taon/utils.fnl}
+(manifest {:path :taon/cite.fnl}
+          {:path :taon/date.fnl}
+          {:path :taon/date-time.fnl}
+          {:path :taon/dine/init.fnl}
+          {:path :taon/dine/proximates.fnl}
+          {:path :taon/food/init.fnl}
+          {:path :taon/food/proximates.fnl}
+          {:path :taon/time.fnl}
+          {:path :taon/utils.fnl}
           (fennel-src))
 ```
 
@@ -200,7 +200,6 @@ Meka will make Fennel available for import under module name "fennel" when you a
 ```fennel
 ;; Functionally equivalent to above example assuming `fennel.lua` contains identical Fennel:
 (import-macros {: manifest} :meka.macros)
-(local fennel-src (require :fennel-src))
 (manifest {:name :taon.mu :path :taon/mu.fnlm}
           {:name :taon.nu :path :taon/nu/init-macros.fnl}
           ;; N.B. `macros.fnl` isn't automatically detected as being a Fennel macros module.
