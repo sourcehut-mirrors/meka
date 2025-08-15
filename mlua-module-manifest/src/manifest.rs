@@ -1,6 +1,7 @@
 use ignore::Walk;
 use mlua::{FromLuaMulti, Function, IntoLua, Lua, MultiValue, Table, UserData, Value};
 use optional_collections::PushOrInit;
+use savefile_derive::Savefile;
 use std::borrow::Cow;
 use std::clone::Clone;
 use std::convert::{From, TryFrom};
@@ -33,7 +34,7 @@ const DOCSTRING_POSITION: usize = 0;
 ///
 /// N.B. `Module`s in `Manifest` aren't guaranteed to be resolveable to embedded text
 /// at comptime unless all `Module`s are of variant `Module::NamedText`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub struct Manifest {
     pub docstring: Option<Cow<'static, str>>,
     pub modules: Vec<Module>,
@@ -625,7 +626,7 @@ impl fmt::Display for Manifest {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub struct NamedTextManifest {
     pub docstring: Option<Cow<'static, str>>,
     pub modules: Vec<ModuleNamedText>,

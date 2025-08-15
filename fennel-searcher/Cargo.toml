@@ -27,6 +27,8 @@ meka-types = { path = "../meka-types" }
 mlua = { workspace = true }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }
 mlua-utils = { path = "../mlua-utils", default-features = false }
+savefile = { workspace = true }
+savefile-derive = { workspace = true }
 
 [dev-dependencies]
 fennel-compile = { path = "../fennel-compile", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

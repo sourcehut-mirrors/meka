@@ -1,4 +1,5 @@
 use quote::{ToTokens, quote};
+use savefile_derive::Savefile;
 use std::clone::Clone;
 use std::fmt;
 use std::fmt::Debug;
@@ -9,7 +10,7 @@ use crate::module_error::{ModuleFileTypeInitError, ModuleInitError};
 
 pub type ModuleInitResult<A> = Result<A, ModuleInitError>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub enum ModuleFileType {
     Fennel,
     FennelMacros,

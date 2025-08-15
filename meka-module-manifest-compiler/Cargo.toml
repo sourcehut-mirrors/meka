@@ -1,0 +1,28 @@
+[package]
+name = "meka-module-manifest-compiler"
+version = "0.1.0"
+edition = { workspace = true }
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-module-manifest-compiler"
+readme = "README.md"
+description = "Helper crate for compiling ~ioiojo/mlua-module-manifest in mlua module mode"
+publish = false
+
+[features]
+default = ["fennel153"]
+fennel100 = ["meka-module-manifest/fennel100"]
+fennel153 = ["meka-module-manifest/fennel153"]
+mlua-lua54 = ["meka-module-manifest/mlua-lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["meka-module-manifest/mlua-lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["meka-module-manifest/mlua-lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["meka-module-manifest/mlua-lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["meka-module-manifest/mlua-luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["meka-module-manifest/mlua-luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["meka-module-manifest/mlua-luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["meka-module-manifest/mlua-luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-module-manifest/mlua-luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-vendored = ["meka-module-manifest/mlua-vendored", "mlua-module-manifest/mlua-vendored"]
+
+[dependencies]
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
+savefile = { workspace = true }

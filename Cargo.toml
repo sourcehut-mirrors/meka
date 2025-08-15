@@ -47,6 +47,7 @@ members = [
   "meka-config-macros-test-single-loader",
   "meka-core",
   "meka-module-manifest",
+  "meka-module-manifest-compiler",
   "meka-module-manifest-tests",
   "meka-searcher",
   "meka-searcher-macros",
@@ -80,6 +81,8 @@ optional-collections = { git = "https://git.sr.ht/~ioiojo/optional-collections",
 paste = { version = "1" }
 proc-macro2 = { version = "1" }
 quote = { version = "1" }
+savefile = { version = "0.19" }
+savefile-derive = { version = "0.19" }
 semver = { version = "1" }
 serial_test = { version = "3" }
 syn = { version = "2", features = ["full"] }

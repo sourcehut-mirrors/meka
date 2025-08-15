@@ -1,3 +1,4 @@
+use savefile_derive::Savefile;
 use std::convert::From;
 use std::error;
 use std::fmt;
@@ -6,7 +7,7 @@ use std::path::PathBuf;
 
 use crate::module_error::{ModuleInitError, ModuleNamedTextInitError};
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum ManifestInitError {
     ModuleInitError(ModuleInitError),
     WalkNonDirectory { path: PathBuf },
@@ -38,7 +39,7 @@ impl From<ManifestInitError> for mlua::Error {
 
 impl error::Error for ManifestInitError {}
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum NamedTextManifestInitError {
     ManifestInitError(ManifestInitError),
     ModuleNamedTextInitError(ModuleNamedTextInitError),

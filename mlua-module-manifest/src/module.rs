@@ -1,5 +1,6 @@
 use once_cell::sync::Lazy;
 use quote::{ToTokens, quote};
+use savefile_derive::Savefile;
 use std::borrow::Cow;
 use std::clone::Clone;
 use std::convert::{From, TryFrom};
@@ -32,7 +33,7 @@ static CARGO_MANIFEST_DIR: Lazy<PathBuf> = Lazy::new(|| {
     PathBuf::from(s)
 });
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub struct ModuleFile {
     pub path: PathBuf,
     pub file_type: ModuleFileType,
@@ -122,7 +123,7 @@ impl ToTokens for ModuleFile {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub struct ModuleNamedFile {
     pub name: Cow<'static, str>,
     pub path: PathBuf,
@@ -199,7 +200,7 @@ impl ToTokens for ModuleNamedFile {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub struct ModuleNamedText {
     pub name: Cow<'static, str>,
     pub text: Cow<'static, str>,
@@ -313,7 +314,7 @@ impl ToTokens for ModuleNamedText {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub enum Module {
     File(ModuleFile),
     NamedFile(ModuleNamedFile),

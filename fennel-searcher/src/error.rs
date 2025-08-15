@@ -1,4 +1,8 @@
-#[derive(Debug)]
+use savefile_derive::Savefile;
+use std::error;
+use std::fmt;
+
+#[derive(Debug, Savefile)]
 pub enum Error {
     /// Could not import Fennel by module name "fennel".
     FailedToImportFennel(mlua::Error),
@@ -26,8 +30,8 @@ impl From<mlua_searcher::Error> for Error {
     }
 }
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             Error::FailedToImportFennel(e) => {
                 format!("Could not import Fennel by module name \"fennel\": {:?}", e)
@@ -41,4 +45,4 @@ impl std::fmt::Display for Error {
     }
 }
 
-impl std::error::Error for Error {}
+impl error::Error for Error {}

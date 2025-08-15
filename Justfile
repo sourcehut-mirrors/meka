@@ -69,6 +69,10 @@ check-meka-core:
 check-meka-module-manifest:
   cargo check --package meka-module-manifest --features mlua-lua54,mlua-vendored
 
+# Run cargo check on meka-module-manifest-compiler
+check-meka-module-manifest-compiler:
+  cargo check --package meka-module-manifest-compiler --features mlua-lua54,mlua-vendored
+
 # Run cargo check on meka-module-manifest-tests
 check-meka-module-manifest-tests:
   cargo check --package meka-module-manifest-tests
@@ -188,6 +192,10 @@ test-meka-core:
 # Run cargo test on meka-module-manifest
 test-meka-module-manifest:
   cargo test --package meka-module-manifest --features mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-module-manifest-compiler
+test-meka-module-manifest-compiler:
+  cargo test --package meka-module-manifest-compiler --features mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-module-manifest-tests
 test-meka-module-manifest-tests:

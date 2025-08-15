@@ -1,17 +1,22 @@
-#[derive(Debug)]
+use savefile_derive::Savefile;
+use std::error;
+use std::fmt;
+use std::io;
+
+#[derive(Debug, Savefile)]
 pub enum Error {
     /// Could not import Fennel by module name "fennel".
     FailedToImportFennel(mlua::Error),
     /// Could not find `fennel.compileString` function.
     MissingFennelCompileStringFunction,
 
-    Io(std::io::Error),
+    Io(io::Error),
     Lua(mlua::Error),
     Str(std::str::Utf8Error),
 }
 
-impl From<std::io::Error> for Error {
-    fn from(error: std::io::Error) -> Self {
+impl From<io::Error> for Error {
+    fn from(error: io::Error) -> Self {
         Error::Io(error)
     }
 }
@@ -34,8 +39,8 @@ impl From<Error> for mlua::Error {
     }
 }
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             Error::FailedToImportFennel(e) => {
                 format!("Could not import Fennel by module name \"fennel\": {:?}", e)
@@ -52,4 +57,4 @@ impl std::fmt::Display for Error {
     }
 }
 
-impl std::error::Error for Error {}
+impl error::Error for Error {}

@@ -29,6 +29,8 @@ fennel-searcher = { path = "../fennel-searcher", default-features = false }
 mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
 optional-collections = { workspace = true }
+savefile = { workspace = true }
+savefile-derive = { workspace = true }
 
 [dev-dependencies]
 meka-module-manifest = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }

@@ -1,10 +1,11 @@
+use savefile_derive::Savefile;
 use std::convert::From;
 use std::error;
 use std::fmt;
 use std::fmt::Debug;
 use std::path::PathBuf;
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum ModuleFileTypeInitError {
     /// Path is missing file extension.
     MissingFileExtension { path: PathBuf },
@@ -38,7 +39,7 @@ impl fmt::Display for ModuleFileTypeInitError {
 
 impl error::Error for ModuleFileTypeInitError {}
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum ModuleFileInitError {
     /// Optional `file_type` parameter not passed, and `path` parameter is missing file extension.
     MissingFileExtension { path: PathBuf },
@@ -95,7 +96,7 @@ impl From<ModuleFileTypeInitError> for ModuleFileInitError {
 
 impl error::Error for ModuleFileInitError {}
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum ModuleNamedFileInitError {
     ModuleFileInitError(ModuleFileInitError),
     UnknownModuleFileType { file_type: String },
@@ -127,7 +128,7 @@ impl From<ModuleFileTypeInitError> for ModuleNamedFileInitError {
 
 impl error::Error for ModuleNamedFileInitError {}
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum ModuleNamedTextInitError {
     Io(std::io::Error),
     UnknownModuleFileType { file_type: String },
@@ -153,7 +154,7 @@ impl From<std::io::Error> for ModuleNamedTextInitError {
 
 impl error::Error for ModuleNamedTextInitError {}
 
-#[derive(Debug)]
+#[derive(Debug, Savefile)]
 pub enum ModuleInitError {
     ModuleFileInitError(ModuleFileInitError),
     ModuleNamedFileInitError(ModuleNamedFileInitError),

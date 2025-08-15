@@ -4,6 +4,7 @@ use fennel_searcher::AddSearcher;
 use mlua::{Lua, LuaOptions, StdLib};
 use mlua_module_manifest::{ModuleFileType, ModuleNamedText, Name, NamedTextManifest};
 use optional_collections::PushOrInit;
+use savefile_derive::Savefile;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -14,7 +15,7 @@ use std::vec::Vec;
 
 use crate::error::CompiledNamedTextManifestInitError;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Savefile)]
 pub struct CompiledNamedTextManifest {
     pub docstring: Option<Cow<'static, str>>,
     pub modules: Vec<ModuleNamedText>,
@@ -55,6 +56,59 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
     /// Compile `ModuleFileType::Fennel` strings within `modules` to Lua, and attest to this
     /// having been done in a type-safe way.
+    #[cfg(feature = "mlua-module")]
+    fn try_from(manifest: NamedTextManifest) -> Result<Self, CompiledNamedTextManifestInitError> {
+        use savefile::{CURRENT_SAVEFILE_LIB_VERSION, WithSchema, load_from_mem, save_to_mem};
+        use std::io::Write;
+        use std::path::Path;
+        use std::process::{Command, Stdio};
+
+        const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
+
+        // Serialize manifest.
+        let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION, WithSchema::NO, &manifest)?;
+
+        // Run ephemeral crate.
+        let mut child = {
+            let current_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT)
+                .join("meka-module-manifest-compiler");
+            Command::new("cargo")
+                .arg("run")
+                .arg("--release")
+                .arg("--quiet")
+                .current_dir(current_dir)
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()?
+        };
+
+        // Send serialized manifest.
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(&serialized)?;
+        }
+
+        let output = child.wait_with_output()?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(
+                CompiledNamedTextManifestInitError::MekaModuleManifestCompiler(format!(
+                    "Ephemeral crate failed: {}",
+                    stderr
+                )),
+            );
+        }
+
+        // Deserialize result.
+        let result: Result<CompiledNamedTextManifest, CompiledNamedTextManifestInitError> =
+            load_from_mem(&output.stdout, CURRENT_SAVEFILE_LIB_VERSION, WithSchema::NO)?;
+
+        result
+    }
+
+    #[cfg(not(feature = "mlua-module"))]
     fn try_from(
         NamedTextManifest { docstring, modules }: NamedTextManifest,
     ) -> Result<Self, CompiledNamedTextManifestInitError> {
