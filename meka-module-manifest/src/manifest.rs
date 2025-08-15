@@ -12,11 +12,6 @@ use std::fmt::Debug;
 use std::ops::Index;
 use std::vec::Vec;
 
-#[cfg(feature = "mlua-module")]
-use cfg_if::cfg_if;
-#[cfg(feature = "mlua-module")]
-use libloading::Library;
-
 use crate::error::CompiledNamedTextManifestInitError;
 
 #[derive(Clone, Debug)]
@@ -130,124 +125,6 @@ impl fmt::Display for CompiledNamedTextManifest {
     }
 }
 
-#[cfg(feature = "mlua-module")]
-fn get_lua_library_names() -> Result<Vec<&'static str>, CompiledNamedTextManifestInitError> {
-    cfg_if! {
-        // Check for Luau first - it's incompatible with mlua-module
-        if #[cfg(any(feature = "mlua-luau", feature = "mlua-luau-jit", feature = "mlua-luau-vector4"))] {
-            Err(CompiledNamedTextManifestInitError::IncompatibleLuaVersion(
-                "Luau does not support shared library loading and is incompatible with mlua-module feature".to_string()
-            ))
-        }
-        // Lua 5.4
-        else if #[cfg(all(feature = "mlua-lua54", windows))] {
-            Ok(vec!["lua54.dll", "lua.dll"])
-        } else if #[cfg(all(feature = "mlua-lua54", target_os = "macos"))] {
-            Ok(vec!["liblua5.4.dylib", "liblua.5.4.dylib", "liblua54.dylib"])
-        } else if #[cfg(all(feature = "mlua-lua54", unix))] {
-            Ok(vec!["liblua5.4.so", "liblua.so.5.4", "liblua5.4.so.0", "liblua54.so"])
-        }
-        // Lua 5.3
-        else if #[cfg(all(feature = "mlua-lua53", windows))] {
-            Ok(vec!["lua53.dll", "lua.dll"])
-        } else if #[cfg(all(feature = "mlua-lua53", target_os = "macos"))] {
-            Ok(vec!["liblua5.3.dylib", "liblua.5.3.dylib", "liblua53.dylib"])
-        } else if #[cfg(all(feature = "mlua-lua53", unix))] {
-            Ok(vec!["liblua5.3.so", "liblua.so.5.3", "liblua5.3.so.0", "liblua53.so"])
-        }
-        // Lua 5.2
-        else if #[cfg(all(feature = "mlua-lua52", windows))] {
-            Ok(vec!["lua52.dll", "lua.dll"])
-        } else if #[cfg(all(feature = "mlua-lua52", target_os = "macos"))] {
-            Ok(vec!["liblua5.2.dylib", "liblua.5.2.dylib", "liblua52.dylib"])
-        } else if #[cfg(all(feature = "mlua-lua52", unix))] {
-            Ok(vec!["liblua5.2.so", "liblua.so.5.2", "liblua5.2.so.0", "liblua52.so"])
-        }
-        // Lua 5.1
-        else if #[cfg(all(feature = "mlua-lua51", windows))] {
-            Ok(vec!["lua51.dll", "lua5.1.dll", "lua.dll"])
-        } else if #[cfg(all(feature = "mlua-lua51", target_os = "macos"))] {
-            Ok(vec!["liblua5.1.dylib", "liblua.5.1.dylib", "liblua51.dylib"])
-        } else if #[cfg(all(feature = "mlua-lua51", unix))] {
-            Ok(vec!["liblua5.1.so", "liblua.so.5.1", "liblua5.1.so.0", "liblua51.so"])
-        }
-        // LuaJIT
-        else if #[cfg(all(feature = "mlua-luajit", windows))] {
-            Ok(vec!["lua51.dll", "luajit.dll", "luajit-5.1.dll"])
-        } else if #[cfg(all(feature = "mlua-luajit", target_os = "macos"))] {
-            Ok(vec!["libluajit-5.1.dylib", "libluajit.dylib", "libluajit-5.1.2.dylib"])
-        } else if #[cfg(all(feature = "mlua-luajit", unix))] {
-            Ok(vec!["libluajit-5.1.so.2", "libluajit-5.1.so", "libluajit.so"])
-        }
-        // LuaJIT 5.2 compat
-        else if #[cfg(all(feature = "mlua-luajit52", windows))] {
-            Ok(vec!["lua52.dll", "luajit.dll", "luajit-5.2.dll"])
-        } else if #[cfg(all(feature = "mlua-luajit52", target_os = "macos"))] {
-            Ok(vec!["libluajit-5.2.dylib", "libluajit.dylib"])
-        } else if #[cfg(all(feature = "mlua-luajit52", unix))] {
-            Ok(vec!["libluajit-5.2.so", "libluajit.so"])
-        }
-        // Unsupported platform for selected feature
-        else if #[cfg(any(feature = "mlua-lua54", feature = "mlua-lua53", feature = "mlua-lua52", feature = "mlua-lua51", feature = "mlua-luajit", feature = "mlua-luajit52"))] {
-            Err(CompiledNamedTextManifestInitError::LuaLibraryLoadError(
-                "Unsupported platform for selected Lua version".to_string()
-            ))
-        }
-        // No Lua version specified
-        else {
-            Err(CompiledNamedTextManifestInitError::NoLuaVersionSpecified)
-        }
-    }
-}
-
-#[cfg(feature = "mlua-module")]
-fn load_lua_library() -> Result<Library, CompiledNamedTextManifestInitError> {
-    let lib_names = get_lua_library_names()?;
-
-    let mut last_error = None;
-
-    // First try to load from standard system paths
-    for lib_name in &lib_names {
-        match unsafe { Library::new(lib_name) } {
-            Ok(lib) => return Ok(lib),
-            Err(e) => last_error = Some(e),
-        }
-    }
-
-    // If that fails, try some common installation paths on Unix systems
-    cfg_if! {
-        if #[cfg(unix)] {
-            let additional_paths = vec![
-                "/usr/local/lib",
-                "/usr/lib",
-                "/usr/lib/x86_64-linux-gnu", // Common on Debian/Ubuntu
-                "/usr/lib64",                // Common on RedHat/Fedora
-                "/opt/homebrew/lib",         // Homebrew on Apple Silicon
-                "/usr/local/opt/lua/lib",    // Homebrew on Intel Mac
-                "/usr/local/opt/luajit/lib", // Homebrew LuaJIT
-            ];
-
-            for path in additional_paths {
-                for lib_name in &lib_names {
-                    let full_path = format!("{}/{}", path, lib_name);
-                    match unsafe { Library::new(&full_path) } {
-                        Ok(lib) => return Ok(lib),
-                        Err(e) => last_error = Some(e),
-                    }
-                }
-            }
-        }
-    }
-
-    // If standard names don't work, create meaningful error
-    Err(CompiledNamedTextManifestInitError::LuaLibraryLoadError(
-        format!(
-            "Could not find Lua library. Tried: {:?}. Last error: {:?}",
-            lib_names, last_error
-        ),
-    ))
-}
-
 fn fennelc(
     text: &str,
     modules_fnl_macros: Option<&Vec<ModuleNamedText>>,
@@ -261,12 +138,6 @@ fn fennelc(
     } else {
         None
     };
-
-    // Load Lua library when mlua-module feature is active and keep library loaded for duration
-    // of this function
-    #[cfg(feature = "mlua-module")]
-    let _lua_lib = load_lua_library()?;
-
     let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
     lua.mount_fennel()?;
     // Mount all modules containing Fennel macros prior to compilation.

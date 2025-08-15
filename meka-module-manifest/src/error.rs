@@ -9,12 +9,6 @@ pub enum CompiledNamedTextManifestInitError {
     FennelCompileError(fennel_compile::Error),
     FennelMountError(fennel_mount::Error),
     FennelSearcherError(fennel_searcher::Error),
-    #[cfg(feature = "mlua-module")]
-    LuaLibraryLoadError(String),
-    #[cfg(feature = "mlua-module")]
-    NoLuaVersionSpecified,
-    #[cfg(feature = "mlua-module")]
-    IncompatibleLuaVersion(String),
 }
 
 impl fmt::Display for CompiledNamedTextManifestInitError {
@@ -26,14 +20,6 @@ impl fmt::Display for CompiledNamedTextManifestInitError {
             CompiledNamedTextManifestInitError::FennelCompileError(error) => format!("{}", error),
             CompiledNamedTextManifestInitError::FennelMountError(error) => format!("{}", error),
             CompiledNamedTextManifestInitError::FennelSearcherError(error) => format!("{}", error),
-            #[cfg(feature = "mlua-module")]
-            CompiledNamedTextManifestInitError::LuaLibraryLoadError(msg) => format!("{}", msg),
-            #[cfg(feature = "mlua-module")]
-            CompiledNamedTextManifestInitError::NoLuaVersionSpecified => {
-                "No Lua, LuaJIT version specified".to_string()
-            }
-            #[cfg(feature = "mlua-module")]
-            CompiledNamedTextManifestInitError::IncompatibleLuaVersion(msg) => format!("{}", msg),
         };
         write!(f, "{}", res)
     }

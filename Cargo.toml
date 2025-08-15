@@ -71,11 +71,9 @@ keywords = ["fennel", "lua"]
 repository = "https://git.sr.ht/~ioiojo/meka"
 
 [workspace.dependencies]
-cfg-if = { version = "1" }
 derive_builder = { version = "0.20" }
 gpgrv = { version = "0.4" }
 ignore = { version = "0.4" }
-libloading = { version = "0.8" }
 mlua = { version = "0.11", default-features = false }
 once_cell = { version = "1" }
 optional-collections = { git = "https://git.sr.ht/~ioiojo/optional-collections", rev = "d9a0720d39b975bd0c117e42e12aba2c1d908a6d" }
