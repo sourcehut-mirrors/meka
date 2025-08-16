@@ -19,7 +19,7 @@ mlua-luajit52 = ["fennel-compile/mlua-luajit52", "fennel-mount/mlua-luajit52", "
 mlua-luau = ["fennel-compile/mlua-luau", "fennel-mount/mlua-luau", "fennel-searcher/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
 mlua-luau-jit = ["fennel-compile/mlua-luau-jit", "fennel-mount/mlua-luau-jit", "fennel-searcher/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
 mlua-luau-vector4 = ["fennel-compile/mlua-luau-vector4", "fennel-mount/mlua-luau-vector4", "fennel-searcher/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
-mlua-module = ["fennel-compile/mlua-module", "fennel-mount/mlua-module", "fennel-searcher/mlua-module", "mlua/module", "mlua-module-manifest/mlua-module"]
+mlua-module = ["dep:tempfile", "fennel-compile/mlua-module", "fennel-mount/mlua-module", "fennel-searcher/mlua-module", "mlua/module", "mlua-module-manifest/mlua-module"]
 mlua-vendored = ["fennel-compile/mlua-vendored", "fennel-mount/mlua-vendored", "fennel-searcher/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]
@@ -31,7 +31,7 @@ mlua-module-manifest = { path = "../mlua-module-manifest", default-features = fa
 optional-collections = { workspace = true }
 savefile = { workspace = true }
 savefile-derive = { workspace = true }
-tempfile = { workspace = true }
+tempfile = { workspace = true, optional = true }
 
 [dev-dependencies]
 meka-module-manifest = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }

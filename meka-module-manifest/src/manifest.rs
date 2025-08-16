@@ -69,22 +69,25 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
         // Serialize manifest.
         let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)?;
 
-        // Create temp directory for isolated `target/`.
-        let temp_dir = TempDir::new()?;
-
         // Run ephemeral crate with isolated `target/`.
         let mut child = {
-            let current_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
+            // Copy meka workspace to temp directory for isolated target/ dir.
+            let temp_dir = TempDir::new()?;
+            let current_dir = temp_dir.path().join("meka");
+            let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
-                .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT)
-                .join("meka-module-manifest-compiler");
+                .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
+            copy_dir_all(&workspace_root, &current_dir)?;
+
+            let cargo_target_dir = temp_dir.path().join("target");
+            let current_dir = current_dir.join("meka-module-manifest-compiler");
             Command::new("cargo")
                 .arg("run")
                 .arg("--release")
                 .arg("--quiet")
                 .args(["--features", "mlua-lua54,mlua-vendored"])
                 .current_dir(current_dir)
-                .env("CARGO_TARGET_DIR", temp_dir.path())
+                .env("CARGO_TARGET_DIR", cargo_target_dir)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
@@ -165,6 +168,35 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
         Ok(Self { docstring, modules })
     }
+}
+
+/// Recursively copy directories.
+#[cfg(feature = "mlua-module")]
+fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), CompiledNamedTextManifestInitError> {
+    use std::fs;
+
+    fs::create_dir_all(dst)?;
+
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+
+        let path = entry.path();
+        let file_name = entry.file_name();
+        let dst_path = dst.join(&file_name);
+
+        // Skip target directory and .git
+        if file_name == "target" || file_name == ".git" {
+            continue;
+        }
+
+        if path.is_dir() {
+            copy_dir_all(&path, &dst_path)?;
+        } else {
+            fs::copy(&path, &dst_path)?;
+        }
+    }
+
+    Ok(())
 }
 
 impl TryFrom<mlua_module_manifest::Manifest> for CompiledNamedTextManifest {
