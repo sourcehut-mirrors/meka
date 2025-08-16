@@ -1,5 +1,3 @@
-use meka_searcher_macros::meka_searcher;
-
 pub mod test_loaders {
     use mlua::{Function, Lua, Table, UserData, UserDataMethods};
 
@@ -43,7 +41,8 @@ pub mod test_loaders {
 
 #[test]
 fn trailing_comma_works() {
-    meka_searcher!({
+    use meka_searcher_macros::meka_searcher;
+    let _ = meka_searcher!({
         "cartridge-src" => test_loaders::cartridge_loader,
         "fennel-src" => fennel_src::loader,
     });

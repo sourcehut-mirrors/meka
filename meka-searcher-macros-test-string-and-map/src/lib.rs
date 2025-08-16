@@ -1,5 +1,3 @@
-use meka_searcher_macros::meka_searcher;
-
 pub mod test_loaders {
     use mlua::{Function, Lua, Table, UserData, UserDataMethods};
 
@@ -43,7 +41,8 @@ pub mod test_loaders {
 
 #[test]
 fn string_and_map_works() {
-    meka_searcher!("my_component", {
+    use meka_searcher_macros::meka_searcher;
+    let _ = meka_searcher!("my_component", {
         "fennel-src" => fennel_src::loader,
         "cartridge-src" => test_loaders::cartridge_loader
     });
