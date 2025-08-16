@@ -1,0 +1,21 @@
+[package]
+name = "meka-module-manifest-tests-module-mode"
+version = "0.1.0"
+edition = { workspace = true }
+publish = false
+
+[features]
+default = ["fennel153-lua54-module"]
+fennel153-lua54-module = ["meka-module-manifest/fennel153",
+                          "meka-module-manifest/mlua-lua54",
+                          "meka-module-manifest/mlua-module",
+                          "meka-searcher/fennel153",
+                          "meka-searcher/mlua-lua54",
+                          "meka-searcher/mlua-module",
+                          "mlua-module-manifest/mlua-lua54",
+                          "mlua-module-manifest/mlua-module"]
+
+[dev-dependencies]
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+meka-searcher = { path = "../meka-searcher", default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }

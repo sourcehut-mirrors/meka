@@ -49,6 +49,7 @@ members = [
   "meka-module-manifest",
   "meka-module-manifest-compiler",
   "meka-module-manifest-tests",
+  "meka-module-manifest-tests-module-mode",
   "meka-searcher",
   "meka-searcher-macros",
   "meka-searcher-macros-test-empty",

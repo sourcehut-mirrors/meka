@@ -1,12 +1,10 @@
-use fennel_compile::Compile;
-use fennel_mount::Mount;
-use fennel_searcher::AddSearcher;
-use mlua::{Lua, LuaOptions, StdLib};
-use mlua_module_manifest::{ModuleFileType, ModuleNamedText, Name, NamedTextManifest};
+#[cfg(not(feature = "mlua-module"))]
+use mlua_module_manifest::ModuleFileType;
+use mlua_module_manifest::{ModuleNamedText, Name, NamedTextManifest};
+#[cfg(not(feature = "mlua-module"))]
 use optional_collections::PushOrInit;
 use savefile_derive::Savefile;
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::fmt;
 use std::fmt::Debug;
@@ -218,10 +216,16 @@ impl fmt::Display for CompiledNamedTextManifest {
     }
 }
 
+#[cfg(not(feature = "mlua-module"))]
 fn fennelc(
     text: &str,
     modules_fnl_macros: Option<&Vec<ModuleNamedText>>,
 ) -> Result<String, CompiledNamedTextManifestInitError> {
+    use fennel_compile::Compile;
+    use fennel_mount::Mount;
+    use fennel_searcher::AddSearcher;
+    use mlua::{Lua, LuaOptions, StdLib};
+    use std::collections::HashMap;
     let modules_fnl_macros = if let Some(modules_fnl_macros) = modules_fnl_macros {
         let modules_fnl_macros = modules_fnl_macros
             .into_iter()
