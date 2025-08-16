@@ -70,23 +70,23 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
         // Run ephemeral crate with isolated `target/`.
         let mut child = {
-            // Copy meka workspace to temp directory for isolated target/ dir.
-            let temp_dir = TempDir::new()?;
-            let current_dir = temp_dir.path().join("meka");
+            let temp_dir = TempDir::with_prefix("tmp-meka-")?;
+            let temp_dir_path = temp_dir.path();
             let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
-            copy_dir_all(&workspace_root, &current_dir)?;
 
-            let cargo_target_dir = temp_dir.path().join("target");
-            let current_dir = current_dir.join("meka-module-manifest-compiler");
+            // Copy meka workspace to temp directory for isolated target/ dir.
+            copy_dir_all(workspace_root, temp_dir_path)?;
+
             Command::new("cargo")
                 .arg("run")
                 .arg("--release")
                 .arg("--quiet")
+                .args(["--package", "meka-module-manifest-compiler"])
                 .args(["--features", "mlua-lua54,mlua-vendored"])
-                .current_dir(current_dir)
-                .env("CARGO_TARGET_DIR", cargo_target_dir)
+                .current_dir(temp_dir_path)
+                .env("CARGO_TARGET_DIR", temp_dir_path.join("target"))
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
