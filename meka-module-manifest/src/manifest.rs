@@ -1,7 +1,7 @@
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(feature = "mlua-external", feature = "mlua-vendored"))]
 use mlua_module_manifest::ModuleFileType;
 use mlua_module_manifest::{ModuleNamedText, Name, NamedTextManifest};
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(feature = "mlua-external", feature = "mlua-vendored"))]
 use optional_collections::PushOrInit;
 use savefile_derive::Savefile;
 use std::borrow::Cow;
@@ -117,7 +117,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
         result
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(feature = "mlua-external", feature = "mlua-vendored"))]
     fn try_from(
         NamedTextManifest { docstring, modules }: NamedTextManifest,
     ) -> Result<Self, CompiledNamedTextManifestInitError> {
@@ -217,7 +217,7 @@ impl fmt::Display for CompiledNamedTextManifest {
     }
 }
 
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(feature = "mlua-external", feature = "mlua-vendored"))]
 fn fennelc(
     text: &str,
     modules_fnl_macros: Option<&Vec<ModuleNamedText>>,
