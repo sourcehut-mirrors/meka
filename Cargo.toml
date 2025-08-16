@@ -86,4 +86,5 @@ savefile-derive = { version = "0.19" }
 semver = { version = "1" }
 serial_test = { version = "3" }
 syn = { version = "2", features = ["full"] }
+tempfile = { version = "3" }
 toml = { version = "0.8" }

@@ -62,13 +62,17 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
         use std::io::Write;
         use std::path::Path;
         use std::process::{Command, Stdio};
+        use tempfile::TempDir;
 
         const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
 
         // Serialize manifest.
         let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)?;
 
-        // Run ephemeral crate.
+        // Create temp directory for isolated `target/`.
+        let temp_dir = TempDir::new()?;
+
+        // Run ephemeral crate with isolated `target/`.
         let mut child = {
             let current_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
@@ -80,6 +84,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
                 .arg("--quiet")
                 .args(["--features", "mlua-lua54,mlua-vendored"])
                 .current_dir(current_dir)
+                .env("CARGO_TARGET_DIR", temp_dir.path())
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
