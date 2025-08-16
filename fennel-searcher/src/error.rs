@@ -1,8 +1,7 @@
-use savefile_derive::Savefile;
 use std::error;
 use std::fmt;
 
-#[derive(Debug, Savefile)]
+#[derive(Debug)]
 pub enum Error {
     /// Could not import Fennel by module name "fennel".
     FailedToImportFennel(mlua::Error),

@@ -23,8 +23,6 @@ mlua-vendored = ["mlua/vendored", "mlua-utils/mlua-vendored"]
 [dependencies]
 mlua = { workspace = true }
 mlua-utils = { path = "../mlua-utils", default-features = false }
-savefile = { workspace = true }
-savefile-derive = { workspace = true }
 
 [dev-dependencies]
 fennel-compile = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

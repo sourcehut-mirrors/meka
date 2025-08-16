@@ -27,8 +27,6 @@ fennel-src = { path = "../fennel-src", default-features = false }
 mlua = { workspace = true }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }
 mlua-utils = { path = "../mlua-utils", default-features = false }
-savefile = { workspace = true }
-savefile-derive = { workspace = true }
 
 [dev-dependencies]
 fennel-mount = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }

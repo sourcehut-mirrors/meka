@@ -1,9 +1,9 @@
-use savefile_derive::Savefile;
 use std::error;
 use std::fmt;
 use std::io;
+use std::str;
 
-#[derive(Debug, Savefile)]
+#[derive(Debug)]
 pub enum Error {
     /// Could not import Fennel by module name "fennel".
     FailedToImportFennel(mlua::Error),
@@ -12,7 +12,7 @@ pub enum Error {
 
     Io(io::Error),
     Lua(mlua::Error),
-    Str(std::str::Utf8Error),
+    Str(str::Utf8Error),
 }
 
 impl From<io::Error> for Error {
@@ -21,8 +21,8 @@ impl From<io::Error> for Error {
     }
 }
 
-impl From<std::str::Utf8Error> for Error {
-    fn from(error: std::str::Utf8Error) -> Self {
+impl From<str::Utf8Error> for Error {
+    fn from(error: str::Utf8Error) -> Self {
         Error::Str(error)
     }
 }

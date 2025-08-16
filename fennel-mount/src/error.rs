@@ -1,8 +1,7 @@
-use savefile_derive::Savefile;
 use std::error;
 use std::fmt;
 
-#[derive(Debug, Savefile)]
+#[derive(Debug)]
 pub enum Error {
     Lua(mlua::Error),
     LuaSearcher(mlua_searcher::Error),
