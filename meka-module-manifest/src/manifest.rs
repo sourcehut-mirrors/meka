@@ -78,6 +78,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
                 .arg("run")
                 .arg("--release")
                 .arg("--quiet")
+                .args(["--features", "mlua-lua54,mlua-vendored"])
                 .current_dir(current_dir)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
