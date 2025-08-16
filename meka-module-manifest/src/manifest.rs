@@ -11,6 +11,8 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::fmt::Debug;
 use std::ops::Index;
+#[cfg(feature = "mlua-module")]
+use std::path::Path;
 use std::vec::Vec;
 
 use crate::error::CompiledNamedTextManifestInitError;
@@ -60,7 +62,6 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
     fn try_from(manifest: NamedTextManifest) -> Result<Self, CompiledNamedTextManifestInitError> {
         use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
         use std::io::Write;
-        use std::path::Path;
         use std::process::{Command, Stdio};
         use tempfile::TempDir;
 
