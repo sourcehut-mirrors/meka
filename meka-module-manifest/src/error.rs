@@ -1,11 +1,9 @@
 use mlua_module_manifest::NamedTextManifestInitError;
-#[cfg(feature = "mlua-module")]
 use savefile::SavefileError;
 use savefile_derive::Savefile;
 use std::convert::From;
 use std::error;
 use std::fmt;
-#[cfg(feature = "mlua-module")]
 use std::io;
 
 #[derive(Debug, Savefile)]
@@ -14,11 +12,11 @@ pub enum CompiledNamedTextManifestInitError {
     FennelCompileError(String),
     FennelMountError(String),
     FennelSearcherError(String),
-    #[cfg(feature = "mlua-module")]
+
+    // These aren't possible to conditionalize via `#[cfg(feature = "mlua-module")]`: doing
+    // so breaks serialization.
     MekaModuleManifestCompiler(String),
-    #[cfg(feature = "mlua-module")]
     Io(String),
-    #[cfg(feature = "mlua-module")]
     Savefile(String),
 }
 
@@ -29,11 +27,9 @@ impl fmt::Display for CompiledNamedTextManifestInitError {
             CompiledNamedTextManifestInitError::FennelCompileError(msg) => msg,
             CompiledNamedTextManifestInitError::FennelMountError(msg) => msg,
             CompiledNamedTextManifestInitError::FennelSearcherError(msg) => msg,
-            #[cfg(feature = "mlua-module")]
+
             CompiledNamedTextManifestInitError::MekaModuleManifestCompiler(msg) => msg,
-            #[cfg(feature = "mlua-module")]
             CompiledNamedTextManifestInitError::Io(msg) => msg,
-            #[cfg(feature = "mlua-module")]
             CompiledNamedTextManifestInitError::Savefile(msg) => msg,
         };
         write!(f, "{}", res)
@@ -64,14 +60,12 @@ impl From<fennel_searcher::Error> for CompiledNamedTextManifestInitError {
     }
 }
 
-#[cfg(feature = "mlua-module")]
 impl From<io::Error> for CompiledNamedTextManifestInitError {
     fn from(error: io::Error) -> Self {
         CompiledNamedTextManifestInitError::Io(error.to_string())
     }
 }
 
-#[cfg(feature = "mlua-module")]
 impl From<SavefileError> for CompiledNamedTextManifestInitError {
     fn from(error: SavefileError) -> Self {
         CompiledNamedTextManifestInitError::Savefile(error.to_string())

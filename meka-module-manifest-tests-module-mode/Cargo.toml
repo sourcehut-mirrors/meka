@@ -15,6 +15,9 @@ fennel153-lua54-module = ["meka-module-manifest/fennel153",
                           "mlua-module-manifest/mlua-lua54",
                           "mlua-module-manifest/mlua-module"]
 
+[dependencies]
+serial_test = { workspace = true }
+
 [dev-dependencies]
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
 meka-searcher = { path = "../meka-searcher", default-features = false }

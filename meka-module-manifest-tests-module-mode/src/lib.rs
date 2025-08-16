@@ -1,4 +1,8 @@
+#[cfg(test)]
+use serial_test::serial;
+
 #[test]
+#[serial]
 fn test_simple_fennel_compilation() {
     use meka_module_manifest::CompiledNamedTextManifest;
     use mlua_module_manifest::{ModuleFileType, ModuleNamedText, NamedTextManifest};
@@ -41,6 +45,7 @@ fn test_simple_fennel_compilation() {
 }
 
 #[test]
+#[serial]
 fn test_fennel_with_macros() {
     use meka_module_manifest::CompiledNamedTextManifest;
     use mlua_module_manifest::{ModuleFileType, ModuleNamedText, NamedTextManifest};
@@ -84,6 +89,7 @@ fn test_fennel_with_macros() {
 }
 
 #[test]
+#[serial]
 fn test_mixed_lua_fennel() {
     use meka_module_manifest::CompiledNamedTextManifest;
     use mlua_module_manifest::{ModuleFileType, ModuleNamedText, NamedTextManifest};
@@ -117,6 +123,7 @@ fn test_mixed_lua_fennel() {
 }
 
 #[test]
+#[serial]
 fn test_compilation_error_handling() {
     use meka_module_manifest::CompiledNamedTextManifest;
     use mlua_module_manifest::{ModuleFileType, ModuleNamedText, NamedTextManifest};
@@ -138,6 +145,7 @@ fn test_compilation_error_handling() {
 
 /// Verify whole workflow works outside of proc macros.
 #[test]
+#[serial]
 fn test_end_to_end_with_mlua_module() {
     use meka_module_manifest::CompiledNamedTextManifest;
     use meka_searcher::MekaSearcher;

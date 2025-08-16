@@ -68,9 +68,11 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
         // Serialize manifest.
         let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)?;
 
+        // Temp directory must outlive child.
+        let temp_dir = TempDir::with_prefix("tmp-meka-")?;
+
         // Run ephemeral crate with isolated `target/`.
         let mut child = {
-            let temp_dir = TempDir::with_prefix("tmp-meka-")?;
             let temp_dir_path = temp_dir.path();
             let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
@@ -81,7 +83,6 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
             Command::new("cargo")
                 .arg("run")
-                .arg("--release")
                 .arg("--quiet")
                 .args(["--package", "meka-module-manifest-compiler"])
                 .args(["--features", "mlua-lua54,mlua-vendored"])
