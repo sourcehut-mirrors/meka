@@ -58,7 +58,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
     /// having been done in a type-safe way.
     #[cfg(feature = "mlua-module")]
     fn try_from(manifest: NamedTextManifest) -> Result<Self, CompiledNamedTextManifestInitError> {
-        use savefile::{CURRENT_SAVEFILE_LIB_VERSION, WithSchema, load_from_mem, save_to_mem};
+        use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
         use std::io::Write;
         use std::path::Path;
         use std::process::{Command, Stdio};
@@ -66,7 +66,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
         const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
 
         // Serialize manifest.
-        let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION, WithSchema::NO, &manifest)?;
+        let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)?;
 
         // Run ephemeral crate.
         let mut child = {
@@ -103,7 +103,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
         // Deserialize result.
         let result: Result<CompiledNamedTextManifest, CompiledNamedTextManifestInitError> =
-            load_from_mem(&output.stdout, CURRENT_SAVEFILE_LIB_VERSION, WithSchema::NO)?;
+            load_from_mem(&output.stdout, CURRENT_SAVEFILE_LIB_VERSION.into())?;
 
         result
     }
