@@ -13,22 +13,21 @@ proc-macro = true
 default = ["fennel153"]
 fennel100 = ["meka-core/fennel100"]
 fennel153 = ["meka-core/fennel153"]
-mlua-lua54 = ["meka-core/mlua-lua54", "mlua/lua54"]
-mlua-lua53 = ["meka-core/mlua-lua53", "mlua/lua53"]
-mlua-lua52 = ["meka-core/mlua-lua52", "mlua/lua52"]
-mlua-lua51 = ["meka-core/mlua-lua51", "mlua/lua51"]
-mlua-luajit = ["meka-core/mlua-luajit", "mlua/luajit"]
-mlua-luajit52 = ["meka-core/mlua-luajit52", "mlua/luajit52"]
-mlua-luau = ["meka-core/mlua-luau", "mlua/luau"]
-mlua-luau-jit = ["meka-core/mlua-luau-jit", "mlua/luau-jit"]
-mlua-luau-vector4 = ["meka-core/mlua-luau-vector4", "mlua/luau-vector4"]
-mlua-module = ["meka-core/mlua-module", "mlua/module"]
-mlua-vendored = ["meka-core/mlua-vendored", "mlua/vendored"]
+mlua-lua54 = ["meka-core/mlua-lua54"]
+mlua-lua53 = ["meka-core/mlua-lua53"]
+mlua-lua52 = ["meka-core/mlua-lua52"]
+mlua-lua51 = ["meka-core/mlua-lua51"]
+mlua-luajit = ["meka-core/mlua-luajit"]
+mlua-luajit52 = ["meka-core/mlua-luajit52"]
+mlua-luau = ["meka-core/mlua-luau"]
+mlua-luau-jit = ["meka-core/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-core/mlua-luau-vector4"]
+mlua-module = ["meka-core/mlua-module"]
+mlua-vendored = ["meka-core/mlua-vendored"]
 
 [dependencies]
 meka-core = { path = "../meka-core", default-features = false }
 meka-utils = { path = "../meka-utils" }
-mlua = { workspace = true, default-features = false }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
 syn = { workspace = true }
