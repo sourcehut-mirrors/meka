@@ -13,6 +13,7 @@ proc-macro = true
 default = ["fennel153"]
 fennel100 = ["meka-core/fennel100"]
 fennel153 = ["meka-core/fennel153"]
+mlua-external = ["meka-core/mlua-external"]
 mlua-lua54 = ["meka-core/mlua-lua54"]
 mlua-lua53 = ["meka-core/mlua-lua53"]
 mlua-lua52 = ["meka-core/mlua-lua52"]

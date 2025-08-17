@@ -8,6 +8,7 @@ description = "Compile Fennel source code to Lua"
 
 [features]
 default = []
+mlua-external = ["mlua-utils/mlua-external"]
 mlua-lua54 = ["mlua/lua54", "mlua-utils/mlua-lua54"]
 mlua-lua53 = ["mlua/lua53", "mlua-utils/mlua-lua53"]
 mlua-lua52 = ["mlua/lua52", "mlua-utils/mlua-lua52"]
