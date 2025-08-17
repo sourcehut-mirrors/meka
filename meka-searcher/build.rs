@@ -27,10 +27,13 @@ fn main() {
     panic!("{}", CONFLICTING_CARGO_MANIFEST_FEATURE_MLUA);
 
     // Luau purposefully lacks support for loading Lua C modules.
-    #[cfg(all(feature = "mlua-module", any(
-        feature = "mlua-luau",
-        feature = "mlua-luau-jit",
-        feature = "mlua-luau-vector4"
-    )))]
+    #[cfg(all(
+        feature = "mlua-module",
+        any(
+            feature = "mlua-luau",
+            feature = "mlua-luau-jit",
+            feature = "mlua-luau-vector4"
+        )
+    ))]
     panic!("{}", LUAU_MODULE_MODE_REQUESTED);
 }
