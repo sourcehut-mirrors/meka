@@ -3,6 +3,27 @@
 ///! build meka-module-manifest-compiler if mlua-module feature is active.
 use cfg_if::cfg_if;
 
+// Workaround for cross-platform `include!` usage.
+//
+// Credit: https://github.com/rust-lang/rust/issues/75075#issuecomment-671370162
+cfg_if! {
+    if #[cfg(windows)] {
+        const HOST_FAMILY: &str = "windows";
+        macro_rules! path_separator {
+            () => {
+                r"\"
+            };
+        }
+    } else if #[cfg(unix)] {
+        const HOST_FAMILY: &str = "unix";
+        macro_rules! path_separator {
+            () => {
+                r"/"
+            };
+        }
+    }
+}
+
 #[allow(dead_code)]
 const MISSING_CARGO_MANIFEST_FEATURE_FENNEL: &str =
     "One Fennel version must be specified as feature in Cargo manifest.";
@@ -46,36 +67,23 @@ fn main() {
             ))]
             panic!("{}", LUAU_MODULE_MODE_REQUESTED);
 
-            println!(concat!("cargo:rerun-if-changed=../meka-module-manifest-compiler/"));
+            println!("cargo:rerun-if-changed=../meka-module-manifest-compiler/");
+            println!("cargo:rerun-if-changed=src/include/features.rs");
 
             let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR").expect(CARGO_MANIFEST_DIR_EXPECT);
             let workspace_root = Path::new(&cargo_manifest_dir).parent().expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
 
             // Compile meka-module-manifest-compiler with Lua matching active feature selection.
-            #[cfg(all(feature = "mlua-external", feature = "mlua-lua54"))]
-            let features = "mlua-lua54";
-            #[cfg(all(feature = "mlua-external", feature = "mlua-lua53"))]
-            let features = "mlua-lua53";
-            #[cfg(all(feature = "mlua-external", feature = "mlua-lua52"))]
-            let features = "mlua-lua52";
-            #[cfg(all(feature = "mlua-external", feature = "mlua-lua51"))]
-            let features = "mlua-lua51";
-            #[cfg(all(feature = "mlua-external", feature = "mlua-luajit"))]
-            let features = "mlua-luajit";
-            #[cfg(all(feature = "mlua-external", feature = "mlua-luajit52"))]
-            let features = "mlua-luajit52";
-            #[cfg(feature = "mlua-lua54")]
-            let features = "mlua-lua54,mlua-vendored";
-            #[cfg(feature = "mlua-lua53")]
-            let features = "mlua-lua53,mlua-vendored";
-            #[cfg(feature = "mlua-lua52")]
-            let features = "mlua-lua52,mlua-vendored";
-            #[cfg(feature = "mlua-lua51")]
-            let features = "mlua-lua51,mlua-vendored";
-            #[cfg(feature = "mlua-luajit")]
-            let features = "mlua-luajit,mlua-vendored";
-            #[cfg(feature = "mlua-luajit52")]
-            let features = "mlua-luajit52,mlua-vendored";
+            let features: &str;
+            include!(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                path_separator!(),
+                "src",
+                path_separator!(),
+                "include",
+                path_separator!(),
+                "features.rs"
+            ));
 
             Command::new("cargo")
                 .arg("build")
@@ -88,4 +96,7 @@ fn main() {
                 .expect(CARGO_BUILD_EXPECT);
         }
     }
+
+    #[cfg(any(windows, unix))]
+    println!("cargo:rust-cfg=host_family={}", HOST_FAMILY);
 }

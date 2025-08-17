@@ -13,6 +13,20 @@ use std::vec::Vec;
 
 use crate::error::CompiledNamedTextManifestInitError;
 
+#[cfg(target_family = "windows")]
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
+
+#[cfg(not(target_family = "windows"))]
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
+
 #[derive(Clone, Debug, Savefile)]
 pub struct CompiledNamedTextManifest {
     pub docstring: Option<Cow<'static, str>>,
@@ -72,12 +86,24 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
                 .parent()
                 .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
 
+            // Compile meka-module-manifest-compiler with Lua matching active feature selection.
+            let features: &str;
+            include!(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                path_separator!(),
+                "src",
+                path_separator!(),
+                "include",
+                path_separator!(),
+                "features.rs"
+            ));
+
             Command::new("cargo")
                 .arg("run")
                 .arg("--release")
                 .arg("--quiet")
                 .args(["--package", "meka-module-manifest-compiler"])
-                .args(["--features", "mlua-lua54,mlua-vendored"])
+                .args(["--features", features])
                 .current_dir(workspace_root)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
