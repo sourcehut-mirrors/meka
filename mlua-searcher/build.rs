@@ -1,18 +1,12 @@
-///! Enforce one version of Fennel be chosen via Cargo feature, and enforce only of one of
-///! mlua-external, mlua-module or mlua-vendored be chosen via Cargo feature.
+///! Enforce only of one of mlua-external, mlua-module or mlua-vendored be chosen via Cargo
+///! feature.
 
-#[allow(dead_code)]
-const MISSING_CARGO_MANIFEST_FEATURE_FENNEL: &str =
-    "One Fennel version must be specified as feature in Cargo manifest.";
 #[allow(dead_code)]
 const CONFLICTING_CARGO_MANIFEST_FEATURE_MLUA: &str = "One, and only one, of mlua-external, mlua-module, or mlua-vendored must be specified as feature in Cargo manifest.";
 #[allow(dead_code)]
 const LUAU_MODULE_MODE_REQUESTED: &str = "Luau doesn't support loading Lua C modules.";
 
 fn main() {
-    #[cfg(not(any(feature = "fennel100", feature = "fennel153")))]
-    panic!("{}", MISSING_CARGO_MANIFEST_FEATURE_FENNEL);
-
     #[cfg(not(any(
         feature = "mlua-external",
         feature = "mlua-module",
