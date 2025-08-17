@@ -9,8 +9,6 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::fmt::Debug;
 use std::ops::Index;
-#[cfg(feature = "mlua-module")]
-use std::path::Path;
 use std::vec::Vec;
 
 use crate::error::CompiledNamedTextManifestInitError;
@@ -60,34 +58,26 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
     fn try_from(manifest: NamedTextManifest) -> Result<Self, CompiledNamedTextManifestInitError> {
         use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
         use std::io::Write;
+        use std::path::Path;
         use std::process::{Command, Stdio};
-        use tempfile::TempDir;
 
         const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
 
         // Serialize manifest.
         let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)?;
 
-        // Temp directory must outlive child.
-        let temp_dir = TempDir::with_prefix("tmp-meka-")?;
-
         // Run ephemeral crate with isolated `target/`.
         let mut child = {
-            let temp_dir_path = temp_dir.path();
             let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
-
-            // Copy meka workspace to temp directory for isolated target/ dir.
-            copy_dir_all(workspace_root, temp_dir_path)?;
 
             Command::new("cargo")
                 .arg("run")
                 .arg("--quiet")
                 .args(["--package", "meka-module-manifest-compiler"])
                 .args(["--features", "mlua-lua54,mlua-vendored"])
-                .current_dir(temp_dir_path)
-                .env("CARGO_TARGET_DIR", temp_dir_path.join("target"))
+                .current_dir(workspace_root)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
@@ -168,35 +158,6 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
         Ok(Self { docstring, modules })
     }
-}
-
-/// Recursively copy directories.
-#[cfg(feature = "mlua-module")]
-fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), CompiledNamedTextManifestInitError> {
-    use std::fs;
-
-    fs::create_dir_all(dst)?;
-
-    for entry in fs::read_dir(src)? {
-        let entry = entry?;
-
-        let path = entry.path();
-        let file_name = entry.file_name();
-        let dst_path = dst.join(&file_name);
-
-        // Skip target directory and .git
-        if file_name == "target" || file_name == ".git" {
-            continue;
-        }
-
-        if path.is_dir() {
-            copy_dir_all(&path, &dst_path)?;
-        } else {
-            fs::copy(&path, &dst_path)?;
-        }
-    }
-
-    Ok(())
 }
 
 impl TryFrom<mlua_module_manifest::Manifest> for CompiledNamedTextManifest {
