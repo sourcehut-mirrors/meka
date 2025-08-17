@@ -87,8 +87,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
                 .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
 
             // Compile meka-module-manifest-compiler with Lua matching active feature selection.
-            let features: &str;
-            include!(concat!(
+            let features: &str = include!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 path_separator!(),
                 "src",

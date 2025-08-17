@@ -51,11 +51,9 @@ fn main() {
 
     cfg_if! {
         if #[cfg(feature = "mlua-module")] {
-            use std::env;
             use std::path::Path;
             use std::process::Command;
 
-            const CARGO_MANIFEST_DIR_EXPECT: &str = "Failed to find Cargo manifest directory";
             const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
             const CARGO_BUILD_EXPECT: &str = "Failed to build meka-module-manifest-compiler";
 
@@ -70,12 +68,11 @@ fn main() {
             println!("cargo:rerun-if-changed=../meka-module-manifest-compiler/");
             println!("cargo:rerun-if-changed=src/include/features.rs");
 
-            let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR").expect(CARGO_MANIFEST_DIR_EXPECT);
+            let cargo_manifest_dir = env!("CARGO_MANIFEST_DIR");
             let workspace_root = Path::new(&cargo_manifest_dir).parent().expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
 
             // Compile meka-module-manifest-compiler with Lua matching active feature selection.
-            let features: &str;
-            include!(concat!(
+            let features: &str = include!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 path_separator!(),
                 "src",
