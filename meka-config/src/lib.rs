@@ -303,10 +303,10 @@ impl Config {
         // Enable importing Fennel at "fennel".
         lua.mount_fennel()?;
 
-        // Enabling importing `fennel_src::loader` at "fennel-src".
+        // Enable importing `fennel_src::loader` at "fennel-src".
         searcher.insert(Cow::from("fennel-src"), fennel_src::loader);
 
-        // Enabling importing `meka_loader` at "meka".
+        // Enable importing `meka_loader` at "meka".
         searcher.insert(Cow::from("meka"), Self::meka_loader);
 
         lua.add_function_searcher(searcher)?;
