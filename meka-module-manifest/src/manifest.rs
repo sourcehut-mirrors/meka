@@ -74,6 +74,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
             Command::new("cargo")
                 .arg("run")
+                .arg("--release")
                 .arg("--quiet")
                 .args(["--package", "meka-module-manifest-compiler"])
                 .args(["--features", "mlua-lua54,mlua-vendored"])

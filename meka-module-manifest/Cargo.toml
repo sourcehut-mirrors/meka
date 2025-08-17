@@ -34,6 +34,9 @@ optional-collections = { workspace = true }
 savefile = { workspace = true }
 savefile-derive = { workspace = true }
 
+[build-dependencies]
+cfg-if = { workspace = true }
+
 [dev-dependencies]
 meka-module-manifest = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
