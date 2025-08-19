@@ -1,0 +1,29 @@
+[package]
+name = "meka-module-registry"
+version = "0.1.0"
+edition = { workspace = true }
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-module-registry"
+readme = "README.md"
+description = "Registry mapping string paths to mlua loader function pointers for Meka"
+
+[features]
+default = ["fennel153"]
+fennel100 = ["fennel-src/fennel100"]
+fennel153 = ["fennel-src/fennel153"]
+mlua-external = ["fennel-src/mlua-external", "mlua-module-manifest/mlua-external"]
+mlua-lua54 = ["fennel-src/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["fennel-src/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["fennel-src/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["fennel-src/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["fennel-src/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["fennel-src/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["fennel-src/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["fennel-src/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["fennel-src/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-vendored = ["fennel-src/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
+
+[dependencies]
+fennel-src = { path = "../fennel-src", default-features = false }
+mlua = { workspace = true }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
+phf = { workspace = true }

@@ -81,6 +81,10 @@ check-meka-module-manifest-tests:
 check-meka-module-manifest-tests-module-mode:
   cargo check --package meka-module-manifest-tests-module-mode
 
+# Run cargo check on meka-module-registry
+check-meka-module-registry:
+  cargo check --package meka-module-registry --features mlua-lua54,mlua-vendored
+
 # Run cargo check on meka-searcher
 check-meka-searcher:
   cargo check --package meka-searcher --features fennel153,mlua-lua54,mlua-vendored
@@ -208,6 +212,10 @@ test-meka-module-manifest-tests:
 # Run cargo test on meka-module-manifest-tests-module-mode
 test-meka-module-manifest-tests-module-mode:
   cargo test --package meka-module-manifest-tests-module-mode
+
+# Run cargo test on meka-module-registry
+test-meka-module-registry:
+  cargo test --package meka-module-registry --features mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-searcher
 test-meka-searcher:
