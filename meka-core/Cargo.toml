@@ -10,22 +10,23 @@ description = "Core implementation crate for use by Meka - not intended for dire
 default = ["fennel153"]
 fennel100 = ["meka-config/fennel100", "meka-module-manifest/fennel100", "meka-searcher/fennel100"]
 fennel153 = ["meka-config/fennel153", "meka-module-manifest/fennel153", "meka-searcher/fennel153"]
-mlua-external = ["meka-config/mlua-external", "meka-module-manifest/mlua-external", "meka-searcher/mlua-external", "mlua-module-manifest/mlua-external"]
-mlua-lua54 = ["meka-config/mlua-lua54", "meka-module-manifest/mlua-lua54", "meka-searcher/mlua-lua54", "mlua-module-manifest/mlua-lua54"]
-mlua-lua53 = ["meka-config/mlua-lua53", "meka-module-manifest/mlua-lua53", "meka-searcher/mlua-lua53", "mlua-module-manifest/mlua-lua53"]
-mlua-lua52 = ["meka-config/mlua-lua52", "meka-module-manifest/mlua-lua52", "meka-searcher/mlua-lua52", "mlua-module-manifest/mlua-lua52"]
-mlua-lua51 = ["meka-config/mlua-lua51", "meka-module-manifest/mlua-lua51", "meka-searcher/mlua-lua51", "mlua-module-manifest/mlua-lua51"]
-mlua-luajit = ["meka-config/mlua-luajit", "meka-module-manifest/mlua-luajit", "meka-searcher/mlua-luajit", "mlua-module-manifest/mlua-luajit"]
-mlua-luajit52 = ["meka-config/mlua-luajit52", "meka-module-manifest/mlua-luajit52", "meka-searcher/mlua-luajit52", "mlua-module-manifest/mlua-luajit52"]
-mlua-luau = ["meka-config/mlua-luau", "meka-module-manifest/mlua-luau", "meka-searcher/mlua-luau", "mlua-module-manifest/mlua-luau"]
-mlua-luau-jit = ["meka-config/mlua-luau-jit", "meka-module-manifest/mlua-luau-jit", "meka-searcher/mlua-luau-jit", "mlua-module-manifest/mlua-luau-jit"]
-mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "meka-searcher/mlua-luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
-mlua-module = ["meka-config/mlua-module", "meka-module-manifest/mlua-module", "meka-searcher/mlua-module", "mlua-module-manifest/mlua-module"]
-mlua-vendored = ["meka-config/mlua-vendored", "meka-module-manifest/mlua-vendored", "meka-searcher/mlua-vendored", "mlua-module-manifest/mlua-vendored"]
+mlua-external = ["meka-config/mlua-external", "meka-loader/mlua-external", "meka-module-manifest/mlua-external", "meka-searcher/mlua-external", "mlua-module-manifest/mlua-external"]
+mlua-lua54 = ["meka-config/mlua-lua54", "meka-loader/mlua-lua54", "meka-module-manifest/mlua-lua54", "meka-searcher/mlua-lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["meka-config/mlua-lua53", "meka-loader/mlua-lua53", "meka-module-manifest/mlua-lua53", "meka-searcher/mlua-lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["meka-config/mlua-lua52", "meka-loader/mlua-lua52", "meka-module-manifest/mlua-lua52", "meka-searcher/mlua-lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["meka-config/mlua-lua51", "meka-loader/mlua-lua51", "meka-module-manifest/mlua-lua51", "meka-searcher/mlua-lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["meka-config/mlua-luajit", "meka-loader/mlua-luajit", "meka-module-manifest/mlua-luajit", "meka-searcher/mlua-luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["meka-config/mlua-luajit52", "meka-loader/mlua-luajit52", "meka-module-manifest/mlua-luajit52", "meka-searcher/mlua-luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["meka-config/mlua-luau", "meka-loader/mlua-luau", "meka-module-manifest/mlua-luau", "meka-searcher/mlua-luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["meka-config/mlua-luau-jit", "meka-loader/mlua-luau-jit", "meka-module-manifest/mlua-luau-jit", "meka-searcher/mlua-luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-loader/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "meka-searcher/mlua-luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-module = ["meka-config/mlua-module", "meka-loader/mlua-module", "meka-module-manifest/mlua-module", "meka-searcher/mlua-module", "mlua-module-manifest/mlua-module"]
+mlua-vendored = ["meka-config/mlua-vendored", "meka-loader/mlua-vendored", "meka-module-manifest/mlua-vendored", "meka-searcher/mlua-vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]
 io-cat = { path = "../io-cat" }
 meka-config = { path = "../meka-config", default-features = false }
+meka-loader = { path = "../meka-loader", default-features = false }
 meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
 meka-searcher = { path = "../meka-searcher", default-features = false }
 meka-types = { path = "../meka-types", default-features = false }

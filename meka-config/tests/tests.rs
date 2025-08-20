@@ -1,6 +1,7 @@
 #[test]
 fn it_works() {
-    use meka_config::{Config, LoaderRegistry};
+    use meka_config::Config;
+    use meka_loader::LoaderRegistry;
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
     use std::borrow::Cow;
     use std::convert::From;
@@ -65,7 +66,8 @@ return {taon = taon}"#;
 
 #[test]
 fn manifest_fennel_macro_works() {
-    use meka_config::{Config, LoaderRegistry};
+    use meka_config::Config;
+    use meka_loader::LoaderRegistry;
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
     use std::borrow::Cow;
     use std::convert::From;
@@ -104,7 +106,8 @@ fn manifest_fennel_macro_works() {
 
 #[test]
 fn standalone_manifest_fennel_macro_works() {
-    use meka_config::{Config, LoaderRegistry};
+    use meka_config::Config;
+    use meka_loader::LoaderRegistry;
     use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
     use std::borrow::Cow;
     use std::convert::From;

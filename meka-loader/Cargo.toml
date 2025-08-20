@@ -1,0 +1,26 @@
+[package]
+name = "meka-loader"
+version = "0.1.0"
+edition = { workspace = true }
+homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-loader"
+readme = "README.md"
+description = "Implementation of the Meka loader function and related type aliases"
+
+[features]
+default = []
+mlua-external = ["mlua-module-manifest/mlua-external"]
+mlua-lua54 = ["mlua/lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["mlua/lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["mlua/lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["mlua/lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["mlua/luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["mlua/luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["mlua/luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-module = ["mlua/module", "mlua-module-manifest/mlua-module"]
+mlua-vendored = ["mlua/vendored", "mlua-module-manifest/mlua-vendored"]
+
+[dependencies]
+mlua = { workspace = true }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }

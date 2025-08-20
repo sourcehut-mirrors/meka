@@ -65,6 +65,10 @@ check-meka-config-macros-test-single-loader:
 check-meka-core:
   cargo check --package meka-core --features fennel153,mlua-lua54,mlua-vendored
 
+# Run cargo check on meka-loader
+check-meka-loader:
+  cargo check --package meka-loader --features mlua-lua54,mlua-vendored
+
 # Run cargo check on meka-module-manifest
 check-meka-module-manifest:
   cargo check --package meka-module-manifest --features mlua-lua54,mlua-vendored
@@ -196,6 +200,10 @@ test-meka-config-macros-test-single-loader:
 # Run cargo test on meka-core
 test-meka-core:
   cargo test --package meka-core --features fennel153,mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-loader
+test-meka-loader:
+  cargo test --package meka-loader --features mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-module-manifest
 test-meka-module-manifest:

@@ -47,6 +47,7 @@ members = [
   "meka-config-macros-test-multiple-loaders",
   "meka-config-macros-test-single-loader",
   "meka-core",
+  "meka-loader",
   "meka-module-manifest",
   "meka-module-manifest-compiler",
   "meka-module-manifest-tests",

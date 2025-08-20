@@ -3,7 +3,8 @@ use fennel_mount::Mount;
 use fennel_searcher::AddSearcher as _;
 use fennel_utils::InsertFennelSearcher;
 use meka_config_macros::loader_registry_from_cargo_manifest;
-use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
+use meka_loader::LoaderRegistry;
+use mlua::{Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
 use mlua_searcher::AddSearcher as _;
 use mlua_utils::{IntoCharArray, IsList};
@@ -20,7 +21,7 @@ use std::result::Result;
 use std::vec::Vec;
 
 pub mod prelude {
-    pub use crate::{Config, ConfigInitError, ConfigInitResult, LoaderRegistry};
+    pub use crate::{Config, ConfigInitError, ConfigInitResult};
 }
 
 #[cfg(target_family = "windows")]
@@ -295,10 +296,7 @@ impl Config {
     }
 
     fn setup_standard_library(lua: &Lua) -> ConfigInitResult<()> {
-        let mut searcher: HashMap<
-            Cow<'static, str>,
-            fn(&Lua, Table, &str) -> mlua::Result<Function>,
-        > = HashMap::with_capacity(2);
+        let mut searcher = LoaderRegistry::with_capacity(2);
 
         // Enable importing Fennel at "fennel".
         lua.mount_fennel()?;
@@ -306,45 +304,12 @@ impl Config {
         // Enable importing `fennel_src::loader` at "fennel-src".
         searcher.insert(Cow::from("fennel-src"), fennel_src::loader);
 
-        // Enable importing `meka_loader` at "meka".
-        searcher.insert(Cow::from("meka"), Self::meka_loader);
+        // Enable importing `meka_loader::loader` at "meka".
+        searcher.insert(Cow::from("meka"), meka_loader::loader);
 
         lua.add_function_searcher(searcher)?;
 
         Ok(())
-    }
-
-    fn meka_loader(lua: &Lua, env: Table, name: &str) -> mlua::Result<Function> {
-        let globals = lua.globals();
-
-        let tbl = lua.create_table().map_err(|_| {
-            mlua::Error::RuntimeError("meka_loader function failed to create Lua table".to_string())
-        })?;
-
-        let manifest: Function = Manifest::loader(lua, env.clone(), "manifest").map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka_loader function called Manifest::loader and got error".to_string(),
-            )
-        })?;
-        let manifest: Table = manifest.call(()).map_err(|_| {
-            mlua::Error::RuntimeError(
-                "meka_loader function called Manifest::loader in Lua context and got error"
-                    .to_string(),
-            )
-        })?;
-        tbl.set("manifest", manifest).map_err(|_| {
-            mlua::Error::RuntimeError("meka_loader function failed to set Lua table".to_string())
-        })?;
-
-        globals.set("meka", tbl).map_err(|_| {
-            mlua::Error::RuntimeError("meka_loader function failed to set Lua table".to_string())
-        })?;
-
-        Ok(lua
-            .load("return meka")
-            .set_name(name)
-            .set_environment(env)
-            .into_function()?)
     }
 
     fn setup_user_library(lua: &Lua, lreg: Option<LoaderRegistry>) -> ConfigInitResult<()> {
@@ -405,13 +370,3 @@ impl Config {
         Ok(config_str)
     }
 }
-
-/// `LoaderRegistry` is a `HashMap` of Lua loader functions indexed by name.
-///
-/// Each Lua loader function must return an `mlua::Function` which, when called, returns an
-/// `mlua::Table` with a `__call` metamethod defined. Calling said `mlua::Table` must return
-/// an `mlua_module_manifest::Manifest`. The idea is to enable Rust crates to export complete
-/// Lua modules. We map those exported Lua modules to names which can be `require`d within a
-/// Meka config.
-pub type LoaderRegistry =
-    HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>;

@@ -10,21 +10,22 @@ description = "Registry mapping string paths to mlua loader function pointers fo
 default = ["fennel153"]
 fennel100 = ["fennel-src/fennel100"]
 fennel153 = ["fennel-src/fennel153"]
-mlua-external = ["fennel-src/mlua-external", "mlua-module-manifest/mlua-external"]
-mlua-lua54 = ["fennel-src/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
-mlua-lua53 = ["fennel-src/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]
-mlua-lua52 = ["fennel-src/mlua-lua52", "mlua/lua52", "mlua-module-manifest/mlua-lua52"]
-mlua-lua51 = ["fennel-src/mlua-lua51", "mlua/lua51", "mlua-module-manifest/mlua-lua51"]
-mlua-luajit = ["fennel-src/mlua-luajit", "mlua/luajit", "mlua-module-manifest/mlua-luajit"]
-mlua-luajit52 = ["fennel-src/mlua-luajit52", "mlua/luajit52", "mlua-module-manifest/mlua-luajit52"]
-mlua-luau = ["fennel-src/mlua-luau", "mlua/luau", "mlua-module-manifest/mlua-luau"]
-mlua-luau-jit = ["fennel-src/mlua-luau-jit", "mlua/luau-jit", "mlua-module-manifest/mlua-luau-jit"]
-mlua-luau-vector4 = ["fennel-src/mlua-luau-vector4", "mlua/luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
-mlua-module = ["fennel-src/mlua-module", "mlua/module", "mlua-module-manifest/mlua-module"]
-mlua-vendored = ["fennel-src/mlua-vendored", "mlua/vendored", "mlua-module-manifest/mlua-vendored"]
+mlua-external = ["fennel-src/mlua-external", "meka-loader/mlua-external", "mlua-module-manifest/mlua-external"]
+mlua-lua54 = ["fennel-src/mlua-lua54", "mlua/lua54", "meka-loader/mlua-lua54", "mlua-module-manifest/mlua-lua54"]
+mlua-lua53 = ["fennel-src/mlua-lua53", "mlua/lua53", "meka-loader/mlua-lua53", "mlua-module-manifest/mlua-lua53"]
+mlua-lua52 = ["fennel-src/mlua-lua52", "mlua/lua52", "meka-loader/mlua-lua52", "mlua-module-manifest/mlua-lua52"]
+mlua-lua51 = ["fennel-src/mlua-lua51", "mlua/lua51", "meka-loader/mlua-lua51", "mlua-module-manifest/mlua-lua51"]
+mlua-luajit = ["fennel-src/mlua-luajit", "mlua/luajit", "meka-loader/mlua-luajit", "mlua-module-manifest/mlua-luajit"]
+mlua-luajit52 = ["fennel-src/mlua-luajit52", "mlua/luajit52", "meka-loader/mlua-luajit52", "mlua-module-manifest/mlua-luajit52"]
+mlua-luau = ["fennel-src/mlua-luau", "mlua/luau", "meka-loader/mlua-luau", "mlua-module-manifest/mlua-luau"]
+mlua-luau-jit = ["fennel-src/mlua-luau-jit", "mlua/luau-jit", "meka-loader/mlua-luau-jit", "mlua-module-manifest/mlua-luau-jit"]
+mlua-luau-vector4 = ["fennel-src/mlua-luau-vector4", "mlua/luau-vector4", "meka-loader/mlua-luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
+mlua-module = ["fennel-src/mlua-module", "mlua/module", "meka-loader/mlua-module", "mlua-module-manifest/mlua-module"]
+mlua-vendored = ["fennel-src/mlua-vendored", "mlua/vendored", "meka-loader/mlua-vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]
 fennel-src = { path = "../fennel-src", default-features = false }
+meka-loader = { path = "../meka-loader", default-features = false }
 mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
 phf = { workspace = true }
