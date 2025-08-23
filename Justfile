@@ -33,6 +33,10 @@ check-io-cat:
 check-meka-config:
   cargo check --package meka-config --features mlua-lua54,mlua-vendored
 
+# Run cargo check on meka-config-evaluator
+check-meka-config-evaluator:
+  cargo check --package meka-config-evaluator --features mlua-lua54,mlua-vendored
+
 # Run cargo check on meka-config-macros
 check-meka-config-macros:
   cargo check --package meka-config-macros --features mlua-lua54,mlua-vendored
@@ -168,6 +172,10 @@ test-io-cat:
 # Run cargo test on meka-config
 test-meka-config:
   cargo test --package meka-config --features mlua-lua54,mlua-vendored
+
+# Run cargo test on meka-config-evaluator
+test-meka-config-evaluator:
+  cargo test --package meka-config-evaluator --features mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-config-macros
 test-meka-config-macros:

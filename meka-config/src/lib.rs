@@ -2,6 +2,9 @@ use fennel_compile::Compile;
 use fennel_mount::Mount;
 use fennel_searcher::AddSearcher as _;
 use fennel_utils::InsertFennelSearcher;
+#[cfg(feature = "mlua-module")]
+use meka_config_macros::loader_paths_from_cargo_manifest;
+#[cfg(not(feature = "mlua-module"))]
 use meka_config_macros::loader_registry_from_cargo_manifest;
 use meka_loader::LoaderRegistry;
 use mlua::{Lua, LuaOptions, StdLib, Table, Value};
@@ -23,6 +26,9 @@ use std::vec::Vec;
 pub mod prelude {
     pub use crate::{Config, ConfigInitError, ConfigInitResult};
 }
+
+#[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+mod evaluator_types;
 
 #[cfg(target_family = "windows")]
 macro_rules! path_separator {
@@ -174,6 +180,26 @@ impl Config {
         Config::new(module, lreg)
     }
 
+    #[cfg(feature = "mlua-module")]
+    pub fn new(module: Module, lreg: Option<Vec<(String, String)>>) -> ConfigInitResult<Self> {
+        use crate::evaluator_types::{ConfigEvaluatorInput, ConfigEvaluatorOutput};
+        use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
+
+        // Get loader paths from downstream crate's Cargo manifest.
+        let mut loader_paths: Vec<(String, String)> = loader_paths_from_cargo_manifest!();
+
+        // Merge with any additional loader paths provided.
+        if let Some(additional_paths) = lreg {
+            loader_paths.extend(additional_paths);
+        }
+
+        // Prepare input with all loader paths.
+        let input = ConfigEvaluatorInput { module, loader_paths };
+
+        // ... rest of implementation (serialize, spawn, etc.)
+    }
+
+    #[cfg(not(feature = "mlua-module"))]
     pub fn new(module: Module, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self> {
         let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 

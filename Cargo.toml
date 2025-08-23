@@ -39,6 +39,7 @@ members = [
   "fennel-utils",
   "io-cat",
   "meka-config",
+  "meka-config-evaluator",
   "meka-config-macros",
   "meka-config-macros-test-empty-metadata",
   "meka-config-macros-test-empty-metadata-section",

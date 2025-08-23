@@ -6,6 +6,7 @@ use std::fmt;
 use std::fs;
 use std::path::Path;
 use std::result::Result;
+use std::string::String;
 
 #[derive(Debug)]
 enum LoaderRegistryError {
@@ -179,4 +180,46 @@ fn validate_loader_path(name: &str, loader_path: &str) -> Result<(), LoaderRegis
     }
 
     Ok(())
+}
+
+// New macro for mlua-module mode - returns paths as strings
+#[proc_macro]
+pub fn loader_paths_from_cargo_manifest(_input: TokenStream) -> TokenStream {
+    match get_loaders_from_cargo_toml() {
+        Ok(loaders) => generate_loader_paths_tokens(loaders),
+        Err(LoaderRegistryError::MissingEnvCargoManifestDir)
+        | Err(LoaderRegistryError::MissingMetadata) => {
+            generate_empty_loader_paths()
+        }
+        Err(e) => {
+            let error_msg = e.to_string();
+            let expanded = quote! { compile_error!(#error_msg); };
+            TokenStream::from(expanded)
+        }
+    }
+}
+
+fn generate_loader_paths_tokens(loaders: HashMap<String, String>) -> TokenStream {
+    if loaders.is_empty() {
+        return generate_empty_loader_paths();
+    }
+
+    let entries = loaders.iter().map(|(name, path)| {
+        quote! {
+            (#name.to_string(), #path.to_string())
+        }
+    });
+
+    let expanded = quote! {
+        vec![#(#entries),*]
+    };
+
+    TokenStream::from(expanded)
+}
+
+fn generate_empty_loader_paths() -> TokenStream {
+    let expanded = quote! {
+        ::std::vec::Vec::<(::std::string::String, ::std::string::String)>::new()
+    };
+    TokenStream::from(expanded)
 }

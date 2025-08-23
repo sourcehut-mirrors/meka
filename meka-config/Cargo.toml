@@ -10,6 +10,8 @@ description = "Read Lua module manifests from config file or string"
 default = ["fennel153"]
 fennel100 = ["fennel-mount/fennel100", "fennel-src/fennel100"]
 fennel153 = ["fennel-mount/fennel153", "fennel-src/fennel153"]
+# core implementation feature for use by meka-config-evaluator - not intended for direct use
+meka-config-evaluator = []
 mlua-external = ["fennel-compile/mlua-external", "fennel-mount/mlua-external", "fennel-searcher/mlua-external", "fennel-src/mlua-external", "fennel-utils/mlua-external", "meka-config-macros/mlua-external", "meka-loader/mlua-external", "mlua-module-manifest/mlua-external", "mlua-searcher/mlua-external", "mlua-utils/mlua-external"]
 mlua-lua54 = ["fennel-compile/mlua-lua54", "fennel-mount/mlua-lua54", "fennel-searcher/mlua-lua54", "fennel-src/mlua-lua54", "fennel-utils/mlua-lua54", "meka-config-macros/mlua-lua54", "meka-loader/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-searcher/mlua-lua54", "mlua-utils/mlua-lua54"]
 mlua-lua53 = ["fennel-compile/mlua-lua53", "fennel-mount/mlua-lua53", "fennel-searcher/mlua-lua53", "fennel-src/mlua-lua53", "fennel-utils/mlua-lua53", "meka-config-macros/mlua-lua53", "meka-loader/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53", "mlua-searcher/mlua-lua53", "mlua-utils/mlua-lua53"]
@@ -35,6 +37,8 @@ mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
 mlua-searcher = { path = "../mlua-searcher", default-features = false }
 mlua-utils = { path = "../mlua-utils", default-features = false }
+savefile = { workspace = true }
+savefile-derive = { workspace = true }
 
 [dev-dependencies]
 fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
