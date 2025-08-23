@@ -233,15 +233,41 @@ impl MekaSearcherInput {
 }
 
 fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
-    let map_entries = map_entries(map);
-    let map_entries_len = map_entries.len();
     let module = module_from_path();
-    quote! {
-        let mut loader_registry = ::meka::LoaderRegistry::with_capacity(#map_entries_len);
-        #(#map_entries)*
-        let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(loader_registry))
-            .expect("Sorry, couldn't instantiate Config")
-            .0;
+    let map_entries_len = map.len();
+
+    #[cfg(feature = "mlua-module")]
+    {
+        // Generate string paths for module mode
+        let string_paths = map.iter().map(|(key, value)| {
+            let path_str = quote!(#value).to_string();
+            quote! {
+                (#key.to_string(), #path_str.to_string())
+            }
+        });
+
+        quote! {
+            let additional_paths = vec![#(#string_paths),*];
+            let config = ::meka::Config::new(#module, Some(additional_paths))
+                .expect("Sorry, couldn't instantiate Config")
+                .0;
+            config
+        }
+    }
+
+    #[cfg(not(feature = "mlua-module"))]
+    {
+        // Generate function pointer registry for normal mode
+        let map_entries = map_entries(map);
+
+        quote! {
+            let mut loader_registry = ::meka::LoaderRegistry::with_capacity(#map_entries_len);
+            #(#map_entries)*
+            let config = ::meka::Config::new(#module, Some(loader_registry))
+                .expect("Sorry, couldn't instantiate Config")
+                .0;
+            config
+        }
     }
 }
 
@@ -292,11 +318,26 @@ fn selected_path() -> (PathBuf, String, ModuleFileType) {
     }
 }
 
-fn config_new_without_map() -> HashMap<String, Manifest> {
+fn config_new_without_map() -> proc_macro2::TokenStream {
     let module = module_from_path();
-    Config::new(module, None)
-        .expect("Sorry, couldn't instantiate Config")
-        .0
+
+    #[cfg(feature = "mlua-module")]
+    {
+        quote! {
+            ::meka::Config::new(#module, None)
+                .expect("Sorry, couldn't instantiate Config")
+                .0
+        }
+    }
+
+    #[cfg(not(feature = "mlua-module"))]
+    {
+        quote! {
+            ::meka::Config::new(#module, None)
+                .expect("Sorry, couldn't instantiate Config")
+                .0
+        }
+    }
 }
 
 #[cfg(test)]
