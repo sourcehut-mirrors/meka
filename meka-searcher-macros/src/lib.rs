@@ -249,7 +249,7 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
 
         quote! {
             let additional_paths = vec![#(#string_paths),*];
-            let config = ::meka::Config::new(#module, Some(additional_paths))
+            let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(additional_paths))
                 .expect("Sorry, couldn't instantiate Config")
                 .0;
             config
@@ -264,7 +264,7 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
         quote! {
             let mut loader_registry = ::meka::LoaderRegistry::with_capacity(#map_entries_len);
             #(#map_entries)*
-            let config = ::meka::Config::new(#module, Some(loader_registry))
+            let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(loader_registry))
                 .expect("Sorry, couldn't instantiate Config")
                 .0;
             config
