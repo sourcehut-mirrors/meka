@@ -1,4 +1,4 @@
-///! Enforce one version of Fennel be chosen via Cargo feature, and enforce only of one of
+///! Enforce one version of Fennel be chosen via Cargo feature, and enforce only one of
 ///! mlua-external, mlua-module or mlua-vendored be chosen via Cargo feature.
 
 #[allow(dead_code)]
