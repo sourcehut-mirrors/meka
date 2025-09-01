@@ -21,14 +21,14 @@ const IO_STDOUT_WRITEALL_EXPECT: &str = "Failed to write result";
 const SAVEFILE_LOAD_FROM_MEM_EXPECT: &str = "Failed to deserialize input";
 const SAVEFILE_SAVE_TO_MEM_EXPECT: &str = "Failed to serialize result";
 
-#[cfg(target_family = "windows")]
+#[cfg(host_family = "windows")]
 macro_rules! path_separator {
     () => {
         r"\"
     };
 }
 
-#[cfg(not(target_family = "windows"))]
+#[cfg(not(host_family = "windows"))]
 macro_rules! path_separator {
     () => {
         r"/"

@@ -13,14 +13,14 @@ use std::vec::Vec;
 
 use crate::error::CompiledNamedTextManifestInitError;
 
-#[cfg(target_family = "windows")]
+#[cfg(host_family = "windows")]
 macro_rules! path_separator {
     () => {
         r"\"
     };
 }
 
-#[cfg(not(target_family = "windows"))]
+#[cfg(not(host_family = "windows"))]
 macro_rules! path_separator {
     () => {
         r"/"

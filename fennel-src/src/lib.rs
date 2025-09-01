@@ -7,14 +7,14 @@ use std::convert::From;
 
 const PAIRS_EXPECT: &str = "`mlua::TablePairs::pairs()` unexpectedly failed";
 
-#[cfg(target_family = "windows")]
+#[cfg(host_family = "windows")]
 macro_rules! path_separator {
     () => {
         r"\"
     };
 }
 
-#[cfg(not(target_family = "windows"))]
+#[cfg(not(host_family = "windows"))]
 macro_rules! path_separator {
     () => {
         r"/"

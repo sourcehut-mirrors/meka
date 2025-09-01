@@ -30,14 +30,14 @@ pub mod prelude {
 #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
 mod evaluator_types;
 
-#[cfg(target_family = "windows")]
+#[cfg(host_family = "windows")]
 macro_rules! path_separator {
     () => {
         r"\"
     };
 }
 
-#[cfg(not(target_family = "windows"))]
+#[cfg(not(host_family = "windows"))]
 macro_rules! path_separator {
     () => {
         r"/"
