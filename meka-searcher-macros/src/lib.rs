@@ -318,26 +318,11 @@ fn selected_path() -> (PathBuf, String, ModuleFileType) {
     }
 }
 
-fn config_new_without_map() -> proc_macro2::TokenStream {
+fn config_new_without_map() -> HashMap<String, Manifest> {
     let module = module_from_path();
-
-    #[cfg(feature = "mlua-module")]
-    {
-        quote! {
-            ::meka::Config::new(#module, None)
-                .expect("Sorry, couldn't instantiate Config")
-                .0
-        }
-    }
-
-    #[cfg(not(feature = "mlua-module"))]
-    {
-        quote! {
-            ::meka::Config::new(#module, None)
-                .expect("Sorry, couldn't instantiate Config")
-                .0
-        }
-    }
+    Config::new(module, None)
+        .expect("Sorry, couldn't instantiate Config")
+        .0
 }
 
 #[cfg(test)]
