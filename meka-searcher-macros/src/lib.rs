@@ -238,12 +238,13 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
 
     #[cfg(feature = "mlua-module")]
     {
-        // Generate string paths for module mode
+        // Generate string paths for module mode.
         let string_paths = map.iter().map(|(key, value)| {
-            let path_str = quote!(#value).to_string();
-            quote! {
-                (#key.to_string(), #path_str.to_string())
-            }
+            // Convert `syn::Path` to string at macro expansion time.
+            let path_str = value.to_token_stream().to_string();
+            // Create string literal token to be subsequently rendered in generated code.
+            let path_lit = LitStr::new(&path_str, value.span());
+            quote! { (#key.to_string(), #path_lit.to_string()) }
         });
 
         quote! {
@@ -257,7 +258,7 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
 
     #[cfg(not(feature = "mlua-module"))]
     {
-        // Generate function pointer registry for normal mode
+        // Generate function pointer registry for normal mode.
         let map_entries = map_entries(map);
 
         quote! {
