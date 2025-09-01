@@ -31,18 +31,9 @@ pub mod prelude {
 mod evaluator_types;
 
 #[cfg(host_family = "windows")]
-macro_rules! path_separator {
-    () => {
-        r"\"
-    };
-}
-
+macro_rules! path_separator { () => { r"\" }; }
 #[cfg(not(host_family = "windows"))]
-macro_rules! path_separator {
-    () => {
-        r"/"
-    };
-}
+macro_rules! path_separator { () => { r"/" }; }
 
 /// Fennel macros to aid in writing `manifest.fnl` files.
 const MEKA_MACROS: &str = include_str!(concat!(

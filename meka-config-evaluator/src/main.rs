@@ -22,18 +22,9 @@ const SAVEFILE_LOAD_FROM_MEM_EXPECT: &str = "Failed to deserialize input";
 const SAVEFILE_SAVE_TO_MEM_EXPECT: &str = "Failed to serialize result";
 
 #[cfg(host_family = "windows")]
-macro_rules! path_separator {
-    () => {
-        r"\"
-    };
-}
-
+macro_rules! path_separator { () => { r"\" }; }
 #[cfg(not(host_family = "windows"))]
-macro_rules! path_separator {
-    () => {
-        r"/"
-    };
-}
+macro_rules! path_separator { () => { r"/" }; }
 
 /// Fennel macros to aid in writing `manifest.fnl` files.
 const MEKA_MACROS: &str = include_str!(concat!(

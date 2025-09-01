@@ -14,18 +14,9 @@ use std::vec::Vec;
 use crate::error::CompiledNamedTextManifestInitError;
 
 #[cfg(host_family = "windows")]
-macro_rules! path_separator {
-    () => {
-        r"\"
-    };
-}
-
+macro_rules! path_separator { () => { r"\" }; }
 #[cfg(not(host_family = "windows"))]
-macro_rules! path_separator {
-    () => {
-        r"/"
-    };
-}
+macro_rules! path_separator { () => { r"/" }; }
 
 #[derive(Clone, Debug, Savefile)]
 pub struct CompiledNamedTextManifest {

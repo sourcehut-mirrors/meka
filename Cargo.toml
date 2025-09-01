@@ -77,7 +77,6 @@ keywords = ["fennel", "lua"]
 repository = "https://git.sr.ht/~ioiojo/meka"
 
 [workspace.dependencies]
-cfg-if = { version = "1" }
 derive_builder = { version = "0.20" }
 gpgrv = { version = "0.4" }
 ignore = { version = "0.4" }
