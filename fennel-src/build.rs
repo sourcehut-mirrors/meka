@@ -1,7 +1,6 @@
 ///! Enforce one version of Fennel be chosen via Cargo feature, and enforce only one of
 ///! mlua-external, mlua-module or mlua-vendored be chosen via Cargo feature. Additionally,
 ///! verify Fennel release PGP signature.
-
 use std::env;
 use std::fs::File;
 use std::io::{BufReader, Read};

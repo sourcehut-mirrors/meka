@@ -8,9 +8,17 @@ use std::convert::From;
 const PAIRS_EXPECT: &str = "`mlua::TablePairs::pairs()` unexpectedly failed";
 
 #[cfg(host_family = "windows")]
-macro_rules! path_separator { () => { r"\" }; }
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
 #[cfg(not(host_family = "windows"))]
-macro_rules! path_separator { () => { r"/" }; }
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
 
 macro_rules! path_fennel {
     ($version:expr) => {

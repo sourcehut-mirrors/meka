@@ -22,9 +22,17 @@ const SAVEFILE_LOAD_FROM_MEM_EXPECT: &str = "Failed to deserialize input";
 const SAVEFILE_SAVE_TO_MEM_EXPECT: &str = "Failed to serialize result";
 
 #[cfg(host_family = "windows")]
-macro_rules! path_separator { () => { r"\" }; }
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
 #[cfg(not(host_family = "windows"))]
-macro_rules! path_separator { () => { r"/" }; }
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
 
 /// Fennel macros to aid in writing `manifest.fnl` files.
 const MEKA_MACROS: &str = include_str!(concat!(
@@ -47,9 +55,8 @@ fn main() {
         .expect(IO_STDIN_READ_TO_END_EXPECT);
 
     // Deserialize input.
-    let input: ConfigEvaluatorInput =
-        load_from_mem(&buffer, CURRENT_SAVEFILE_LIB_VERSION.into())
-            .expect(SAVEFILE_LOAD_FROM_MEM_EXPECT);
+    let input: ConfigEvaluatorInput = load_from_mem(&buffer, CURRENT_SAVEFILE_LIB_VERSION.into())
+        .expect(SAVEFILE_LOAD_FROM_MEM_EXPECT);
 
     // Evaluate config and get result.
     let result = evaluate_config(input);
@@ -74,8 +81,8 @@ fn evaluate_config(input: ConfigEvaluatorInput) -> ConfigEvaluatorOutput {
 
     // Parse file type
     let file_type = match input.module.file_type {
-        ModuleFileType::Fennel => {},
-        ModuleFileType::Lua => {},
+        ModuleFileType::Fennel => {}
+        ModuleFileType::Lua => {}
         _ => return ConfigEvaluatorOutput::Err(format!("Invalid file type: {}", input.file_type)),
     };
 
@@ -103,8 +110,9 @@ fn setup_lua_environment(lua: &Lua, loader_paths: Vec<(String, String)>) -> mlua
     setup_user_library(lua, loader_paths)?;
 
     // Insert Fennel searcher
-    lua.insert_fennel_searcher()
-        .map_err(|e| mlua::Error::RuntimeError(format!("Failed to insert Fennel searcher: {}", e)))?;
+    lua.insert_fennel_searcher().map_err(|e| {
+        mlua::Error::RuntimeError(format!("Failed to insert Fennel searcher: {}", e))
+    })?;
 
     Ok(())
 }
@@ -155,7 +163,7 @@ fn setup_user_library(lua: &Lua, loader_paths: Vec<(String, String)>) -> mlua::R
 fn get_config_as_lua_string(
     lua: &Lua,
     config_str: String,
-    file_type: ModuleFileType
+    file_type: ModuleFileType,
 ) -> mlua::Result<String> {
     match file_type {
         ModuleFileType::Fennel => {
@@ -168,18 +176,20 @@ fn get_config_as_lua_string(
             lua.compile_fennel_string(&config_str)
         }
         ModuleFileType::Lua => Ok(config_str),
-        ModuleFileType::FennelMacros => {
-            Err(mlua::Error::RuntimeError("FennelMacros not supported".to_string()))
-        }
+        ModuleFileType::FennelMacros => Err(mlua::Error::RuntimeError(
+            "FennelMacros not supported".to_string(),
+        )),
     }
 }
 
 fn evaluate_and_extract_manifests(
     lua: &Lua,
-    config_str: &str
+    config_str: &str,
 ) -> Result<HashMap<String, Vec<u8>>, String> {
     // Evaluate config module
-    let value: Value = lua.load(config_str).eval()
+    let value: Value = lua
+        .load(config_str)
+        .eval()
         .map_err(|e| format!("Failed to evaluate config: {}", e))?;
 
     let mut map = HashMap::new();
@@ -195,7 +205,8 @@ fn evaluate_and_extract_manifests(
 
                 match key {
                     Value::String(key_str) => {
-                        let key = key_str.to_str()
+                        let key = key_str
+                            .to_str()
                             .map_err(|_| "Invalid string key".to_string())?
                             .to_string();
 
@@ -205,10 +216,11 @@ fn evaluate_and_extract_manifests(
                                     .map_err(|_| "Invalid Manifest userdata".to_string())?;
 
                                 // Serialize the manifest
-                                let serialized = save_to_mem(
-                                    CURRENT_SAVEFILE_LIB_VERSION.into(),
-                                    &manifest
-                                ).map_err(|e| format!("Failed to serialize manifest: {}", e))?;
+                                let serialized =
+                                    save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)
+                                        .map_err(|e| {
+                                            format!("Failed to serialize manifest: {}", e)
+                                        })?;
 
                                 map.insert(key, serialized);
                             }
@@ -220,13 +232,11 @@ fn evaluate_and_extract_manifests(
             }
         }
         Value::UserData(ud) => {
-            let manifest = Manifest::try_from(ud)
-                .map_err(|_| "Invalid Manifest userdata".to_string())?;
+            let manifest =
+                Manifest::try_from(ud).map_err(|_| "Invalid Manifest userdata".to_string())?;
 
-            let serialized = save_to_mem(
-                CURRENT_SAVEFILE_LIB_VERSION.into(),
-                &manifest
-            ).map_err(|e| format!("Failed to serialize manifest: {}", e))?;
+            let serialized = save_to_mem(CURRENT_SAVEFILE_LIB_VERSION.into(), &manifest)
+                .map_err(|e| format!("Failed to serialize manifest: {}", e))?;
 
             // Empty string key for single manifest return
             map.insert("".to_string(), serialized);

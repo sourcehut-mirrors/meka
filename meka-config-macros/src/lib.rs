@@ -188,9 +188,7 @@ pub fn loader_paths_from_cargo_manifest(_input: TokenStream) -> TokenStream {
     match get_loaders_from_cargo_toml() {
         Ok(loaders) => generate_loader_paths_tokens(loaders),
         Err(LoaderRegistryError::MissingEnvCargoManifestDir)
-        | Err(LoaderRegistryError::MissingMetadata) => {
-            generate_empty_loader_paths()
-        }
+        | Err(LoaderRegistryError::MissingMetadata) => generate_empty_loader_paths(),
         Err(e) => {
             let error_msg = e.to_string();
             let expanded = quote! { compile_error!(#error_msg); };

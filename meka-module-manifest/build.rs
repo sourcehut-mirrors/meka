@@ -8,11 +8,19 @@
 #[cfg(windows)]
 const HOST_FAMILY: &str = "windows";
 #[cfg(windows)]
-macro_rules! path_separator { () => { r"\" }; }
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
 #[cfg(unix)]
 const HOST_FAMILY: &str = "unix";
 #[cfg(unix)]
-macro_rules! path_separator { () => { r"/" }; }
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
 
 #[allow(dead_code)]
 const MISSING_CARGO_MANIFEST_FEATURE_FENNEL: &str =
@@ -59,7 +67,9 @@ fn main() {
         println!("cargo:rerun-if-changed=src/include/features.rs");
 
         let cargo_manifest_dir = env!("CARGO_MANIFEST_DIR");
-        let workspace_root = Path::new(&cargo_manifest_dir).parent().expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
+        let workspace_root = Path::new(&cargo_manifest_dir)
+            .parent()
+            .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
 
         // Compile meka-module-manifest-compiler with Lua matching active feature selection.
         let features: &str = include!(concat!(

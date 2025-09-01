@@ -31,9 +31,17 @@ pub mod prelude {
 mod evaluator_types;
 
 #[cfg(host_family = "windows")]
-macro_rules! path_separator { () => { r"\" }; }
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
 #[cfg(not(host_family = "windows"))]
-macro_rules! path_separator { () => { r"/" }; }
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
 
 /// Fennel macros to aid in writing `manifest.fnl` files.
 const MEKA_MACROS: &str = include_str!(concat!(
@@ -185,7 +193,10 @@ impl Config {
         }
 
         // Prepare input with all loader paths.
-        let input = ConfigEvaluatorInput { module, loader_paths };
+        let input = ConfigEvaluatorInput {
+            module,
+            loader_paths,
+        };
 
         // ... rest of implementation (serialize, spawn, etc.)
     }
