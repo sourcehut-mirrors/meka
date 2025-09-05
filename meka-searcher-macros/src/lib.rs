@@ -240,11 +240,7 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     {
         // Generate string paths for module mode.
         let string_paths = map.iter().map(|(key, value)| {
-            // Convert `syn::Path` to string at macro expansion time.
-            let path_str = value.to_token_stream().to_string();
-            // Create string literal token to be subsequently rendered in generated code.
-            let path_lit = LitStr::new(&path_str, value.span());
-            quote! { (#key.to_string(), #path_lit.to_string()) }
+            quote! { (#key.to_string(), stringify!(#value).to_string()) }
         });
 
         quote! {
