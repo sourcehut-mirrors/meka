@@ -1,0 +1,23 @@
+[package]
+name = "meka-config-tests-module-mode"
+version = "0.1.0"
+edition = { workspace = true }
+publish = false
+
+[features]
+default = ["fennel153-lua54-module"]
+fennel153-lua54-module = ["meka-config/fennel153",
+                          "meka-config/mlua-lua54",
+                          "meka-config/mlua-module",
+                          "meka-config-macros/mlua-lua54",
+                          "meka-config-macros/mlua-module",
+                          "mlua-module-manifest/mlua-lua54",
+                          "mlua-module-manifest/mlua-module"]
+
+[package.metadata.meka.loaders]
+test-loader = "meka_config_tests_module_mode::test_loader"
+
+[dev-dependencies]
+meka-config = { path = "../meka-config", default-features = false }
+meka-config-macros = { path = "../meka-config-macros", default-features = false }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }

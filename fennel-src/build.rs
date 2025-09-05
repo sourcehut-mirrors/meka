@@ -72,6 +72,8 @@ fn main() {
     }
 
     #[cfg(any(windows, unix))]
+    println!("cargo::rustc-check-cfg=cfg(host_family, values(\"windows\", \"unix\"))");
+    #[cfg(any(windows, unix))]
     println!("cargo:rust-cfg=host_family={}", HOST_FAMILY);
 }
 

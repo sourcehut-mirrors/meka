@@ -47,6 +47,7 @@ members = [
   "meka-config-macros-test-invalid-loader-path",
   "meka-config-macros-test-multiple-loaders",
   "meka-config-macros-test-single-loader",
+  "meka-config-tests-module-mode",
   "meka-core",
   "meka-loader",
   "meka-module-manifest",

@@ -6,11 +6,13 @@
 //! string data.
 
 use meka_loader::{LoaderFn, LoaderRegistry};
-use mlua::{Function, Lua, Table};
 use mlua_module_manifest::Manifest;
 use phf::phf_map;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::result::Result;
+use std::string::String;
+use std::vec::Vec;
 
 /// Perfect hash map for O(1) compile-time string-to-function lookups.
 ///

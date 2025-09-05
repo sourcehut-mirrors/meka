@@ -1,35 +1,47 @@
-use fennel_compile::Compile;
-use fennel_mount::Mount;
-use fennel_searcher::AddSearcher as _;
-use fennel_utils::InsertFennelSearcher;
-#[cfg(feature = "mlua-module")]
-use meka_config_macros::loader_paths_from_cargo_manifest;
-#[cfg(not(feature = "mlua-module"))]
-use meka_config_macros::loader_registry_from_cargo_manifest;
-use meka_loader::LoaderRegistry;
-use mlua::{Lua, LuaOptions, StdLib, Table, Value};
 use mlua_module_manifest::{Manifest, Module, ModuleFile, ModuleFileType, ModuleNamedText};
-use mlua_searcher::AddSearcher as _;
-use mlua_utils::{IntoCharArray, IsList};
 use savefile_derive::Savefile;
-use std::borrow::Cow;
 use std::collections::HashMap;
-use std::convert::{From, TryFrom};
 use std::error;
 use std::fmt;
-use std::fs::File;
 use std::io;
-use std::io::Read;
 use std::path::Path;
 use std::result::Result;
 use std::vec::Vec;
+
+#[cfg(not(feature = "mlua-module"))]
+use fennel_compile::Compile;
+#[cfg(not(feature = "mlua-module"))]
+use fennel_mount::Mount;
+#[cfg(not(feature = "mlua-module"))]
+use fennel_searcher::AddSearcher as _;
+#[cfg(not(feature = "mlua-module"))]
+use fennel_utils::InsertFennelSearcher;
+#[cfg(not(feature = "mlua-module"))]
+use meka_loader::LoaderRegistry;
+#[cfg(not(feature = "mlua-module"))]
+use mlua::{Lua, LuaOptions, StdLib, Table, Value};
+#[cfg(not(feature = "mlua-module"))]
+use mlua_searcher::AddSearcher as _;
+#[cfg(not(feature = "mlua-module"))]
+use mlua_utils::{IntoCharArray, IsList};
+#[cfg(not(feature = "mlua-module"))]
+use std::borrow::Cow;
+#[cfg(not(feature = "mlua-module"))]
+use std::convert::{From, TryFrom};
+#[cfg(not(feature = "mlua-module"))]
+use std::fs::File;
+#[cfg(not(feature = "mlua-module"))]
+use std::io::Read;
+
+#[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+use savefile::SavefileError;
 
 pub mod prelude {
     pub use crate::{Config, ConfigInitError, ConfigInitResult};
 }
 
 #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
-mod evaluator_types;
+pub mod evaluator_types;
 
 #[cfg(host_family = "windows")]
 macro_rules! path_separator {
@@ -45,6 +57,7 @@ macro_rules! path_separator {
 }
 
 /// Fennel macros to aid in writing `manifest.fnl` files.
+#[cfg(not(feature = "mlua-module"))]
 const MEKA_MACROS: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
     path_separator!(),
@@ -56,22 +69,23 @@ const MEKA_MACROS: &str = include_str!(concat!(
 /// Error message for `Iterator::Item.expect()` in `mlua::TablePairs`es - which `mlua`
 /// wraps in `Result` to facilitate lazily converting Lua types to Rust. Presumably this
 /// can only fail if the user requests a Rust type which doesn't implement `FromLua`.
+#[cfg(not(feature = "mlua-module"))]
 const PAIRS_EXPECT: &str = "`mlua::TablePairs::pairs()` unexpectedly failed";
 
 #[derive(Debug, Savefile)]
 pub enum ConfigInitError {
     InvalidConfigModuleFileType,
     InvalidConfigModuleResult {
-        got: &'static str,
+        got: String,
     },
     InvalidConfigModuleResultTableKey {
-        got: &'static str,
+        got: String,
     },
     MalformedConfigModuleResultTableKeyString {
         content: Vec<u8>,
     },
     InvalidConfigModuleResultTableValue {
-        got: &'static str,
+        got: String,
     },
     InvalidConfigModuleResultTableValueUserData,
     InvalidConfigModuleResultUserData,
@@ -87,6 +101,8 @@ pub enum ConfigInitError {
 
     #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
     ConfigEvaluator(String),
+    #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+    Savefile(String),
 }
 
 impl fmt::Display for ConfigInitError {
@@ -100,17 +116,19 @@ impl fmt::Display for ConfigInitError {
             ConfigInitError::InvalidConfigModuleResultTableValueUserData => "Expected config module to return table of Manifest userdata indexed by string, but found unsupported userdata type".to_string(),
             ConfigInitError::InvalidConfigModuleResultUserData => "Expected config module to return Manifest userdata, but found unsupported userdata type".to_string(),
 
-            ConfigInitError::FennelCompileError(msg) => msg,
-            ConfigInitError::FennelMountError(msg) => msg,
-            ConfigInitError::FennelSearcherError(msg) => msg,
-            ConfigInitError::Io(msg) => msg,
-            ConfigInitError::Lua(msg) => msg,
-            ConfigInitError::LuaModuleManifestModuleFileInitError(msg) => msg,
-            ConfigInitError::LuaModuleManifestModuleNamedTextInitError(msg) => msg,
-            ConfigInitError::LuaSearcherError(msg) => msg,
+            ConfigInitError::FennelCompileError(msg) => msg.to_string(),
+            ConfigInitError::FennelMountError(msg) => msg.to_string(),
+            ConfigInitError::FennelSearcherError(msg) => msg.to_string(),
+            ConfigInitError::Io(msg) => msg.to_string(),
+            ConfigInitError::Lua(msg) => msg.to_string(),
+            ConfigInitError::LuaModuleManifestModuleFileInitError(msg) => msg.to_string(),
+            ConfigInitError::LuaModuleManifestModuleNamedTextInitError(msg) => msg.to_string(),
+            ConfigInitError::LuaSearcherError(msg) => msg.to_string(),
 
             #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
-            ConfigInitError::ConfigEvaluator(msg) => msg,
+            ConfigInitError::ConfigEvaluator(msg) => msg.to_string(),
+            #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+            ConfigInitError::Savefile(msg) => msg.to_string(),
         };
         write!(f, "{}", res)
     }
@@ -164,6 +182,13 @@ impl From<mlua_searcher::Error> for ConfigInitError {
     }
 }
 
+#[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+impl From<SavefileError> for ConfigInitError {
+    fn from(error: SavefileError) -> Self {
+        ConfigInitError::Savefile(error.to_string())
+    }
+}
+
 impl error::Error for ConfigInitError {}
 
 pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
@@ -172,6 +197,21 @@ pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
 pub struct Config(pub HashMap<String, Manifest>);
 
 impl Config {
+    #[cfg(feature = "mlua-module")]
+    pub fn from_path<P>(
+        path: P,
+        additional_loader_paths: Option<Vec<(String, String)>>,
+    ) -> ConfigInitResult<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let path: &Path = path.as_ref();
+        let module = ModuleFile::new(path, None)?;
+        let module = Module::File(module);
+        Config::new(module, additional_loader_paths)
+    }
+
+    #[cfg(not(feature = "mlua-module"))]
     pub fn from_path<P>(path: P, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self>
     where
         P: AsRef<Path>,
@@ -182,6 +222,21 @@ impl Config {
         Config::new(module, lreg)
     }
 
+    #[cfg(feature = "mlua-module")]
+    pub fn from_str<S>(
+        s: S,
+        file_type: ModuleFileType,
+        additional_loader_paths: Option<Vec<(String, String)>>,
+    ) -> ConfigInitResult<Self>
+    where
+        S: AsRef<str>,
+    {
+        let module = ModuleNamedText::new("manifest", s.as_ref(), file_type)?;
+        let module = Module::NamedText(module);
+        Config::new(module, additional_loader_paths)
+    }
+
+    #[cfg(not(feature = "mlua-module"))]
     pub fn from_str<S>(
         s: S,
         file_type: ModuleFileType,
@@ -202,11 +257,15 @@ impl Config {
     ) -> ConfigInitResult<Self> {
         use crate::evaluator_types::ConfigEvaluatorInput;
         use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
+        use std::io::Write;
+        use std::path::Path;
+        use std::process::{Command, Stdio};
 
         const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
 
         // Get loader paths from downstream crate's Cargo manifest.
-        let mut loader_paths: Vec<(String, String)> = loader_paths_from_cargo_manifest!();
+        let mut loader_paths: Vec<(String, String)> =
+            meka_config_macros::loader_paths_from_cargo_manifest!();
 
         // Merge with any additional loader paths provided.
         if let Some(additional_loader_paths) = additional_loader_paths {
@@ -319,7 +378,7 @@ impl Config {
         match value {
             Value::Table(table) => {
                 if table.is_list() {
-                    let got = "list";
+                    let got = "list".to_string();
                     return Err(ConfigInitError::InvalidConfigModuleResult { got });
                 }
                 for pairs in table.pairs::<Value, Value>() {
@@ -336,7 +395,7 @@ impl Config {
                                             map.insert(key.to_string(), manifest);
                                         }
                                         value => {
-                                            let got = mlua_utils::typename(&value);
+                                            let got = mlua_utils::typename(&value).to_string();
                                             return Err(ConfigInitError::InvalidConfigModuleResultTableValue { got });
                                         }
                                     }
@@ -350,7 +409,7 @@ impl Config {
 
                         // Found unsupported key.
                         (key, _) => {
-                            let got = mlua_utils::typename(&key);
+                            let got = mlua_utils::typename(&key).to_string();
                             return Err(ConfigInitError::InvalidConfigModuleResultTableKey { got });
                         }
                     }
@@ -363,7 +422,7 @@ impl Config {
                 map.insert("".to_string(), manifest);
             }
             value => {
-                let got = mlua_utils::typename(&value);
+                let got = mlua_utils::typename(&value).to_string();
                 return Err(ConfigInitError::InvalidConfigModuleResult { got });
             }
         }
@@ -373,6 +432,7 @@ impl Config {
 
     /// Modify `package.path` and `package.cpath` to prevent loading Lua and C modules from
     /// system paths.
+    #[cfg(not(feature = "mlua-module"))]
     fn modify_paths(lua: &Lua) -> ConfigInitResult<()> {
         let globals: Table = lua.globals();
 
@@ -399,6 +459,7 @@ impl Config {
         Ok(())
     }
 
+    #[cfg(not(feature = "mlua-module"))]
     fn setup_standard_library(lua: &Lua) -> ConfigInitResult<()> {
         let mut searcher = LoaderRegistry::with_capacity(2);
 
@@ -416,8 +477,10 @@ impl Config {
         Ok(())
     }
 
+    #[cfg(not(feature = "mlua-module"))]
     fn setup_user_library(lua: &Lua, lreg: Option<LoaderRegistry>) -> ConfigInitResult<()> {
-        let mut loader_registry: LoaderRegistry = loader_registry_from_cargo_manifest!();
+        let mut loader_registry: LoaderRegistry =
+            meka_config_macros::loader_registry_from_cargo_manifest!();
         match lreg {
             Some(lreg) if !lreg.is_empty() => loader_registry.extend(lreg),
             _ => {}
@@ -426,6 +489,7 @@ impl Config {
         Ok(())
     }
 
+    #[cfg(not(feature = "mlua-module"))]
     fn get_config_module_as_lua_string(lua: &Lua, module: Module) -> ConfigInitResult<String> {
         // Read config module to string.
         let config_str = Self::read_config_module(module.clone())?;
@@ -456,6 +520,7 @@ impl Config {
         Ok(config_str)
     }
 
+    #[cfg(not(feature = "mlua-module"))]
     fn read_config_module(module: Module) -> ConfigInitResult<String> {
         let text: String = match module {
             Module::File(module_file) => Self::read_config_module_from_path(&module_file.path)?,
@@ -467,6 +532,7 @@ impl Config {
         Ok(text)
     }
 
+    #[cfg(not(feature = "mlua-module"))]
     fn read_config_module_from_path(path: &Path) -> ConfigInitResult<String> {
         let mut config_str = String::new();
         let mut file = File::open(path)?;

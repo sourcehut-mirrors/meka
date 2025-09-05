@@ -1,13 +1,25 @@
 ///! Enforce one version of Fennel be chosen via Cargo feature, and enforce only one of
 ///! mlua-external, mlua-module or mlua-vendored be chosen via Cargo feature.
 
-// Workaround for cross-platform `include_str!` usage.
+// Workaround for cross-platform `include!` usage.
 //
 // Credit: https://github.com/rust-lang/rust/issues/75075#issuecomment-671370162
 #[cfg(windows)]
 const HOST_FAMILY: &str = "windows";
+#[cfg(all(windows, feature = "mlua-module"))]
+macro_rules! path_separator {
+    () => {
+        r"\"
+    };
+}
 #[cfg(unix)]
 const HOST_FAMILY: &str = "unix";
+#[cfg(all(unix, feature = "mlua-module"))]
+macro_rules! path_separator {
+    () => {
+        r"/"
+    };
+}
 
 #[allow(dead_code)]
 const MISSING_CARGO_MANIFEST_FEATURE_FENNEL: &str =
@@ -83,6 +95,8 @@ fn main() {
             .expect(CARGO_BUILD_EXPECT);
     }
 
+    #[cfg(any(windows, unix))]
+    println!("cargo::rustc-check-cfg=cfg(host_family, values(\"windows\", \"unix\"))");
     #[cfg(any(windows, unix))]
     println!("cargo:rust-cfg=host_family={}", HOST_FAMILY);
 }
