@@ -28,10 +28,8 @@ fn test_simple_lua_config() {
     )
     .expect("Failed to create module");
     let module = Module::NamedText(module);
-
     let config = Config::new(module, None);
     assert!(config.is_ok(), "Failed to create config: {:?}", config);
-
     let config = config.unwrap();
     assert_eq!(config.0.len(), 1);
     assert!(config.0.contains_key(""));
@@ -48,10 +46,8 @@ fn test_simple_fennel_config() {
     let module = ModuleNamedText::new("config", module, ModuleFileType::Fennel)
         .expect("Failed to create module");
     let module = Module::NamedText(module);
-
     let config = Config::new(module, None);
     assert!(config.is_ok(), "Failed to create config: {:?}", config);
-
     let config = config.unwrap();
     assert_eq!(config.0.len(), 1);
     assert!(config.0.contains_key(""));
@@ -69,10 +65,8 @@ return { first = manifest1, second = manifest2 }"#;
     let module = ModuleNamedText::new("config", module, ModuleFileType::Lua)
         .expect("Failed to create module");
     let module = Module::NamedText(module);
-
     let config = Config::new(module, None);
     assert!(config.is_ok(), "Failed to create config: {:?}", config);
-
     let config = config.unwrap();
     assert_eq!(config.0.len(), 2);
     assert!(config.0.contains_key("first"));
@@ -112,4 +106,76 @@ fn test_with_custom_loader_paths() {
 
     let config = Config::new(module, Some(additional_loader_paths));
     assert!(config.is_ok(), "Failed to create config: {:?}", config);
+}
+
+#[test]
+fn test_error_invalid_config_return() {
+    use meka_config::Config;
+    use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
+
+    let module = r#"return "not a manifest or table""#;
+    let module = ModuleNamedText::new("config", module, ModuleFileType::Lua)
+        .expect("Failed to create module");
+    let module = Module::NamedText(module);
+    let config = Config::new(module, None);
+    assert!(config.is_err());
+}
+
+#[test]
+fn test_error_config_returns_list() {
+    use meka_config::Config;
+    use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
+
+    let module = r#"local meka = require("meka")
+local manifest = meka.manifest
+local first = manifest.new({ name = "test1", text = "return 1", type = "lua" })
+local second = manifest.new({ name = "test2", text = "return 2", type = "lua" })
+return {first, second}  -- Array, not table"#;
+    let module = ModuleNamedText::new("config", module, ModuleFileType::Lua)
+        .expect("Failed to create module");
+    let module = Module::NamedText(module);
+    let config = Config::new(module, None);
+    assert!(config.is_err());
+}
+
+#[test]
+fn test_error_fennel_syntax_error() {
+    use meka_config::Config;
+    use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
+
+    let module = r#"(local meka (require :meka ; Missing closing paren"#;
+    let module = ModuleNamedText::new("config", module, ModuleFileType::Fennel)
+        .expect("Failed to create module");
+    let module = Module::NamedText(module);
+    let config = Config::new(module, None);
+    assert!(config.is_err());
+}
+
+#[test]
+fn test_error_runtime_error() {
+    use meka_config::Config;
+    use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
+
+    let module = r#"error("Intentional error")"#;
+    let module = ModuleNamedText::new("config", module, ModuleFileType::Lua)
+        .expect("Failed to create module");
+    let module = Module::NamedText(module);
+    let config = Config::new(module, None);
+    assert!(config.is_err());
+}
+
+#[test]
+fn test_fennel_with_macros() {
+    use meka_config::Config;
+    use mlua_module_manifest::{Module, ModuleFileType, ModuleNamedText};
+
+    let module = r#"(import-macros {: manifest} :meka.macros)
+(manifest "Test manifest with macros" {:name :test :text "return 'macro test'" :type :lua})"#;
+    let module = ModuleNamedText::new("config", module, ModuleFileType::Fennel)
+        .expect("Failed to create module");
+    let module = Module::NamedText(module);
+    let config = Config::new(module, None);
+    assert!(config.is_ok(), "Failed to create config: {:?}", config);
+    let config = config.unwrap();
+    assert_eq!(config.0.len(), 1);
 }
