@@ -22,4 +22,4 @@ fennel153-lua54-vendored = ["fennel-src/fennel153",
 fennel-src = { path = "../fennel-src", default-features = false }
 meka = { path = "../", default-features = false }
 meka-searcher-macros = { path = "../meka-searcher-macros", default-features = false }
-mlua = { workspace = true, default-features = false }
+mlua = { workspace = true }

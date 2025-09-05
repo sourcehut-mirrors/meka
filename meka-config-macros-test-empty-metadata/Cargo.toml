@@ -13,4 +13,4 @@ lua54-vendored = ["meka-config-macros/mlua-lua54",
 
 [dependencies]
 meka-config-macros = { path = "../meka-config-macros", default-features = false }
-mlua = { workspace = true, default-features = false }
+mlua = { workspace = true }

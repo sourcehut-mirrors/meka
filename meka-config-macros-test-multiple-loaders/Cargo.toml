@@ -24,5 +24,5 @@ fennel153-lua54-vendored = ["fennel-src/fennel153",
 [dependencies]
 fennel-src = { path = "../fennel-src", default-features = false }
 meka-config-macros = { path = "../meka-config-macros", default-features = false }
-mlua = { workspace = true, default-features = false }
+mlua = { workspace = true }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
