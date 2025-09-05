@@ -7,8 +7,8 @@ pub mod prelude {
     pub use crate::{
         InputStringError, InputStringResult, IntoCharArray, IsList, TryIntoString,
         extract_non_system_lua_paths, package_config, package_cpath, package_loaded,
-        package_loaded_contains, package_path, pcall_require, pcall_require_into, require,
-        typename,
+        package_loaded_contains, package_path, package_searchers_or_loaders, pcall_require,
+        pcall_require_into, require, typename,
     };
 }
 
@@ -18,6 +18,10 @@ const PATH_CHARS_NTH_EXPECT: &str = "Unexpectedly couldn't get nth char from pre
 
 /// Error message for `mlua::Table::contains_key(1).expect()` - which should always succeed.
 const TABLE_CONTAINS_KEY_1_EXPECT: &str = "`mlua::Table::contains_key(1)` unexpectedly failed";
+
+/// Error message designed for running `table.get(key)` on `mlua::Table` `table` verified to
+/// contain key `key`.
+const TABLE_GET_EXPECT: &str = "Unexpectedly couldn't get key from pre-checked table";
 
 // Error extracting `String` from an `mlua::String` or `mlua::Value`.
 #[derive(Debug)]
@@ -337,6 +341,35 @@ pub fn package_path(lua: &Lua) -> mlua::Result<String> {
         }
     };
     Ok(package_path)
+}
+
+/// Return Lua's `package.searchers` or `package.loaders` as `Table`.
+pub fn package_searchers_or_loaders(lua: &Lua) -> mlua::Result<Table> {
+    let globals: Table = lua.globals();
+    let package: Table = globals.get("package").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_searchers_or_loaders function couldn't get Lua package table"
+                .to_string(),
+        )
+    })?;
+    let package_searchers_or_loaders: Table = if package.contains_key("searchers").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_searchers_or_loaders function couldn't check if package table contains searchers key"
+                .to_string(),
+        )
+    })? {
+        package.get("searchers").expect(TABLE_GET_EXPECT)
+    } else if package.contains_key("loaders").map_err(|_| {
+        mlua::Error::RuntimeError(
+            "mlua-utils package_searchers_or_loaders function couldn't check if package table contains loaders key"
+                .to_string(),
+        )
+    })? {
+        package.get("loaders").expect(TABLE_GET_EXPECT)
+    } else {
+        return Err(mlua::Error::RuntimeError("mlua-utils package_searchers_or_loaders function couldn't find either Lua package.searchers or package.loaders table".to_string()));
+    };
+    Ok(package_searchers_or_loaders)
 }
 
 /// Import a Lua module with `pcall(require, module_name)`.

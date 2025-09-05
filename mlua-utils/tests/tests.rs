@@ -43,6 +43,12 @@ fn package_path_works() {
 }
 
 #[test]
+fn package_searchers_or_loaders_works() {
+    let lua = Lua::new();
+    assert!(mlua_utils::package_searchers_or_loaders(&lua).is_ok());
+}
+
+#[test]
 fn typename_works() {
     let lua = Lua::new();
 
