@@ -309,7 +309,7 @@ impl AddSearcher for Lua {
 
     fn add_cat_searcher_fnl(&self, modules: CatCow) -> Result<()> {
         let globals = self.globals();
-        let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
+        let searchers: Table = mlua_utils::package_searchers_or_loaders(self)?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = CatSearcher::new(modules, registry_key);
         searchers.raw_insert(2, searcher).map_err(|e| e.into())
