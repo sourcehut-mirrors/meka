@@ -1,12 +1,3 @@
-use meka_config_macros::loader_registry_from_cargo_manifest;
-use mlua::{Function, Lua, LuaOptions, ObjectLike, StdLib, Table};
-use mlua_module_manifest::{Manifest, Module, ModuleNamedText};
-use std::borrow::Cow;
-use std::collections::HashMap;
-
-const MANIFEST_MODULES_MODULE_NAMED_TEXT_EXPECT: &str =
-    "fennel-src should return exactly one NamedText module";
-
 pub mod test_loaders {
     use mlua::{Function, Lua, Table, UserData, UserDataMethods};
 
@@ -59,6 +50,15 @@ pub mod test_loaders {
 
 #[test]
 fn test_multiple_loaders() {
+    use meka_config_macros::loader_registry_from_cargo_manifest;
+    use mlua::{Function, Lua, LuaOptions, ObjectLike, StdLib, Table};
+    use mlua_module_manifest::{Manifest, Module, ModuleNamedText};
+    use std::borrow::Cow;
+    use std::collections::HashMap;
+
+    const MANIFEST_MODULES_MODULE_NAMED_TEXT_EXPECT: &str =
+        "fennel-src should return exactly one NamedText module";
+
     let loader_registry: HashMap<
         Cow<'static, str>,
         fn(&Lua, Table, &str) -> mlua::Result<Function>,
