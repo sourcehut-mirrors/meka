@@ -1,9 +1,12 @@
 use mlua_module_manifest::NamedTextManifestInitError;
-use savefile::SavefileError;
 use savefile_derive::Savefile;
 use std::convert::From;
 use std::error;
 use std::fmt;
+
+#[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
+use savefile::SavefileError;
+#[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
 use std::io;
 
 #[derive(Debug, Savefile)]
@@ -13,10 +16,11 @@ pub enum CompiledNamedTextManifestInitError {
     FennelMountError(String),
     FennelSearcherError(String),
 
-    // These aren't possible to conditionalize via `#[cfg(feature = "mlua-module")]`: doing
-    // so breaks serialization.
+    #[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
     MekaModuleManifestCompiler(String),
+    #[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
     Io(String),
+    #[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
     Savefile(String),
 }
 
@@ -28,8 +32,11 @@ impl fmt::Display for CompiledNamedTextManifestInitError {
             CompiledNamedTextManifestInitError::FennelMountError(msg) => msg,
             CompiledNamedTextManifestInitError::FennelSearcherError(msg) => msg,
 
+            #[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
             CompiledNamedTextManifestInitError::MekaModuleManifestCompiler(msg) => msg,
+            #[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
             CompiledNamedTextManifestInitError::Io(msg) => msg,
+            #[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
             CompiledNamedTextManifestInitError::Savefile(msg) => msg,
         };
         write!(f, "{}", res)
@@ -60,12 +67,14 @@ impl From<fennel_searcher::Error> for CompiledNamedTextManifestInitError {
     }
 }
 
+#[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
 impl From<io::Error> for CompiledNamedTextManifestInitError {
     fn from(error: io::Error) -> Self {
         CompiledNamedTextManifestInitError::Io(error.to_string())
     }
 }
 
+#[cfg(any(feature = "mlua-module", feature = "meka-module-manifest-compiler"))]
 impl From<SavefileError> for CompiledNamedTextManifestInitError {
     fn from(error: SavefileError) -> Self {
         CompiledNamedTextManifestInitError::Savefile(error.to_string())

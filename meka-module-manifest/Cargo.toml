@@ -10,6 +10,8 @@ description = "Compiled Lua-only text version of ~ioiojo/mlua-module-manifest"
 default = ["fennel153"]
 fennel100 = ["fennel-mount/fennel100"]
 fennel153 = ["fennel-mount/fennel153"]
+# core implementation feature for use by meka-module-manifest-compiler - not intended for direct use
+meka-module-manifest-compiler = []
 mlua-external = ["dep:mlua", "fennel-compile/mlua-external", "fennel-mount/mlua-external", "fennel-searcher/mlua-external", "mlua-module-manifest/mlua-external"]
 mlua-lua54 = ["fennel-compile/mlua-lua54", "fennel-mount/mlua-lua54", "fennel-searcher/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54"]
 mlua-lua53 = ["fennel-compile/mlua-lua53", "fennel-mount/mlua-lua53", "fennel-searcher/mlua-lua53", "mlua/lua53", "mlua-module-manifest/mlua-lua53"]

@@ -7,7 +7,7 @@
 // Credit: https://github.com/rust-lang/rust/issues/75075#issuecomment-671370162
 #[cfg(windows)]
 const HOST_FAMILY: &str = "windows";
-#[cfg(windows)]
+#[cfg(all(windows, feature = "mlua-module"))]
 macro_rules! path_separator {
     () => {
         r"\"
@@ -15,7 +15,7 @@ macro_rules! path_separator {
 }
 #[cfg(unix)]
 const HOST_FAMILY: &str = "unix";
-#[cfg(unix)]
+#[cfg(all(unix, feature = "mlua-module"))]
 macro_rules! path_separator {
     () => {
         r"/"

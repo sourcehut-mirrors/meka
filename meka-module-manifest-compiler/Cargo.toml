@@ -24,6 +24,6 @@ mlua-luau-vector4 = ["meka-module-manifest/mlua-luau-vector4", "mlua-module-mani
 mlua-vendored = ["meka-module-manifest/mlua-vendored", "mlua-module-manifest/mlua-vendored"]
 
 [dependencies]
-meka-module-manifest = { path = "../meka-module-manifest", default-features = false }
+meka-module-manifest = { path = "../meka-module-manifest", default-features = false, features = ["meka-module-manifest-compiler"] }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
 savefile = { workspace = true }
