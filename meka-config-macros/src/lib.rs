@@ -182,7 +182,6 @@ fn validate_loader_path(name: &str, loader_path: &str) -> Result<(), LoaderRegis
     Ok(())
 }
 
-// New macro for mlua-module mode - returns paths as strings
 #[proc_macro]
 pub fn loader_paths_from_cargo_manifest(_input: TokenStream) -> TokenStream {
     match get_loaders_from_cargo_toml() {
