@@ -62,7 +62,7 @@ pub fn loader_registry_from_cargo_manifest(_input: TokenStream) -> TokenStream {
 fn generate_empty_loader_registry() -> TokenStream {
     let expanded = quote! {
         ::std::collections::HashMap::<
-            ::std::borrow::Cow<'static, str>,
+            ::std::borrow::Cow<'static, ::std::primitive::str>,
             fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function>
         >::new()
     };
