@@ -28,3 +28,7 @@ fennel-src = { path = "../fennel-src", default-features = false }
 meka-loader = { path = "../meka-loader", default-features = false }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false }
 phf = { workspace = true }
+
+[dev-dependencies]
+mlua = { workspace = true, features = ["lua54", "vendored"] }
+mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

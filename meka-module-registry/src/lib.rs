@@ -6,10 +6,8 @@
 //! string data.
 
 use meka_loader::{LoaderFn, LoaderRegistry};
-use mlua_module_manifest::Manifest;
 use phf::phf_map;
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::result::Result;
 use std::string::String;
 use std::vec::Vec;
@@ -34,7 +32,7 @@ static LOADERS: phf::Map<&'static str, LoaderFn> = phf_map! {
 /// * `Err(Vec<String>)` - List of unknown function paths which couldn't be resolved
 ///
 /// # Example
-/// ```no_run
+/// ```rust-ignore
 /// let paths = vec![
 ///     ("fnl".to_string(), "fennel_src::loader".to_string()),
 ///     ("meka".to_string(), "meka::loader".to_string()),
