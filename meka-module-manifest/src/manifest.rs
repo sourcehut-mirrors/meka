@@ -89,6 +89,10 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
             let features: &str = include!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 path_separator!(),
+                "..",
+                path_separator!(),
+                "meka-utils",
+                path_separator!(),
                 "src",
                 path_separator!(),
                 "include",

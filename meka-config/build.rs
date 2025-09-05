@@ -34,16 +34,54 @@ fn main() {
     #[cfg(all(feature = "mlua-module", feature = "mlua-vendored"))]
     panic!("{}", CONFLICTING_CARGO_MANIFEST_FEATURE_MLUA);
 
-    // Luau purposefully lacks support for loading Lua C modules.
-    #[cfg(all(
-        feature = "mlua-module",
-        any(
+    #[cfg(feature = "mlua-module")]
+    {
+        use std::path::Path;
+        use std::process::Command;
+
+        const CARGO_MANIFEST_DIR_PARENT_EXPECT: &str = "Failed to find Cargo workspace root";
+        const CARGO_BUILD_EXPECT: &str = "Failed to build meka-config-evaluator";
+
+        // Luau purposefully lacks support for loading Lua C modules.
+        #[cfg(any(
             feature = "mlua-luau",
             feature = "mlua-luau-jit",
             feature = "mlua-luau-vector4"
-        )
-    ))]
-    panic!("{}", LUAU_MODULE_MODE_REQUESTED);
+        ))]
+        panic!("{}", LUAU_MODULE_MODE_REQUESTED);
+
+        println!("cargo:rerun-if-changed=../meka-config-evaluator/");
+        println!("cargo:rerun-if-changed=../meka-utils/src/include/features.rs");
+
+        let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
+
+        // Compile meka-config-evaluator with Lua matching active feature selection.
+        let features: &str = include!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            path_separator!(),
+            "..",
+            path_separator!(),
+            "meka-utils",
+            path_separator!(),
+            "src",
+            path_separator!(),
+            "include",
+            path_separator!(),
+            "features.rs"
+        ));
+
+        Command::new("cargo")
+            .arg("build")
+            .arg("--release")
+            .arg("--quiet")
+            .args(["--package", "meka-config-evaluator"])
+            .args(["--features", features])
+            .current_dir(workspace_root)
+            .spawn()
+            .expect(CARGO_BUILD_EXPECT);
+    }
 
     #[cfg(any(windows, unix))]
     println!("cargo:rust-cfg=host_family={}", HOST_FAMILY);

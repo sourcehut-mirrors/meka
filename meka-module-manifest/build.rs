@@ -64,16 +64,19 @@ fn main() {
         panic!("{}", LUAU_MODULE_MODE_REQUESTED);
 
         println!("cargo:rerun-if-changed=../meka-module-manifest-compiler/");
-        println!("cargo:rerun-if-changed=src/include/features.rs");
+        println!("cargo:rerun-if-changed=../meka-utils/src/include/features.rs");
 
-        let cargo_manifest_dir = env!("CARGO_MANIFEST_DIR");
-        let workspace_root = Path::new(&cargo_manifest_dir)
+        let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .expect(CARGO_MANIFEST_DIR_PARENT_EXPECT);
 
         // Compile meka-module-manifest-compiler with Lua matching active feature selection.
         let features: &str = include!(concat!(
             env!("CARGO_MANIFEST_DIR"),
+            path_separator!(),
+            "..",
+            path_separator!(),
+            "meka-utils",
             path_separator!(),
             "src",
             path_separator!(),
