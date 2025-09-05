@@ -8,23 +8,24 @@ description = "Require Lua modules by name"
 
 [features]
 default = []
-mlua-external = []
-mlua-lua54 = ["mlua/lua54"]
-mlua-lua53 = ["mlua/lua53"]
-mlua-lua52 = ["mlua/lua52"]
-mlua-lua51 = ["mlua/lua51"]
-mlua-luajit = ["mlua/luajit"]
-mlua-luajit52 = ["mlua/luajit52"]
-mlua-luau = ["mlua/luau"]
-mlua-luau-jit = ["mlua/luau-jit"]
-mlua-luau-vector4 = ["mlua/luau-vector4"]
-mlua-module = ["mlua/module"]
-mlua-vendored = ["mlua/vendored"]
+mlua-external = ["mlua-utils/mlua-external"]
+mlua-lua54 = ["mlua/lua54", "mlua-utils/mlua-lua54"]
+mlua-lua53 = ["mlua/lua53", "mlua-utils/mlua-lua53"]
+mlua-lua52 = ["mlua/lua52", "mlua-utils/mlua-lua52"]
+mlua-lua51 = ["mlua/lua51", "mlua-utils/mlua-lua51"]
+mlua-luajit = ["mlua/luajit", "mlua-utils/mlua-luajit"]
+mlua-luajit52 = ["mlua/luajit52", "mlua-utils/mlua-luajit52"]
+mlua-luau = ["mlua/luau", "mlua-utils/mlua-luau"]
+mlua-luau-jit = ["mlua/luau-jit", "mlua-utils/mlua-luau-jit"]
+mlua-luau-vector4 = ["mlua/luau-vector4", "mlua-utils/mlua-luau-vector4"]
+mlua-module = ["mlua/module", "mlua-utils/mlua-module"]
+mlua-vendored = ["mlua/vendored", "mlua-utils/mlua-vendored"]
 
 [dependencies]
 io-cat = { path = "../io-cat" }
 meka-types = { path = "../meka-types" }
 mlua = { workspace = true }
+mlua-utils = { path = "../mlua-utils", default-features = false }
 
 [dev-dependencies]
 mlua = { workspace = true, features = ["lua54", "vendored"] }

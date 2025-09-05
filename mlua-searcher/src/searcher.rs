@@ -303,7 +303,7 @@ pub trait AddSearcher {
 impl AddSearcher for Lua {
     fn add_searcher(&self, modules: HashMap<Cow<'static, str>, Cow<'static, str>>) -> Result<()> {
         let globals = self.globals();
-        let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
+        let searchers: Table = mlua_utils::package_searchers_or_loaders(self)?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = Searcher::new(modules, registry_key);
         searchers.raw_insert(2, searcher).map_err(|e| e.into())
@@ -335,7 +335,7 @@ impl AddSearcher for Lua {
         P: 'static + AsRef<Path> + Send,
     {
         let globals = self.globals();
-        let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
+        let searchers: Table = mlua_utils::package_searchers_or_loaders(self)?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = PathSearcherPoly::new(modules, registry_key, transform);
         searchers.raw_insert(2, searcher).map_err(|e| e.into())
@@ -349,7 +349,7 @@ impl AddSearcher for Lua {
         >,
     ) -> Result<()> {
         let globals = self.globals();
-        let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
+        let searchers: Table = mlua_utils::package_searchers_or_loaders(self)?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = ClosureSearcher::new(modules, registry_key);
         searchers.raw_insert(2, searcher).map_err(|e| e.into())
@@ -360,7 +360,7 @@ impl AddSearcher for Lua {
         modules: HashMap<Cow<'static, str>, fn(&Lua, Table, &str) -> mlua::Result<Function>>,
     ) -> Result<()> {
         let globals = self.globals();
-        let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
+        let searchers: Table = mlua_utils::package_searchers_or_loaders(self)?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = FunctionSearcher::new(modules, registry_key);
         searchers.raw_insert(2, searcher).map_err(|e| e.into())
@@ -368,7 +368,7 @@ impl AddSearcher for Lua {
 
     fn add_cat_searcher(&self, modules: CatCow) -> Result<()> {
         let globals = self.globals();
-        let searchers: Table = globals.get::<Table>("package")?.get("searchers")?;
+        let searchers: Table = mlua_utils::package_searchers_or_loaders(self)?;
         let registry_key = self.create_registry_value(globals)?;
         let searcher = CatSearcher::new(modules, registry_key);
         searchers.raw_insert(2, searcher).map_err(|e| e.into())
