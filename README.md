@@ -4,7 +4,7 @@ Embed Lua and compile-to-Lua language modules in Rust.
 
 ## Synopsis
 
-Assume we have the following directory structure, where `.` is a simple Rust library crate containing subdirectory `taon`. Inside `taon` are Fennel modules to embed:
+Assume we have the following directory structure, where `.` is a simple Rust library crate containing subdirectory `taon`. Inside `taon` are [Fennel] modules to embed:
 
 ```bash
 $ tree
@@ -179,6 +179,25 @@ fn main() {
 }
 ```
 
+## Cargo features
+
+- fennel100 - Embed v1.0.0 release of Fennel where appropriate.
+- fennel153 - **Enabled** by default. Embed v1.5.3 release of Fennel where appropriate.
+- mlua-external - Indicate Lua includes and libraries are to be found externally via `pkg-config` rather than vendoring them.
+- mlua-lua54 - Enable Lua [5.4] support.
+- mlua-lua53 - Enable Lua [5.3] support.
+- mlua-lua52 - Enable Lua [5.2] support.
+- mlua-lua51 - Enable Lua [5.1] support.
+- mlua-luajit - Enable [LuaJIT] support.
+- mlua-luajit52 - Enable [LuaJIT] support with partial compatibility with Lua 5.2.
+- mlua-luau - Enable [Luau] support (auto vendored mode).
+- mlua-luau-jit - Enable [Luau] support with JIT backend.
+- mlua-luau-vector4 - Enable [Luau] support with 4-dimensional vector.
+- mlua-module - Enable module mode (building loadable `cdylib` library for Lua).
+- mlua-vendored - Build static Lua(JIT) libraries from sources during `mlua` compilation using [lua-src] or [luajit-src].
+- preload - Only relevant if building with mlua-module feature active. Indicate environment variable `LD_PRELOAD` or `DYLD_INSERT_LIBRARIES` has been set to preclude need for launching subprocesses in mlua-module mode and to allow more efficient code generation in mlua-module mode when registry feature is active.
+- registry - **Enabled** by default. Map strings to function pointers for more efficient code generation in most cases.
+
 ## Other topics
 
 ### Embedding Fennel Macro modules
@@ -240,3 +259,14 @@ at your option.
 ## Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+
+
+[Fennel]: https://fennel-lang.org/
+[5.4]: https://www.lua.org/manual/5.4/manual.html
+[5.3]: https://www.lua.org/manual/5.3/manual.html
+[5.2]: https://www.lua.org/manual/5.2/manual.html
+[5.1]: https://www.lua.org/manual/5.1/manual.html
+[LuaJIT]: https://luajit.org/
+[Luau]: https://github.com/luau-lang/luau
+[lua-src]: https://github.com/mlua-rs/lua-src-rs
+[luajit-src]: https://github.com/mlua-rs/luajit-src-rs
