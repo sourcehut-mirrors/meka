@@ -5,3 +5,6 @@ edition = { workspace = true }
 homepage = "https://git.sr.ht/~ioiojo/meka/tree/master/item/meka-utils"
 readme = "README.md"
 description = "Utility functions for Meka"
+
+[dependencies]
+syn = { workspace = true }

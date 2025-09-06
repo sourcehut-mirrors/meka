@@ -10,24 +10,28 @@ description = "Proc macros for Meka searcher instantiation"
 proc-macro = true
 
 [features]
-default = ["fennel153"]
-fennel100 = ["meka-core/fennel100"]
-fennel153 = ["meka-core/fennel153"]
-mlua-external = ["meka-core/mlua-external"]
-mlua-lua54 = ["meka-core/mlua-lua54"]
-mlua-lua53 = ["meka-core/mlua-lua53"]
-mlua-lua52 = ["meka-core/mlua-lua52"]
-mlua-lua51 = ["meka-core/mlua-lua51"]
-mlua-luajit = ["meka-core/mlua-luajit"]
-mlua-luajit52 = ["meka-core/mlua-luajit52"]
-mlua-luau = ["meka-core/mlua-luau"]
-mlua-luau-jit = ["meka-core/mlua-luau-jit"]
-mlua-luau-vector4 = ["meka-core/mlua-luau-vector4"]
-mlua-module = ["meka-core/mlua-module"]
-mlua-vendored = ["meka-core/mlua-vendored"]
+default = ["fennel153", "registry"]
+fennel100 = ["meka-core/fennel100", "meka-module-registry/fennel100"]
+fennel153 = ["meka-core/fennel153", "meka-module-registry/fennel153"]
+mlua-external = ["meka-core/mlua-external", "meka-module-registry/mlua-external"]
+mlua-lua54 = ["meka-core/mlua-lua54", "meka-module-registry/mlua-lua54"]
+mlua-lua53 = ["meka-core/mlua-lua53", "meka-module-registry/mlua-lua53"]
+mlua-lua52 = ["meka-core/mlua-lua52", "meka-module-registry/mlua-lua52"]
+mlua-lua51 = ["meka-core/mlua-lua51", "meka-module-registry/mlua-lua51"]
+mlua-luajit = ["meka-core/mlua-luajit", "meka-module-registry/mlua-luajit"]
+mlua-luajit52 = ["meka-core/mlua-luajit52", "meka-module-registry/mlua-luajit52"]
+mlua-luau = ["meka-core/mlua-luau", "meka-module-registry/mlua-luau"]
+mlua-luau-jit = ["meka-core/mlua-luau-jit", "meka-module-registry/mlua-luau-jit"]
+mlua-luau-vector4 = ["meka-core/mlua-luau-vector4", "meka-module-registry/mlua-luau-vector4"]
+mlua-module = ["meka-core/mlua-module", "meka-module-registry/mlua-module"]
+mlua-vendored = ["meka-core/mlua-vendored", "meka-module-registry/mlua-vendored"]
+# generate more efficient code when passing inline map to proc macros (recommended)
+# only disable if importing unregistered manifest-loader functions in meka manifest
+registry = ["dep:meka-module-registry"]
 
 [dependencies]
 meka-core = { path = "../meka-core", default-features = false }
+meka-module-registry = { path = "../meka-module-registry", default-features = false, optional = true }
 meka-utils = { path = "../meka-utils" }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }

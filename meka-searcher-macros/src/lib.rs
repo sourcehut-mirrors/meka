@@ -116,6 +116,69 @@ impl MekaSearcherInput {
     /// Returns `proc_macro2::TokenStream` for testability.
     fn expand(self, embed: bool) -> syn::Result<proc_macro2::TokenStream> {
         let tokens = match (self.key, self.map) {
+            #[cfg(all(not(feature = "mlua-module"), feature = "registry"))]
+            (Some(key), Some(map)) => {
+                // Both key and map present with registry feature
+                let config = config_new_with_map(map);
+                let (_, path_str, _) = selected_path();
+                let key = key.value();
+                let key: &str = key.as_ref();
+                let searcher = if embed {
+                    let manifest = if let Some(manifest) = config.get(key) {
+                        CompiledNamedTextManifest::try_from((*manifest).clone()).expect(
+                            "Sorry, couldn't convert Manifest into CompiledNamedTextManifest",
+                        )
+                    } else {
+                        panic!(
+                            "Sorry, couldn't find key {} in Meka manifest at {}",
+                            key, path_str
+                        );
+                    };
+                    MekaSearcher::from(manifest)
+                } else {
+                    let manifest = if let Some(manifest) = config.get(key) {
+                        (*manifest).clone()
+                    } else {
+                        panic!(
+                            "Sorry, couldn't find key {} in Meka manifest at {}",
+                            key, path_str
+                        );
+                    };
+                    MekaSearcher::from(manifest)
+                };
+                quote! { #searcher }
+            }
+            #[cfg(all(not(feature = "mlua-module"), not(feature = "registry")))]
+            (Some(key), Some(map)) => {
+                // Both key and map present
+                let tokens = config_new_with_map(map);
+                let (_, path_str, _) = selected_path();
+                if embed {
+                    quote! {{
+                        #tokens
+                        let key: &str = #key.as_ref();
+                        let manifest = if let Some(manifest) = config.get(key) {
+                            ::meka::CompiledNamedTextManifest::try_from((*manifest).clone())
+                                .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                        } else {
+                            panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
+                        };
+                        ::meka::MekaSearcher::from(manifest)
+                    }}
+                } else {
+                    quote! {{
+                        #tokens
+                        let key: &str = #key.as_ref();
+                        let manifest = if let Some(manifest) = config.get(key) {
+                            (*manifest).clone()
+                        } else {
+                            panic!("Sorry, couldn't find key {} in Meka manifest at {}", key, #path_str);
+                        };
+                        ::meka::MekaSearcher::from(manifest)
+                    }}
+                }
+            }
+            #[cfg(feature = "mlua-module")]
             (Some(key), Some(map)) => {
                 // Both key and map present
                 let tokens = config_new_with_map(map);
@@ -176,6 +239,59 @@ impl MekaSearcherInput {
                 };
                 quote! { #searcher }
             }
+            #[cfg(all(not(feature = "mlua-module"), feature = "registry"))]
+            (None, Some(map)) => {
+                // Only map present with registry feature
+                let config = config_new_with_map(map);
+                let (_, path_str, _) = selected_path();
+                let searcher = if embed {
+                    let manifest = if let Some(manifest) = config.get("") {
+                        CompiledNamedTextManifest::try_from((*manifest).clone()).expect(
+                            "Sorry, couldn't convert Manifest into CompiledNamedTextManifest",
+                        )
+                    } else {
+                        panic!("Sorry, couldn't find Meka manifest at {}", path_str);
+                    };
+                    MekaSearcher::from(manifest)
+                } else {
+                    let manifest = if let Some(manifest) = config.get("") {
+                        (*manifest).clone()
+                    } else {
+                        panic!("Sorry, couldn't find Meka manifest at {}", path_str);
+                    };
+                    MekaSearcher::from(manifest)
+                };
+                quote! { #searcher }
+            }
+            #[cfg(all(not(feature = "mlua-module"), not(feature = "registry")))]
+            (None, Some(map)) => {
+                // Only map present
+                let tokens = config_new_with_map(map);
+                let (_, path_str, _) = selected_path();
+                if embed {
+                    quote! {{
+                        #tokens
+                        let manifest = if let Some(manifest) = config.get("") {
+                            ::meka::CompiledNamedTextManifest::try_from((*manifest).clone())
+                                .expect("Sorry, couldn't convert Manifest into CompiledNamedTextManifest")
+                        } else {
+                            panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
+                        };
+                        ::meka::MekaSearcher::from(manifest)
+                    }}
+                } else {
+                    quote! {{
+                        #tokens
+                        let manifest = if let Some(manifest) = config.get("") {
+                            (*manifest).clone()
+                        } else {
+                            panic!("Sorry, couldn't find Meka manifest at {}", #path_str);
+                        };
+                        ::meka::MekaSearcher::from(manifest)
+                    }}
+                }
+            }
+            #[cfg(feature = "mlua-module")]
             (None, Some(map)) => {
                 // Only map present
                 let tokens = config_new_with_map(map);
@@ -232,50 +348,63 @@ impl MekaSearcherInput {
     }
 }
 
+#[cfg(feature = "mlua-module")]
+fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
+    let module = module_from_path();
+
+    // Generate string paths for module mode.
+    let string_paths = map.iter().map(|(key, value)| {
+        quote! { (#key.to_string(), stringify!(#value).to_string()) }
+    });
+
+    quote! {
+        let additional_paths = vec![#(#string_paths),*];
+        let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(additional_paths))
+            .expect("Sorry, couldn't instantiate Config")
+            .0;
+    }
+}
+
+#[cfg(all(not(feature = "mlua-module"), feature = "registry"))]
+fn config_new_with_map(map: Vec<(LitStr, Path)>) -> HashMap<String, Manifest> {
+    let module = module_from_path();
+
+    // Generate string paths for normal mode with registry feature.
+    let additional_paths: Vec<(String, String)> = map
+        .iter()
+        .map(|(key, value)| (key.value(), meka_utils::path_to_string(value)))
+        .collect();
+
+    let loader_registry = match meka_module_registry::build_loader_registry(additional_paths) {
+        Ok(loader_registry) => loader_registry,
+        Err(unknown) => panic!("Unknown loader paths: {:?}", unknown),
+    };
+
+    Config::new(module, Some(loader_registry))
+        .expect("Sorry, couldn't instantiate Config")
+        .0
+}
+
+#[cfg(all(not(feature = "mlua-module"), not(feature = "registry")))]
 fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     let module = module_from_path();
     let map_entries_len = map.len();
 
-    #[cfg(feature = "mlua-module")]
-    {
-        // Generate string paths for module mode.
-        let string_paths = map.iter().map(|(key, value)| {
-            quote! { (#key.to_string(), stringify!(#value).to_string()) }
-        });
-
-        quote! {
-            let additional_paths = vec![#(#string_paths),*];
-            let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(additional_paths))
-                .expect("Sorry, couldn't instantiate Config")
-                .0;
-            config
-        }
-    }
-
-    #[cfg(not(feature = "mlua-module"))]
-    {
-        // Generate function pointer registry for normal mode.
-        let map_entries = map_entries(map);
-
-        quote! {
-            let mut loader_registry = ::meka::LoaderRegistry::with_capacity(#map_entries_len);
-            #(#map_entries)*
-            let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(loader_registry))
-                .expect("Sorry, couldn't instantiate Config")
-                .0;
-            config
-        }
-    }
-}
-
-fn map_entries(map: Vec<(LitStr, Path)>) -> Vec<proc_macro2::TokenStream> {
-    let map_entries = map.iter().map(|(key, value)| {
+    // Generate function pointer registry for normal mode.
+    let map_entries: Vec<proc_macro2::TokenStream> = map.iter().map(|(key, value)| {
         quote! {
             let _: fn(&::mlua::Lua, ::mlua::Table, &::std::primitive::str) -> ::mlua::Result<::mlua::Function> = #value;
             loader_registry.insert(::std::borrow::Cow::from(#key), #value);
         }
     }).collect();
-    map_entries
+
+    quote! {
+        let mut loader_registry = ::meka::LoaderRegistry::with_capacity(#map_entries_len);
+        #(#map_entries)*
+        let config: ::std::collections::HashMap<::std::string::String, ::meka::Manifest> = ::meka::Config::new(#module, Some(loader_registry))
+            .expect("Sorry, couldn't instantiate Config")
+            .0;
+    }
 }
 
 fn module_from_path() -> Module {

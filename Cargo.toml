@@ -10,7 +10,7 @@ repository = { workspace = true }
 description = "Embed Lua and compile-to-Lua language modules in Rust"
 
 [features]
-default = ["fennel153"]
+default = ["fennel153", "registry"]
 fennel100 = ["meka-core/fennel100", "meka-searcher-macros/fennel100"]
 fennel153 = ["meka-core/fennel153", "meka-searcher-macros/fennel153"]
 mlua-external = ["meka-core/mlua-external", "meka-searcher-macros/mlua-external"]
@@ -25,6 +25,9 @@ mlua-luau-jit = ["meka-core/mlua-luau-jit", "meka-searcher-macros/mlua-luau-jit"
 mlua-luau-vector4 = ["meka-core/mlua-luau-vector4", "meka-searcher-macros/mlua-luau-vector4"]
 mlua-module = ["meka-core/mlua-module", "meka-searcher-macros/mlua-module"]
 mlua-vendored = ["meka-core/mlua-vendored", "meka-searcher-macros/mlua-vendored"]
+# generate more efficient code when passing inline map to proc macros (recommended)
+# only disable if importing unregistered manifest-loader functions in meka manifest
+registry = ["meka-searcher-macros/registry"]
 
 [dependencies]
 meka-core = { path = "./meka-core", default-features = false }

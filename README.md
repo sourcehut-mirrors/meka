@@ -1,4 +1,4 @@
-# meka
+# Meka
 
 Embed Lua and compile-to-Lua language modules in Rust.
 
@@ -138,16 +138,23 @@ fn main() {
     // in the map. Here, calling `fennel-src` inside `manifest.fnl` calls `fennel_src::loader`.
     //
     // Because `fennel_src::loader` is available by default in `manifest.fnl` at `fennel-src`,
-    // passing this map is redundant. However, it can come in handy if you package your own
-    // Fennel/Lua modules as Rust crates in the style of ~ioiojo/meka/fennel-src.
+    // passing this map is redundant. However, other manifest-loader functions can be passed
+    // as well (see: `meka-module-registry`).
     //
-    // Passing the optional map to the `meka_searcher!` macro is not recommended, as it
-    // causes the macro to generate less efficient code than if the manifest-loader functions
-    // were specified in `Cargo.toml` metadata instead:
+    // To use your own manifest-loader function in `manifest.fnl`, either:
     //
-    //      # Specify manifest-loader functions in Cargo.toml (equivalent, recommended)
+    // A) Specify it in `Cargo.toml` rather than passing it as a map to `meka_searcher!`:
+    //
     //      [package.metadata.meka.loaders]
     //      fennel-src = "fennel_src::loader"
+    //
+    // B) Submit a patch to `meka-module-registry` to get it included.
+    //
+    // C) Build Meka with the `registry` feature disabled (`--no-default-features`).
+    //
+    // When the `registry` feature is disabled, passing the optional map to the `meka_searcher!`
+    // macro causes the macro to generate less efficient code than if the manifest-loader
+    // functions were specified in `Cargo.toml` metadata instead.
     #[cfg(not(debug_assertions))]
     let taon = meka_searcher!("taon", {"fennel-src" => fennel_src::loader});
     #[cfg(debug_assertions)]
