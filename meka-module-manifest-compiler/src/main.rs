@@ -1,4 +1,4 @@
-use meka_module_manifest::{CompiledNamedTextManifest, CompiledNamedTextManifestInitError};
+use meka_module_manifest::CompiledNamedTextManifest;
 use mlua_module_manifest::NamedTextManifest;
 use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
 use std::convert::TryFrom;

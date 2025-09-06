@@ -2,7 +2,6 @@ use meka_config::evaluator_types::ConfigEvaluatorInput;
 use meka_config::{Config, ConfigInitError};
 use meka_loader::LoaderRegistry;
 use meka_module_registry::build_loader_registry;
-use mlua_module_manifest::Manifest;
 use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
 use std::io;
 use std::io::{Read, Write};
