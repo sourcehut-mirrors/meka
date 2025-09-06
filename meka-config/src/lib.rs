@@ -8,39 +8,45 @@ use std::path::Path;
 use std::result::Result;
 use std::vec::Vec;
 
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use fennel_compile::Compile;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use fennel_mount::Mount;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use fennel_searcher::AddSearcher as _;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use fennel_utils::InsertFennelSearcher;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use meka_loader::LoaderRegistry;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use mlua::{Lua, LuaOptions, StdLib, Table, Value};
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use mlua_searcher::AddSearcher as _;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use mlua_utils::{IntoCharArray, IsList};
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use std::borrow::Cow;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use std::convert::{From, TryFrom};
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use std::fs::File;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use std::io::Read;
 
-#[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+#[cfg(any(
+    all(feature = "mlua-module", not(feature = "preload")),
+    feature = "meka-config-evaluator"
+))]
 use savefile::SavefileError;
 
 pub mod prelude {
     pub use crate::{Config, ConfigInitError, ConfigInitResult};
 }
 
-#[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+#[cfg(any(
+    all(feature = "mlua-module", not(feature = "preload")),
+    feature = "meka-config-evaluator"
+))]
 pub mod evaluator_types;
 
 #[cfg(host_family = "windows")]
@@ -57,7 +63,7 @@ macro_rules! path_separator {
 }
 
 /// Fennel macros to aid in writing `manifest.fnl` files.
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 const MEKA_MACROS: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
     path_separator!(),
@@ -69,7 +75,7 @@ const MEKA_MACROS: &str = include_str!(concat!(
 /// Error message for `Iterator::Item.expect()` in `mlua::TablePairs`es - which `mlua`
 /// wraps in `Result` to facilitate lazily converting Lua types to Rust. Presumably this
 /// can only fail if the user requests a Rust type which doesn't implement `FromLua`.
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 const PAIRS_EXPECT: &str = "`mlua::TablePairs::pairs()` unexpectedly failed";
 
 #[derive(Debug, Savefile)]
@@ -99,9 +105,15 @@ pub enum ConfigInitError {
     LuaModuleManifestModuleNamedTextInitError(String),
     LuaSearcherError(String),
 
-    #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+    #[cfg(any(
+        all(feature = "mlua-module", not(feature = "preload")),
+        feature = "meka-config-evaluator"
+    ))]
     ConfigEvaluator(String),
-    #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+    #[cfg(any(
+        all(feature = "mlua-module", not(feature = "preload")),
+        feature = "meka-config-evaluator"
+    ))]
     Savefile(String),
 }
 
@@ -125,9 +137,9 @@ impl fmt::Display for ConfigInitError {
             ConfigInitError::LuaModuleManifestModuleNamedTextInitError(msg) => msg.to_string(),
             ConfigInitError::LuaSearcherError(msg) => msg.to_string(),
 
-            #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+            #[cfg(any(all(feature = "mlua-module", not(feature = "preload")), feature = "meka-config-evaluator"))]
             ConfigInitError::ConfigEvaluator(msg) => msg.to_string(),
-            #[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+            #[cfg(any(all(feature = "mlua-module", not(feature = "preload")), feature = "meka-config-evaluator"))]
             ConfigInitError::Savefile(msg) => msg.to_string(),
         };
         write!(f, "{}", res)
@@ -182,7 +194,10 @@ impl From<mlua_searcher::Error> for ConfigInitError {
     }
 }
 
-#[cfg(any(feature = "mlua-module", feature = "meka-config-evaluator"))]
+#[cfg(any(
+    all(feature = "mlua-module", not(feature = "preload")),
+    feature = "meka-config-evaluator"
+))]
 impl From<SavefileError> for ConfigInitError {
     fn from(error: SavefileError) -> Self {
         ConfigInitError::Savefile(error.to_string())
@@ -197,7 +212,7 @@ pub type ConfigInitResult<A> = Result<A, ConfigInitError>;
 pub struct Config(pub HashMap<String, Manifest>);
 
 impl Config {
-    #[cfg(feature = "mlua-module")]
+    #[cfg(all(feature = "mlua-module", not(feature = "preload")))]
     pub fn from_path<P>(
         path: P,
         additional_loader_paths: Option<Vec<(String, String)>>,
@@ -211,7 +226,7 @@ impl Config {
         Config::new(module, additional_loader_paths)
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     pub fn from_path<P>(path: P, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self>
     where
         P: AsRef<Path>,
@@ -222,7 +237,7 @@ impl Config {
         Config::new(module, lreg)
     }
 
-    #[cfg(feature = "mlua-module")]
+    #[cfg(all(feature = "mlua-module", not(feature = "preload")))]
     pub fn from_str<S>(
         s: S,
         file_type: ModuleFileType,
@@ -236,7 +251,7 @@ impl Config {
         Config::new(module, additional_loader_paths)
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     pub fn from_str<S>(
         s: S,
         file_type: ModuleFileType,
@@ -250,7 +265,7 @@ impl Config {
         Config::new(module, lreg)
     }
 
-    #[cfg(feature = "mlua-module")]
+    #[cfg(all(feature = "mlua-module", not(feature = "preload")))]
     pub fn new(
         module: Module,
         additional_loader_paths: Option<Vec<(String, String)>>,
@@ -336,7 +351,7 @@ impl Config {
         result
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     pub fn new(module: Module, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self> {
         let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
 
@@ -432,7 +447,7 @@ impl Config {
 
     /// Modify `package.path` and `package.cpath` to prevent loading Lua and C modules from
     /// system paths.
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn modify_paths(lua: &Lua) -> ConfigInitResult<()> {
         let globals: Table = lua.globals();
 
@@ -459,7 +474,7 @@ impl Config {
         Ok(())
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn setup_standard_library(lua: &Lua) -> ConfigInitResult<()> {
         let mut searcher = LoaderRegistry::with_capacity(2);
 
@@ -477,7 +492,7 @@ impl Config {
         Ok(())
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn setup_user_library(lua: &Lua, lreg: Option<LoaderRegistry>) -> ConfigInitResult<()> {
         let mut loader_registry: LoaderRegistry =
             meka_config_macros::loader_registry_from_cargo_manifest!();
@@ -489,7 +504,7 @@ impl Config {
         Ok(())
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn get_config_module_as_lua_string(lua: &Lua, module: Module) -> ConfigInitResult<String> {
         // Read config module to string.
         let config_str = Self::read_config_module(module.clone())?;
@@ -520,7 +535,7 @@ impl Config {
         Ok(config_str)
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn read_config_module(module: Module) -> ConfigInitResult<String> {
         let text: String = match module {
             Module::File(module_file) => Self::read_config_module_from_path(&module_file.path)?,
@@ -532,7 +547,7 @@ impl Config {
         Ok(text)
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn read_config_module_from_path(path: &Path) -> ConfigInitResult<String> {
         let mut config_str = String::new();
         let mut file = File::open(path)?;

@@ -25,6 +25,18 @@ mlua-luau-jit = ["meka-core/mlua-luau-jit", "meka-searcher-macros/mlua-luau-jit"
 mlua-luau-vector4 = ["meka-core/mlua-luau-vector4", "meka-searcher-macros/mlua-luau-vector4"]
 mlua-module = ["meka-core/mlua-module", "meka-searcher-macros/mlua-module"]
 mlua-vendored = ["meka-core/mlua-vendored", "meka-searcher-macros/mlua-vendored"]
+# indicates environment variable LD_PRELOAD or DYLD_INSERT_LIBRARIES has
+# been set and to not build/run meka-config-evaluator, meka-module-manifest-compiler
+# in mlua-module mode as such
+#
+# precludes need for launching meka-config-evaluator, meka-module-manifest-compiler
+# subprocesses and building meka-module-registry crate
+#
+# enables meka-searcher-macros to generate more efficient code in mlua-module mode
+# when registry feature is active
+#
+# only relevant if building with mlua-module feature active
+preload = ["meka-core/preload", "meka-searcher-macros/preload"]
 # generate more efficient code when passing inline map to proc macros (recommended)
 # only disable if importing unregistered manifest-loader functions in meka manifest
 registry = ["meka-searcher-macros/registry"]

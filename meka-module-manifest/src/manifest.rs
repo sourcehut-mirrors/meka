@@ -7,9 +7,9 @@ use std::fmt::Debug;
 use std::ops::Index;
 use std::vec::Vec;
 
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use mlua_module_manifest::ModuleFileType;
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use optional_collections::PushOrInit;
 
 use crate::error::CompiledNamedTextManifestInitError;
@@ -68,7 +68,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
 
     /// Compile `ModuleFileType::Fennel` strings within `modules` to Lua, and attest to this
     /// having been done in a type-safe way.
-    #[cfg(feature = "mlua-module")]
+    #[cfg(all(feature = "mlua-module", not(feature = "preload")))]
     fn try_from(manifest: NamedTextManifest) -> Result<Self, CompiledNamedTextManifestInitError> {
         use savefile::{CURRENT_SAVEFILE_LIB_VERSION, load_from_mem, save_to_mem};
         use std::io::Write;
@@ -137,7 +137,7 @@ impl TryFrom<NamedTextManifest> for CompiledNamedTextManifest {
         result
     }
 
-    #[cfg(not(feature = "mlua-module"))]
+    #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     fn try_from(
         NamedTextManifest { docstring, modules }: NamedTextManifest,
     ) -> Result<Self, CompiledNamedTextManifestInitError> {
@@ -208,7 +208,7 @@ impl fmt::Display for CompiledNamedTextManifest {
     }
 }
 
-#[cfg(not(feature = "mlua-module"))]
+#[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 fn fennelc(
     text: &str,
     modules_fnl_macros: Option<&Vec<ModuleNamedText>>,

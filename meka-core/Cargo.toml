@@ -22,6 +22,15 @@ mlua-luau-jit = ["meka-config/mlua-luau-jit", "meka-loader/mlua-luau-jit", "meka
 mlua-luau-vector4 = ["meka-config/mlua-luau-vector4", "meka-loader/mlua-luau-vector4", "meka-module-manifest/mlua-luau-vector4", "meka-searcher/mlua-luau-vector4", "mlua-module-manifest/mlua-luau-vector4"]
 mlua-module = ["meka-config/mlua-module", "meka-loader/mlua-module", "meka-module-manifest/mlua-module", "meka-searcher/mlua-module", "mlua-module-manifest/mlua-module"]
 mlua-vendored = ["meka-config/mlua-vendored", "meka-loader/mlua-vendored", "meka-module-manifest/mlua-vendored", "meka-searcher/mlua-vendored", "mlua-module-manifest/mlua-vendored"]
+# indicates environment variable LD_PRELOAD or DYLD_INSERT_LIBRARIES has
+# been set and to not build/run meka-config-evaluator, meka-module-manifest-compiler
+# in mlua-module mode as such
+#
+# precludes need for launching meka-config-evaluator, meka-module-manifest-compiler
+# subprocesses and building meka-module-registry crate
+#
+# only relevant if building with mlua-module feature active
+preload = ["meka-config/preload", "meka-module-manifest/preload"]
 
 [dependencies]
 io-cat = { path = "../io-cat" }

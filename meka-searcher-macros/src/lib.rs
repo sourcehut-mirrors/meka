@@ -116,7 +116,10 @@ impl MekaSearcherInput {
     /// Returns `proc_macro2::TokenStream` for testability.
     fn expand(self, embed: bool) -> syn::Result<proc_macro2::TokenStream> {
         let tokens = match (self.key, self.map) {
-            #[cfg(all(not(feature = "mlua-module"), feature = "registry"))]
+            #[cfg(all(
+                any(not(feature = "mlua-module"), feature = "preload"),
+                feature = "registry"
+            ))]
             (Some(key), Some(map)) => {
                 // Both key and map present with registry feature
                 let config = config_new_with_map(map);
@@ -148,7 +151,10 @@ impl MekaSearcherInput {
                 };
                 quote! { #searcher }
             }
-            #[cfg(all(not(feature = "mlua-module"), not(feature = "registry")))]
+            #[cfg(all(
+                any(not(feature = "mlua-module"), feature = "preload"),
+                not(feature = "registry")
+            ))]
             (Some(key), Some(map)) => {
                 // Both key and map present
                 let tokens = config_new_with_map(map);
@@ -178,7 +184,7 @@ impl MekaSearcherInput {
                     }}
                 }
             }
-            #[cfg(feature = "mlua-module")]
+            #[cfg(all(feature = "mlua-module", not(feature = "preload")))]
             (Some(key), Some(map)) => {
                 // Both key and map present
                 let tokens = config_new_with_map(map);
@@ -239,7 +245,10 @@ impl MekaSearcherInput {
                 };
                 quote! { #searcher }
             }
-            #[cfg(all(not(feature = "mlua-module"), feature = "registry"))]
+            #[cfg(all(
+                any(not(feature = "mlua-module"), feature = "preload"),
+                feature = "registry"
+            ))]
             (None, Some(map)) => {
                 // Only map present with registry feature
                 let config = config_new_with_map(map);
@@ -263,7 +272,10 @@ impl MekaSearcherInput {
                 };
                 quote! { #searcher }
             }
-            #[cfg(all(not(feature = "mlua-module"), not(feature = "registry")))]
+            #[cfg(all(
+                any(not(feature = "mlua-module"), feature = "preload"),
+                not(feature = "registry")
+            ))]
             (None, Some(map)) => {
                 // Only map present
                 let tokens = config_new_with_map(map);
@@ -291,7 +303,7 @@ impl MekaSearcherInput {
                     }}
                 }
             }
-            #[cfg(feature = "mlua-module")]
+            #[cfg(all(feature = "mlua-module", not(feature = "preload")))]
             (None, Some(map)) => {
                 // Only map present
                 let tokens = config_new_with_map(map);
@@ -348,7 +360,7 @@ impl MekaSearcherInput {
     }
 }
 
-#[cfg(feature = "mlua-module")]
+#[cfg(all(feature = "mlua-module", not(feature = "preload")))]
 fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     let module = module_from_path();
 
@@ -365,7 +377,10 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     }
 }
 
-#[cfg(all(not(feature = "mlua-module"), feature = "registry"))]
+#[cfg(all(
+    any(not(feature = "mlua-module"), feature = "preload"),
+    feature = "registry"
+))]
 fn config_new_with_map(map: Vec<(LitStr, Path)>) -> HashMap<String, Manifest> {
     let module = module_from_path();
 
@@ -385,7 +400,10 @@ fn config_new_with_map(map: Vec<(LitStr, Path)>) -> HashMap<String, Manifest> {
         .0
 }
 
-#[cfg(all(not(feature = "mlua-module"), not(feature = "registry")))]
+#[cfg(all(
+    any(not(feature = "mlua-module"), feature = "preload"),
+    not(feature = "registry")
+))]
 fn config_new_with_map(map: Vec<(LitStr, Path)>) -> proc_macro2::TokenStream {
     let module = module_from_path();
     let map_entries_len = map.len();
