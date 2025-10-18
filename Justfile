@@ -71,7 +71,7 @@ check-meka-config-tests-module-mode:
 
 # Run cargo check on meka-core
 check-meka-core:
-  cargo check --package meka-core --features fennel153,mlua-lua54,mlua-vendored
+  cargo check --package meka-core --features fennel160,mlua-lua54,mlua-vendored
 
 # Run cargo check on meka-loader
 check-meka-loader:
@@ -99,7 +99,7 @@ check-meka-module-registry:
 
 # Run cargo check on meka-searcher
 check-meka-searcher:
-  cargo check --package meka-searcher --features fennel153,mlua-lua54,mlua-vendored
+  cargo check --package meka-searcher --features fennel160,mlua-lua54,mlua-vendored
 
 # Run cargo check on meka-searcher-macros
 check-meka-searcher-macros:
@@ -215,7 +215,7 @@ test-meka-config-tests-module-mode:
 
 # Run cargo test on meka-core
 test-meka-core:
-  cargo test --package meka-core --features fennel153,mlua-lua54,mlua-vendored
+  cargo test --package meka-core --features fennel160,mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-loader
 test-meka-loader:
@@ -243,7 +243,7 @@ test-meka-module-registry:
 
 # Run cargo test on meka-searcher
 test-meka-searcher:
-  cargo test --package meka-searcher --features fennel153,mlua-lua54,mlua-vendored
+  cargo test --package meka-searcher --features fennel160,mlua-lua54,mlua-vendored
 
 # Run cargo test on meka-searcher-macros
 test-meka-searcher-macros:

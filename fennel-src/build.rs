@@ -34,7 +34,9 @@ fn main() {
     let version = "1.0.0";
     #[cfg(feature = "fennel153")]
     let version = "1.5.3";
-    #[cfg(not(any(feature = "fennel100", feature = "fennel153")))]
+    #[cfg(feature = "fennel160")]
+    let version = "1.6.0";
+    #[cfg(not(any(feature = "fennel100", feature = "fennel153", feature = "fennel160")))]
     panic!("{}", MISSING_CARGO_MANIFEST_FEATURE_FENNEL);
 
     #[cfg(not(any(

@@ -28,7 +28,7 @@ fn mount_works() {
         .load(r#"return require("fennel").version"#)
         .eval()
         .unwrap();
-    assert_eq!(version, "1.5.3");
+    assert_eq!(version, "1.6.0");
 
     let searchers_len = globals
         .get::<Table>("package")
@@ -45,7 +45,7 @@ fn mount_works() {
         .load(r#"return require("fennel").version"#)
         .eval()
         .unwrap();
-    assert_eq!(version, "1.5.3");
+    assert_eq!(version, "1.6.0");
 
     let searchers_len = globals
         .get::<Table>("package")

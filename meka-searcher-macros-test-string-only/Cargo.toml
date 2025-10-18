@@ -5,14 +5,14 @@ edition = { workspace = true }
 publish = false
 
 [features]
-default = ["fennel153-lua54-vendored"]
-fennel153-lua54-vendored = ["fennel-src/fennel153",
+default = ["fennel160-lua54-vendored"]
+fennel160-lua54-vendored = ["fennel-src/fennel160",
                             "fennel-src/mlua-lua54",
                             "fennel-src/mlua-vendored",
-                            "meka/fennel153",
+                            "meka/fennel160",
                             "meka/mlua-lua54",
                             "meka/mlua-vendored",
-                            "meka-searcher-macros/fennel153",
+                            "meka-searcher-macros/fennel160",
                             "meka-searcher-macros/mlua-lua54",
                             "meka-searcher-macros/mlua-vendored",
                             "mlua/lua54",

@@ -84,10 +84,10 @@ fn fennel_works() {
     use std::fs::{File, remove_file};
     use std::io::Write;
 
-    const FENNEL: &str = fennel_src::FENNEL153;
-    const FENNEL_PATH: &str = fennel_src::FENNEL153_PATH;
-    const FENNEL_ASC_PATH: &str = fennel_src::FENNEL153_ASC_PATH;
-    const FENNEL_VERSION: &str = fennel_src::FENNEL153_VERSION;
+    const FENNEL: &str = fennel_src::FENNEL160;
+    const FENNEL_PATH: &str = fennel_src::FENNEL160_PATH;
+    const FENNEL_ASC_PATH: &str = fennel_src::FENNEL160_ASC_PATH;
+    const FENNEL_VERSION: &str = fennel_src::FENNEL160_VERSION;
 
     const FILE_CREATE_EXPECT: &str = "Unexpectedly failed to create file";
     const FILE_WRITE_EXPECT: &str = "Unexpectedly failed to write file";
@@ -96,11 +96,11 @@ fn fennel_works() {
     assert!(Path::new(FENNEL_PATH).is_absolute());
     assert!(Path::new(FENNEL_ASC_PATH).is_absolute());
 
-    let version = "1.5.3";
+    let version = "1.6.0";
     assert!(FENNEL_VERSION == version);
 
-    // `wc fennel-1.5.3.lua | awk '{print $3}'`
-    let wc = 288808;
+    // `wc fennel-1.6.0.lua | awk '{print $3}'`
+    let wc = 302186;
     assert!(FENNEL.len() == wc);
 
     let path = PathBuf::new()
@@ -173,7 +173,7 @@ fn lua_works() {
         .eval()
         .expect(LUA_REQUIRE_FENNEL_VERSION_EXPECT);
 
-    assert_eq!(version, "1.5.3");
+    assert_eq!(version, "1.6.0");
 
     // Repeat test now passing 'as' option to fennel-src loader function.
     let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
@@ -201,13 +201,13 @@ fn lua_works() {
         .eval()
         .expect(LUA_REQUIRE_FENNEL_VERSION_EXPECT);
 
-    assert_eq!(version, "1.5.3");
+    assert_eq!(version, "1.6.0");
 
     // Repeat test now passing 'version' and 'as' options to fennel-src loader function.
     let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
     lua.mount_fennel_src().expect(MOUNT_FENNEL_SRC_EXPECT);
     let manifest: Manifest = lua
-        .load(r#"require("fennel-src")({version = "1.5.3", as = "fffennnelll"})"#)
+        .load(r#"require("fennel-src")({version = "1.6.0", as = "fffennnelll"})"#)
         .eval()
         .expect(LUA_REQUIRE_FENNEL_SRC_EXPECT);
 
@@ -229,5 +229,5 @@ fn lua_works() {
         .eval()
         .expect(LUA_REQUIRE_FENNEL_VERSION_EXPECT);
 
-    assert_eq!(version, "1.5.3");
+    assert_eq!(version, "1.6.0");
 }

@@ -8,7 +8,7 @@ const MISSING_CARGO_MANIFEST_FEATURE_FENNEL: &str =
 const CONFLICTING_CARGO_MANIFEST_FEATURE_MLUA: &str = "One, and only one, of mlua-external or mlua-vendored must be specified as feature in Cargo manifest.";
 
 fn main() {
-    #[cfg(not(any(feature = "fennel100", feature = "fennel153")))]
+    #[cfg(not(any(feature = "fennel100", feature = "fennel153", feature = "fennel160")))]
     panic!("{}", MISSING_CARGO_MANIFEST_FEATURE_FENNEL);
 
     #[cfg(not(any(feature = "mlua-external", feature = "mlua-vendored")))]

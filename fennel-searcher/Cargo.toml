@@ -31,7 +31,7 @@ mlua-utils = { path = "../mlua-utils", default-features = false }
 
 [dev-dependencies]
 fennel-compile = { path = "../fennel-compile", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
-fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+fennel-mount = { path = "../fennel-mount", default-features = false, features = ["fennel160", "mlua-lua54", "mlua-vendored"] }
 fennel-searcher = { path = ".", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
 mlua = { workspace = true, features = ["lua54", "vendored"] }
 serial_test = { workspace = true }

@@ -9,7 +9,9 @@ use crate::types::Result;
 pub const FENNEL: &str = fennel_src::FENNEL100;
 #[cfg(feature = "fennel153")]
 pub const FENNEL: &str = fennel_src::FENNEL153;
-#[cfg(not(any(feature = "fennel100", feature = "fennel153")))]
+#[cfg(feature = "fennel160")]
+pub const FENNEL: &str = fennel_src::FENNEL160;
+#[cfg(not(any(feature = "fennel100", feature = "fennel153", feature = "fennel160")))]
 unreachable!("Enforced by Cargo build script");
 
 pub trait Mount {

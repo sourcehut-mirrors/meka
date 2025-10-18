@@ -7,9 +7,10 @@ readme = "README.md"
 description = "Make Fennel available in mlua::Lua instance"
 
 [features]
-default = ["fennel153"]
+default = ["fennel160"]
 fennel100 = ["fennel-src/fennel100"]
 fennel153 = ["fennel-src/fennel153"]
+fennel160 = ["fennel-src/fennel160"]
 mlua-external = ["fennel-src/mlua-external", "mlua-searcher/mlua-external", "mlua-utils/mlua-external"]
 mlua-lua54 = ["fennel-src/mlua-lua54", "mlua/lua54", "mlua-searcher/mlua-lua54", "mlua-utils/mlua-lua54"]
 mlua-lua53 = ["fennel-src/mlua-lua53", "mlua/lua53", "mlua-searcher/mlua-lua53", "mlua-utils/mlua-lua53"]
@@ -30,7 +31,7 @@ mlua-searcher = { path = "../mlua-searcher", default-features = false }
 mlua-utils = { path = "../mlua-utils", default-features = false }
 
 [dev-dependencies]
-fennel-mount = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+fennel-mount = { path = ".", default-features = false, features = ["fennel160", "mlua-lua54", "mlua-vendored"] }
+fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel160", "mlua-lua54", "mlua-vendored"] }
 mlua = { workspace = true, features = ["lua54", "vendored"] }
 mlua-searcher = { path = "../mlua-searcher", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

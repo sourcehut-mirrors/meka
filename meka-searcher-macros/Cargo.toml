@@ -10,9 +10,10 @@ description = "Proc macros for Meka searcher instantiation"
 proc-macro = true
 
 [features]
-default = ["fennel153", "registry"]
+default = ["fennel160", "registry"]
 fennel100 = ["meka-core/fennel100", "meka-module-registry/fennel100"]
 fennel153 = ["meka-core/fennel153", "meka-module-registry/fennel153"]
+fennel160 = ["meka-core/fennel160", "meka-module-registry/fennel160"]
 mlua-external = ["meka-core/mlua-external", "meka-module-registry/mlua-external"]
 mlua-lua54 = ["meka-core/mlua-lua54", "meka-module-registry/mlua-lua54"]
 mlua-lua53 = ["meka-core/mlua-lua53", "meka-module-registry/mlua-lua53"]

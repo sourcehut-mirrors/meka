@@ -7,9 +7,10 @@ readme = "README.md"
 description = "Read Lua module manifests from config file or string"
 
 [features]
-default = ["fennel153"]
+default = ["fennel160"]
 fennel100 = ["fennel-mount/fennel100", "fennel-src/fennel100"]
 fennel153 = ["fennel-mount/fennel153", "fennel-src/fennel153"]
+fennel160 = ["fennel-mount/fennel160", "fennel-src/fennel160"]
 # core implementation feature for use by meka-config-evaluator - not intended for direct use
 meka-config-evaluator = []
 mlua-external = ["dep:mlua", "fennel-compile/mlua-external", "fennel-mount/mlua-external", "fennel-searcher/mlua-external", "fennel-src/mlua-external", "fennel-utils/mlua-external", "meka-config-macros/mlua-external", "meka-loader/mlua-external", "mlua-module-manifest/mlua-external", "mlua-searcher/mlua-external", "mlua-utils/mlua-external"]
@@ -50,6 +51,6 @@ savefile = { workspace = true }
 savefile-derive = { workspace = true }
 
 [dev-dependencies]
-fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
-meka-config = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+fennel-src = { path = "../fennel-src", default-features = false, features = ["fennel160", "mlua-lua54", "mlua-vendored"] }
+meka-config = { path = ".", default-features = false, features = ["fennel160", "mlua-lua54", "mlua-vendored"] }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }

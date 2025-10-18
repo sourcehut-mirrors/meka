@@ -5,11 +5,11 @@ edition = { workspace = true }
 publish = false
 
 [features]
-default = ["fennel153-lua54-module"]
-fennel153-lua54-module = ["meka-module-manifest/fennel153",
+default = ["fennel160-lua54-module"]
+fennel160-lua54-module = ["meka-module-manifest/fennel160",
                           "meka-module-manifest/mlua-lua54",
                           "meka-module-manifest/mlua-module",
-                          "meka-searcher/fennel153",
+                          "meka-searcher/fennel160",
                           "meka-searcher/mlua-lua54",
                           "meka-searcher/mlua-module",
                           "mlua-module-manifest/mlua-lua54",

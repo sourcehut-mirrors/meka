@@ -8,8 +8,8 @@ publish = false
 fennel-src = "fennel_src::loader"
 
 [features]
-default = ["fennel153-lua54-vendored"]
-fennel153-lua54-vendored = ["fennel-src/fennel153",
+default = ["fennel160-lua54-vendored"]
+fennel160-lua54-vendored = ["fennel-src/fennel160",
                             "fennel-src/mlua-lua54",
                             "fennel-src/mlua-vendored",
                             "meka-config-macros/mlua-lua54",

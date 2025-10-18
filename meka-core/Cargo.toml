@@ -7,9 +7,10 @@ readme = "README.md"
 description = "Core implementation crate for use by Meka - not intended for direct use"
 
 [features]
-default = ["fennel153"]
+default = ["fennel160"]
 fennel100 = ["meka-config/fennel100", "meka-module-manifest/fennel100", "meka-searcher/fennel100"]
 fennel153 = ["meka-config/fennel153", "meka-module-manifest/fennel153", "meka-searcher/fennel153"]
+fennel160 = ["meka-config/fennel160", "meka-module-manifest/fennel160", "meka-searcher/fennel160"]
 mlua-external = ["meka-config/mlua-external", "meka-loader/mlua-external", "meka-module-manifest/mlua-external", "meka-searcher/mlua-external", "mlua-module-manifest/mlua-external"]
 mlua-lua54 = ["meka-config/mlua-lua54", "meka-loader/mlua-lua54", "meka-module-manifest/mlua-lua54", "meka-searcher/mlua-lua54", "mlua-module-manifest/mlua-lua54"]
 mlua-lua53 = ["meka-config/mlua-lua53", "meka-loader/mlua-lua53", "meka-module-manifest/mlua-lua53", "meka-searcher/mlua-lua53", "mlua-module-manifest/mlua-lua53"]

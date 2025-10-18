@@ -18,14 +18,14 @@ If you wish to specify a Fennel release version:
 ```toml
 # basic
 [dependencies]
-fennel-src = { version = "*", default-features = false, features = ["fennel153"] }
+fennel-src = { version = "*", default-features = false, features = ["fennel160"] }
 ```
 
 ```toml
 # advanced
 [features]
-default = ["fennel153"]
-fennel153 = ["fennel-src/fennel153"]
+default = ["fennel160"]
+fennel160 = ["fennel-src/fennel160"]
 
 [dependencies]
 fennel-src = { version = "*", default-features = false }
@@ -34,20 +34,20 @@ fennel-src = { version = "*", default-features = false }
 ### Code
 
 ```rust
-/// Contents of `fennel-1.5.3`.
-const FENNEL: &str = fennel_src::FENNEL153;
+/// Contents of `fennel-1.6.0`.
+const FENNEL: &str = fennel_src::FENNEL160;
 
-/// Path to `fennel-1.5.3`.
-const FENNEL_PATH: &str = fennel_src::FENNEL153_PATH;
+/// Path to `fennel-1.6.0`.
+const FENNEL_PATH: &str = fennel_src::FENNEL160_PATH;
 assert!(Path::new(FENNEL_PATH).is_absolute());
 
-/// Path to `fennel-1.5.3.asc`.
-const FENNEL_ASC_PATH: &str = fennel_src::FENNEL153_ASC_PATH;
+/// Path to `fennel-1.6.0.asc`.
+const FENNEL_ASC_PATH: &str = fennel_src::FENNEL160_ASC_PATH;
 assert!(Path::new(FENNEL_ASC_PATH).is_absolute());
 
 /// Fennel version.
-const FENNEL_VERSION: &str = fennel_src::FENNEL153_VERSION;
-assert!(FENNEL_VERSION == "1.5.3");
+const FENNEL_VERSION: &str = fennel_src::FENNEL160_VERSION;
+assert!(FENNEL_VERSION == "1.6.0");
 ```
 
 ## License

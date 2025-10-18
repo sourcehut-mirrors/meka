@@ -10,8 +10,8 @@ lua-src = "test_loaders::lua_loader"
 n64 = "test_loaders::cartridge_loader"
 
 [features]
-default = ["fennel153-lua54-vendored"]
-fennel153-lua54-vendored = ["fennel-src/fennel153",
+default = ["fennel160-lua54-vendored"]
+fennel160-lua54-vendored = ["fennel-src/fennel160",
                             "fennel-src/mlua-lua54",
                             "fennel-src/mlua-vendored",
                             "meka-config-macros/mlua-lua54",

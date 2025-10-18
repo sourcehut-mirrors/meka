@@ -5,8 +5,8 @@ edition = { workspace = true }
 publish = false
 
 [features]
-default = ["fennel153-lua54-vendored"]
-fennel153-lua54-vendored = ["meka-module-manifest/fennel153",
+default = ["fennel160-lua54-vendored"]
+fennel160-lua54-vendored = ["meka-module-manifest/fennel160",
                             "meka-module-manifest/mlua-lua54",
                             "meka-module-manifest/mlua-vendored",
                             "mlua-module-manifest/mlua-lua54",

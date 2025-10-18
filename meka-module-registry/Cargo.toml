@@ -7,9 +7,10 @@ readme = "README.md"
 description = "Registry mapping string paths to mlua loader function pointers for Meka"
 
 [features]
-default = ["fennel153"]
+default = ["fennel160"]
 fennel100 = ["fennel-src/fennel100"]
 fennel153 = ["fennel-src/fennel153"]
+fennel160 = ["fennel-src/fennel160"]
 mlua-external = ["fennel-src/mlua-external", "meka-loader/mlua-external", "mlua-module-manifest/mlua-external"]
 mlua-lua54 = ["fennel-src/mlua-lua54", "meka-loader/mlua-lua54", "mlua-module-manifest/mlua-lua54"]
 mlua-lua53 = ["fennel-src/mlua-lua53", "meka-loader/mlua-lua53", "mlua-module-manifest/mlua-lua53"]

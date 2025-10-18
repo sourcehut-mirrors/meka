@@ -20,14 +20,14 @@ If you wish to specify a Fennel release version:
 ```toml
 # basic
 [dependencies]
-fennel-mount = { version = "*", default-features = false, features = ["fennel153"] }
+fennel-mount = { version = "*", default-features = false, features = ["fennel160"] }
 ```
 
 ```toml
 # advanced
 [features]
-default = ["fennel153"]
-fennel153 = ["fennel-mount/fennel153"]
+default = ["fennel160"]
+fennel160 = ["fennel-mount/fennel160"]
 
 [dependencies]
 fennel-mount = { version = "*", default-features = false }

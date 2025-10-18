@@ -7,9 +7,10 @@ readme = "README.md"
 description = "Compiled Lua-only text version of ~ioiojo/mlua-module-manifest"
 
 [features]
-default = ["fennel153"]
+default = ["fennel160"]
 fennel100 = ["fennel-mount/fennel100"]
 fennel153 = ["fennel-mount/fennel153"]
+fennel160 = ["fennel-mount/fennel160"]
 # core implementation feature for use by meka-module-manifest-compiler - not intended for direct use
 meka-module-manifest-compiler = []
 mlua-external = ["dep:mlua", "fennel-compile/mlua-external", "fennel-mount/mlua-external", "fennel-searcher/mlua-external", "mlua-module-manifest/mlua-external"]
@@ -44,5 +45,5 @@ savefile = { workspace = true }
 savefile-derive = { workspace = true }
 
 [dev-dependencies]
-meka-module-manifest = { path = ".", default-features = false, features = ["fennel153", "mlua-lua54", "mlua-vendored"] }
+meka-module-manifest = { path = ".", default-features = false, features = ["fennel160", "mlua-lua54", "mlua-vendored"] }
 mlua-module-manifest = { path = "../mlua-module-manifest", default-features = false, features = ["mlua-lua54", "mlua-vendored"] }
