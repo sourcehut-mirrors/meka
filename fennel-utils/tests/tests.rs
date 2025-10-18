@@ -1,11 +1,11 @@
-use mlua::{Lua, LuaOptions, StdLib, Value};
+use mlua::{Lua, Value};
 
 #[test]
 fn fennel_view_works() {
     use fennel_mount::Mount;
     use fennel_utils::FennelView;
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().unwrap();
 
@@ -25,7 +25,7 @@ fn insert_fennel_searcher_works() {
     use fennel_mount::Mount;
     use fennel_utils::InsertFennelSearcher;
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().unwrap();
 

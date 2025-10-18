@@ -117,7 +117,7 @@ fn fennel_works() {
 
 #[test]
 fn lua_works() {
-    use mlua::{Function, Lua, LuaOptions, StdLib, Table};
+    use mlua::{Function, Lua, Table};
     use mlua_module_manifest::{Manifest, Module, ModuleNamedText};
     use mlua_searcher::AddSearcher;
     use std::borrow::Cow;
@@ -148,7 +148,7 @@ fn lua_works() {
         }
     }
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.mount_fennel_src().expect(MOUNT_FENNEL_SRC_EXPECT);
     let manifest: Manifest = lua
         .load(r#"require("fennel-src")()"#)
@@ -165,7 +165,7 @@ fn lua_works() {
     let mut modules: HashMap<Cow<'static, str>, Cow<'static, str>> = HashMap::new();
     modules.insert(named_text.name, named_text.text);
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.add_searcher(modules)
         .expect(LUA_REQUIRE_FENNEL_SRC_EXPECT);
     let version: String = lua
@@ -176,7 +176,7 @@ fn lua_works() {
     assert_eq!(version, "1.6.0");
 
     // Repeat test now passing 'as' option to fennel-src loader function.
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.mount_fennel_src().expect(MOUNT_FENNEL_SRC_EXPECT);
     let manifest: Manifest = lua
         .load(r#"require("fennel-src")({as = "fffennnelll"})"#)
@@ -193,7 +193,7 @@ fn lua_works() {
     let mut modules: HashMap<Cow<'static, str>, Cow<'static, str>> = HashMap::new();
     modules.insert(named_text.name, named_text.text);
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.add_searcher(modules)
         .expect(LUA_REQUIRE_FENNEL_SRC_EXPECT);
     let version: String = lua
@@ -204,7 +204,7 @@ fn lua_works() {
     assert_eq!(version, "1.6.0");
 
     // Repeat test now passing 'version' and 'as' options to fennel-src loader function.
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.mount_fennel_src().expect(MOUNT_FENNEL_SRC_EXPECT);
     let manifest: Manifest = lua
         .load(r#"require("fennel-src")({version = "1.6.0", as = "fffennnelll"})"#)
@@ -221,7 +221,7 @@ fn lua_works() {
     let mut modules: HashMap<Cow<'static, str>, Cow<'static, str>> = HashMap::new();
     modules.insert(named_text.name, named_text.text);
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.add_searcher(modules)
         .expect(LUA_REQUIRE_FENNEL_SRC_EXPECT);
     let version: String = lua

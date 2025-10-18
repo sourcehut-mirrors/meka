@@ -58,13 +58,13 @@ fn test_available_loaders() {
 #[test]
 fn test_fennel_src_loader() {
     use meka_module_registry::build_loader_registry;
-    use mlua::{Function, Lua, LuaOptions, ObjectLike, StdLib, Table};
+    use mlua::{Function, Lua, ObjectLike, Table};
     use mlua_module_manifest::{Manifest, Module, ModuleNamedText};
 
     const MANIFEST_MODULES_MODULE_NAMED_TEXT_EXPECT: &str =
         "fennel-src should return exactly one NamedText module";
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     let paths = vec![("fennel-src".to_string(), "fennel_src::loader".to_string())];
     let loader_registry = build_loader_registry(paths).unwrap();
     let loader: &fn(&Lua, Table, &str) -> mlua::Result<Function> = loader_registry

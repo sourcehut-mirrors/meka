@@ -3,7 +3,7 @@ use fennel_mount::Mount;
 use fennel_searcher::AddSearcher;
 use io_cat::CatKind;
 use meka_types::{CatCow, CatCowMap};
-use mlua::{Lua, LuaOptions, StdLib, Table, Value};
+use mlua::{Lua, Table, Value};
 use serial_test::serial;
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -29,7 +29,7 @@ fn add_path_searcher_fnl_works() {
             .join("color.fnl"),
     );
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().unwrap();
     lua.add_path_searcher_fnl(lime).unwrap();
@@ -51,7 +51,7 @@ fn module_reloading_works() {
     let mut lime = HashMap::new();
     lime.insert(name.clone(), path.clone());
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().unwrap();
 
@@ -115,7 +115,7 @@ fn module_reloading_works() {
 
 #[test]
 fn add_searcher_fnl_macros_works() {
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     // Mock macros.
     let mut macro_searcher = HashMap::new();
@@ -185,7 +185,7 @@ fn add_path_searcher_fnl_macros_works() {
             .join("orchard.fnl"),
     );
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().expect("mount_fennel");
     lua.add_path_searcher_fnl_macros(hat)
@@ -233,7 +233,7 @@ fn macro_module_reloading_works() {
 
     {: pear}"#;
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     // Make Fennel available for evaluating macros.
     lua.mount_fennel().expect("mount_fennel");
@@ -414,7 +414,7 @@ fn add_cat_searcher_fnl_works() {
     );
     let lime = CatCow(lime);
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().unwrap();
     lua.add_cat_searcher_fnl(lime).unwrap();
@@ -458,7 +458,7 @@ fn add_cat_searcher_fnl_macros_works() {
     );
     let stand = CatCow(stand);
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().expect("mount_fennel");
 

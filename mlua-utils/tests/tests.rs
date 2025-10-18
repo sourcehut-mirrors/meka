@@ -1,4 +1,4 @@
-use mlua::{Function, Lua, LuaOptions, StdLib, Table, Value};
+use mlua::{Function, Lua, Table, Value};
 use std::path::MAIN_SEPARATOR;
 
 #[test]
@@ -148,7 +148,7 @@ fn unrestrict_getmetatable_works() {
     use fennel_utils::FennelView;
     use test_loaders::Cartridge;
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.mount_fennel().unwrap();
 
     let cartridge: Function = test_loaders::cartridge_loader(&lua, lua.globals(), "cartridge")

@@ -2,7 +2,7 @@
 fn compile_works() {
     use fennel_compile::Compile;
     use fennel_mount::Mount;
-    use mlua::{Lua, LuaOptions, StdLib, Table};
+    use mlua::{Lua, Table};
     use std::env;
     use std::path::PathBuf;
 
@@ -11,7 +11,7 @@ fn compile_works() {
     const MOUNT_FENNEL_EXPECT: &str = "mount_fennel";
     const COMPILE_FENNEL_STRING_EXPECT: &str = "compile_fennel_string";
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     let fnl_str = "(print (+ 1 1))";
     let fnl_bytes = fnl_str.as_bytes();

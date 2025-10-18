@@ -1,11 +1,11 @@
 #[test]
 fn mount_works() {
     use fennel_mount::Mount;
-    use mlua::{Lua, LuaOptions, StdLib, Table};
+    use mlua::{Lua, Table};
 
     const MOUNT_FENNEL_EXPECT: &str = "mount_fennel";
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     #[allow(unused_assignments)]
     let mut expected_searchers_len = 0;

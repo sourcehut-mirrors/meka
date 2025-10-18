@@ -11,10 +11,10 @@ Adds Fennel-to-Lua compilation functions to `mlua::Lua` instance.
 ```rust
 use fennel_compile::Compile;
 use fennel_mount::Mount;
-use mlua::{Lua, LuaOptions, StdLib};
+use mlua::Lua;
 
 fn main() {
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     // Add Fennel to Lua's `package.searchers`. Required before running `compile_fennel_string`.
     lua.mount_fennel().unwrap();
     let got = lua.compile_fennel_string("(print (+ 1 1))");

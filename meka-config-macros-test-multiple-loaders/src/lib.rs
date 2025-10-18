@@ -51,7 +51,7 @@ pub mod test_loaders {
 #[test]
 fn test_multiple_loaders() {
     use meka_config_macros::loader_registry_from_cargo_manifest;
-    use mlua::{Function, Lua, LuaOptions, ObjectLike, StdLib, Table};
+    use mlua::{Function, Lua, ObjectLike, Table};
     use mlua_module_manifest::{Manifest, Module, ModuleNamedText};
     use std::borrow::Cow;
     use std::collections::HashMap;
@@ -70,7 +70,7 @@ fn test_multiple_loaders() {
     assert!(loader_registry.contains_key("lua-src"));
     assert!(loader_registry.contains_key("n64"));
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     // Test fennel-src loader
     let loader: &fn(&Lua, Table, &str) -> mlua::Result<Function> = loader_registry

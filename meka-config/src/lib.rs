@@ -19,7 +19,7 @@ use fennel_utils::InsertFennelSearcher;
 #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use meka_loader::LoaderRegistry;
 #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
-use mlua::{Lua, LuaOptions, StdLib, Table, Value};
+use mlua::{Lua, Table, Value};
 #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
 use mlua_searcher::AddSearcher as _;
 #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
@@ -353,7 +353,7 @@ impl Config {
 
     #[cfg(any(not(feature = "mlua-module"), feature = "preload"))]
     pub fn new(module: Module, lreg: Option<LoaderRegistry>) -> ConfigInitResult<Self> {
-        let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+        let lua = Lua::new();
 
         // Set up Lua environment: modify `package.path` and `package.cpath` to prevent loading
         // Lua and C modules from system paths.

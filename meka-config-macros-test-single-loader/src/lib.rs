@@ -1,7 +1,7 @@
 #[test]
 fn test_single_loader() {
     use meka_config_macros::loader_registry_from_cargo_manifest;
-    use mlua::{Function, Lua, LuaOptions, ObjectLike, StdLib, Table};
+    use mlua::{Function, Lua, ObjectLike, Table};
     use mlua_module_manifest::{Manifest, Module, ModuleNamedText};
     use std::borrow::Cow;
     use std::collections::HashMap;
@@ -19,7 +19,7 @@ fn test_single_loader() {
     assert!(loader_registry.contains_key("fennel-src"));
 
     // Test that the loader actually works
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     let loader: &fn(&Lua, Table, &str) -> mlua::Result<Function> = loader_registry
         .get("fennel-src")
         .expect("Unexpectedly couldn't find fennel-src loader in loader registry");

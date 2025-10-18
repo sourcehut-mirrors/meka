@@ -216,7 +216,7 @@ fn fennelc(
     use fennel_compile::Compile;
     use fennel_mount::Mount;
     use fennel_searcher::AddSearcher;
-    use mlua::{Lua, LuaOptions, StdLib};
+    use mlua::Lua;
     use std::collections::HashMap;
     let modules_fnl_macros = if let Some(modules_fnl_macros) = modules_fnl_macros {
         let modules_fnl_macros = modules_fnl_macros
@@ -227,7 +227,7 @@ fn fennelc(
     } else {
         None
     };
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     lua.mount_fennel()?;
     // Mount all modules containing Fennel macros prior to compilation.
     if let Some(modules_fnl_macros) = modules_fnl_macros {

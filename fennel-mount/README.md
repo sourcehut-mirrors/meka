@@ -37,14 +37,14 @@ fennel-mount = { version = "*", default-features = false }
 
 ```rust
 use fennel_mount::Mount;
-use mlua::{Lua, LuaOptions, StdLib};
+use mlua::Lua;
 
 fn main() {
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
     // Add Fennel to Lua's `package.searchers`.
     lua.mount_fennel().unwrap();
     let version = lua.load(r#"return require("fennel").version"#).eval().unwrap();
-    // Prints "1.5.3"
+    // Prints "1.6.0"
     println!("{}", version);
 }
 ```

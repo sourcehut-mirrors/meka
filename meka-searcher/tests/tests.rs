@@ -2,7 +2,7 @@ use fennel_mount::Mount;
 use io_cat::CatKind;
 use meka_searcher::{AddMekaSearcher, MekaSearcher, RuntimeRead};
 use meka_types::{CatCow, CatCowMap};
-use mlua::{Lua, LuaOptions, StdLib};
+use mlua::Lua;
 use std::borrow::Cow;
 use std::convert::From;
 use std::env;
@@ -82,7 +82,7 @@ fn add_meka_searcher_runtime_works() {
 
     let meka_searcher = MekaSearcher::RuntimeRead(runtime_read);
 
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
+    let lua = Lua::new();
 
     lua.mount_fennel().unwrap();
     lua.add_meka_searcher(meka_searcher)

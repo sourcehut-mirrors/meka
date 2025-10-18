@@ -105,13 +105,9 @@ Or, simply:
 ```rust
 // Add `add_meka_searcher` method to `mlua::Lua`, import macros.
 use meka::{AddMekaSearcher, meka_searcher, meka_searcher_hot};
-use mlua::{Lua, LuaOptions, StdLib};
+use mlua::Lua;
 
 fn main() {
-    // Fennel requires instantiating `mlua::Lua` like this.
-    let lua = unsafe { Lua::unsafe_new_with(StdLib::ALL, LuaOptions::default()) };
-
-    // If you won't be needing Fennel, `mlua::Lua` can be instantiated more safely.
     let lua = Lua::new();
 
     // In release builds:
