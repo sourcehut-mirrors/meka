@@ -166,12 +166,12 @@ fn main() {
     // Enable Lua's `require` to find Fennel/Lua modules declared in the `taon` manifest.
     lua.add_meka_searcher(taon).unwrap();
 
-    let uuid = lua.load(r#"require("taon.utils").uuid()"#).eval().unwrap();
+    let uuid: String = lua.load(r#"require("taon.utils").uuid()"#).eval().unwrap();
     // e.g. "d717c6d8-ebed-47ca-8c21-2b6624846ddc"
     eprintln!("{}", uuid);
 
-    let version = lua.load(r#"require("fennel").version"#).eval().unwrap();
-    assert_eq!(&version, "1.0.0");
+    let version: String = lua.load(r#"require("fennel").version"#).eval().unwrap();
+    assert_eq!(&version, "1.6.0");
 }
 ```
 
