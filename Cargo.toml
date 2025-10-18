@@ -12,7 +12,6 @@ description = "Embed Lua and compile-to-Lua language modules in Rust"
 [features]
 default = ["fennel160", "registry"]
 fennel100 = ["meka-core/fennel100", "meka-searcher-macros/fennel100"]
-fennel153 = ["meka-core/fennel153", "meka-searcher-macros/fennel153"]
 fennel160 = ["meka-core/fennel160", "meka-searcher-macros/fennel160"]
 mlua-external = ["meka-core/mlua-external", "meka-searcher-macros/mlua-external"]
 mlua-lua54 = ["meka-core/mlua-lua54", "meka-searcher-macros/mlua-lua54"]

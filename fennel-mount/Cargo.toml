@@ -9,7 +9,6 @@ description = "Make Fennel available in mlua::Lua instance"
 [features]
 default = ["fennel160"]
 fennel100 = ["fennel-src/fennel100"]
-fennel153 = ["fennel-src/fennel153"]
 fennel160 = ["fennel-src/fennel160"]
 mlua-external = ["fennel-src/mlua-external", "mlua-searcher/mlua-external", "mlua-utils/mlua-external"]
 mlua-lua54 = ["fennel-src/mlua-lua54", "mlua/lua54", "mlua-searcher/mlua-lua54", "mlua-utils/mlua-lua54"]

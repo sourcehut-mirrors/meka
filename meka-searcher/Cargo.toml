@@ -9,7 +9,6 @@ description = "Require Meka manifest by name"
 [features]
 default = ["fennel160"]
 fennel100 = ["meka-module-manifest/fennel100"]
-fennel153 = ["meka-module-manifest/fennel153"]
 fennel160 = ["meka-module-manifest/fennel160"]
 mlua-external = ["fennel-searcher/mlua-external", "meka-module-manifest/mlua-external", "mlua-module-manifest/mlua-external", "mlua-searcher/mlua-external"]
 mlua-lua54 = ["fennel-searcher/mlua-lua54", "meka-module-manifest/mlua-lua54", "mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-searcher/mlua-lua54"]

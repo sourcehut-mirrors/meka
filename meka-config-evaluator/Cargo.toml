@@ -10,7 +10,6 @@ publish = false
 [features]
 default = ["fennel160"]
 fennel100 = ["meka-config/fennel100", "meka-module-registry/fennel100"]
-fennel153 = ["meka-config/fennel153", "meka-module-registry/fennel153"]
 fennel160 = ["meka-config/fennel160", "meka-module-registry/fennel160"]
 mlua-external = ["meka-config/mlua-external", "meka-loader/mlua-external", "meka-module-registry/mlua-external", "mlua-module-manifest/mlua-external"]
 mlua-lua54 = ["meka-config/mlua-lua54", "meka-loader/mlua-lua54", "meka-module-registry/mlua-lua54", "mlua-module-manifest/mlua-lua54"]

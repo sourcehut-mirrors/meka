@@ -10,7 +10,7 @@ const CONFLICTING_CARGO_MANIFEST_FEATURE_MLUA: &str = "One, and only one, of mlu
 const LUAU_MODULE_MODE_REQUESTED: &str = "Luau doesn't support loading Lua C modules.";
 
 fn main() {
-    #[cfg(not(any(feature = "fennel100", feature = "fennel153", feature = "fennel160")))]
+    #[cfg(not(any(feature = "fennel100", feature = "fennel160")))]
     panic!("{}", MISSING_CARGO_MANIFEST_FEATURE_FENNEL);
 
     #[cfg(not(any(

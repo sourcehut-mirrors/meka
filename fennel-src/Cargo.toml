@@ -9,7 +9,6 @@ description = "Vendored version of Fennel"
 [features]
 default = ["fennel160"]
 fennel100 = []
-fennel153 = []
 fennel160 = []
 mlua-external = ["mlua-module-manifest/mlua-external", "mlua-utils/mlua-external"]
 mlua-lua54 = ["mlua/lua54", "mlua-module-manifest/mlua-lua54", "mlua-utils/mlua-lua54"]

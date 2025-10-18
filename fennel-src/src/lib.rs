@@ -57,8 +57,6 @@ macro_rules! setup {
 
 #[cfg(feature = "fennel100")]
 setup!("1.0.0", 100);
-#[cfg(feature = "fennel153")]
-setup!("1.5.3", 153);
 #[cfg(feature = "fennel160")]
 setup!("1.6.0", 160);
 
@@ -151,11 +149,6 @@ pub fn manifest(version: Option<String>, name: Option<String>) -> Result<Manifes
     let text = if let Some(version) = version {
         match version.as_ref() {
             "1.6.0" => text160,
-            "1.5.3" => {
-                return Err(
-                    "fennel-1.5.3 requested but fennel160 feature flag inactive".to_string()
-                );
-            }
             "1.0.0" => {
                 return Err(
                     "fennel-1.0.0 requested but fennel100 feature flag inactive".to_string()
@@ -173,33 +166,6 @@ pub fn manifest(version: Option<String>, name: Option<String>) -> Result<Manifes
     };
 
     // Repeated `text` r-value is workaround for limitations of Rust's `#[cfg]` macro.
-    #[cfg(feature = "fennel153")]
-    let text153 = Cow::from(FENNEL153);
-    #[cfg(feature = "fennel153")]
-    let text = if let Some(version) = version {
-        match version.as_ref() {
-            "1.6.0" => {
-                return Err(
-                    "fennel-1.6.0 requested but fennel160 feature flag inactive".to_string()
-                );
-            }
-            "1.5.3" => text153,
-            "1.0.0" => {
-                return Err(
-                    "fennel-1.0.0 requested but fennel100 feature flag inactive".to_string()
-                );
-            }
-            version => {
-                return Err(format!(
-                    "Unsupported Fennel version requested ({})",
-                    version
-                ));
-            }
-        }
-    } else {
-        text153
-    };
-
     #[cfg(feature = "fennel100")]
     let text100 = Cow::from(FENNEL100);
     #[cfg(feature = "fennel100")]
@@ -210,11 +176,6 @@ pub fn manifest(version: Option<String>, name: Option<String>) -> Result<Manifes
             "1.6.0" => {
                 return Err(
                     "fennel-1.6.0 requested but fennel160 feature flag inactive".to_string()
-                );
-            }
-            "1.5.3" => {
-                return Err(
-                    "fennel-1.5.3 requested but fennel153 feature flag inactive".to_string()
                 );
             }
             "1.0.0" => text100,

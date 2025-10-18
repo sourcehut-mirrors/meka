@@ -178,7 +178,6 @@ fn main() {
 ## Cargo features
 
 - fennel100 - Embed v1.0.0 release of Fennel where appropriate.
-- fennel153 - Embed v1.5.3 release of Fennel where appropriate.
 - fennel160 - **Enabled** by default. Embed v1.6.0 release of Fennel where appropriate.
 - mlua-external - Indicate Lua includes and libraries are to be found externally via `pkg-config` rather than vendoring them.
 - mlua-lua54 - Enable Lua [5.4] support.
